@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TeamInSync</string>
+    <string name="welcome_default">Welcome User!</string>
+    <string name="my_team_label">My team:</string>
+    <string name="trainings_label">Training Sessions</string>
+    <string name="team_name_default">TEAM NAME</string>
+    <string name="league_name_default">League Name</string>
+    <string name="city_stadium_default">Stadium Name - City</string>
+    <string name="squad_list_btn_label">Players</string>
+    <string name="login_welcome_text">Welcome on TeamInSync, sign in to continue</string>
+    <string name="sign_in_button">Sign In</string>
+    <string name="register_button">Register</string>
+    <string name="auth_ok">Sign in successful!</string>
+    <string name="auth_session_creation_err">WARNING: An error occurred during session creation!</string>
+    <string name="auth_generic_err">WARNING: unable to authenticate!</string>
+    <string name="register_ok">Registration successful!</string>
+    <string name="register_err">WARNING: unable to register user!</string>
+    <string name="connection_err">WARNING: a connection error occurred during authentication!</string>
+</resources>

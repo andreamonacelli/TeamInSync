@@ -1,3 +1,19 @@
 <resources>
-    <string name="app_name">TeamInSync</string>
+    <string name="app_name" translatable="false">TeamInSync</string>
+    <string name="welcome_default">Benvenuto Utente!</string>
+    <string name="my_team_label">La mia squadra:</string>
+    <string name="trainings_label">Allenamenti</string>
+    <string name="team_name_default">NOME SQUADRA</string>
+    <string name="league_name_default">Nome Campionato</string>
+    <string name="city_stadium_default">Nome dello Stadio - Città</string>
+    <string name="squad_list_btn_label">Squadra</string>
+    <string name="login_welcome_text">Benvenuto su TeamInSync, accedi per continuare</string>
+    <string name="sign_in_button">Accedi</string>
+    <string name="register_button">Registrati</string>
+    <string name="auth_ok">Accesso avvenuto correttamente!</string>
+    <string name="auth_session_creation_err">ATTENZIONE: Errore nella creazione della sessione!</string>
+    <string name="auth_generic_err">ATTENZIONE: Impossibile effettuare l'accesso!</string>
+    <string name="register_ok">Registrazione avvenuta con successo!</string>
+    <string name="register_err">ATTENZIONE: Registrazione non riuscita!</string>
+    <string name="connection_err">ATTENZIONE: Si è verificato un errore di connessione durante l'autenticazione!</string>
 </resources>

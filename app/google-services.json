@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "288846049128",
+    "firebase_url": "https://team-insync-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "team-insync",
+    "storage_bucket": "team-insync.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288846049128:android:359d9464e0029c4ef970dd",
+        "android_client_info": {
+          "package_name": "com.monacdev.teaminsync"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288846049128-rv93cm1o0h23u7lklc462s48s436tlji.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkSGyQ6_YKF0p_TYKrwN99NrOWUG4c1LQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "288846049128-rv93cm1o0h23u7lklc462s48s436tlji.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
