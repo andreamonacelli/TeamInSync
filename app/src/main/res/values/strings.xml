@@ -15,7 +15,7 @@
     <string name="auth_generic_err">ATTENZIONE: Impossibile effettuare l\'accesso!</string>
     <string name="register_ok">Registrazione avvenuta con successo! Completa i tuoi dati.</string>
     <string name="register_err">ATTENZIONE: Registrazione non riuscita!</string>
-    <string name="connection_err">ATTENZIONE: Si è verificato un errore di connessione durante l\'autenticazione!</string>
+    <string name="connection_err">ATTENZIONE: Si è verificato un errore di connessione!</string>
     <string name="form_not_compiled">ATTENZIONE: Compilare tutti i campi!</string>
     <string name="registration_wizard_title">Completa il tuo profilo</string>
     <string name="reg_wizard_username_hint" translatable="false">Username</string>
@@ -32,4 +32,5 @@
     <string name="no_team_selected">ATTENZIONE: Per favore selezionare una squadra!</string>
     <string name="invalid_date">ATTENZIONE: Data di nascita inserita non valida o in formato sbagliato!</string>
     <string name="empty_form_fields">ATTENZIONE: Compilare tutti i campi!</string>
+    <string name="homepage_welcome">Benvenuto, </string>
 </resources>

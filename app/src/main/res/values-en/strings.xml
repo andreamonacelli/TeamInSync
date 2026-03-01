@@ -16,7 +16,7 @@
     <string name="auth_generic_err">WARNING: unable to authenticate!</string>
     <string name="register_ok">Registration successful! Complete your data.</string>
     <string name="register_err">WARNING: unable to register user!</string>
-    <string name="connection_err">WARNING: a connection error occurred during authentication!</string>
+    <string name="connection_err">WARNING: a connection error occurred!</string>
     <string name="form_not_compiled">WARNING: Compile all fields!</string>
     <string name="registration_wizard_title">Complete your profile</string>
     <string name="reg_wizard_name_label">Name</string>
@@ -32,4 +32,5 @@
     <string name="no_team_selected">WARNING: Please select a team!</string>
     <string name="invalid_date">WARNING: Birthdate invalid or in wrong format!</string>
     <string name="empty_form_fields">WARNING: fill all fields!</string>
+    <string name="homepage_welcome">"Welcome, "</string>
 </resources>

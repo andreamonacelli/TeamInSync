@@ -10,13 +10,13 @@
 
     <ImageView
         android:id="@+id/teamLogoIV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
+        android:layout_width="175dp"
+        android:layout_height="175dp"
+        android:layout_marginTop="20dp"
         android:contentDescription="Team Logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/homepageHeaderTV"
+        app:layout_constraintTop_toBottomOf="@+id/teamNameTV"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
@@ -37,25 +37,26 @@
         android:id="@+id/toTrainingPageBtn"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="72dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginStart="8dp"
         android:layout_marginEnd="32dp"
+        android:layout_marginBottom="24dp"
         android:text="@string/trainings_label"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/squadListBtn"
-        app:layout_constraintTop_toBottomOf="@+id/cityStadiumTV" />
+        app:layout_constraintStart_toEndOf="@+id/squadListBtn" />
 
     <Button
         android:id="@+id/squadListBtn"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="24dp"
         android:text="@string/squad_list_btn_label"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/toTrainingPageBtn"
         app:layout_constraintHorizontal_bias="0.285"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cityStadiumTV" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/myTeamLabel"
@@ -111,7 +112,6 @@
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/ic_launcher_foreground"
         android:contentDescription="Notifications Button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"

@@ -15,6 +15,10 @@ public final class Constants {
     public static final String USERS_REFERENCE_STRING = "users";
     public static final String TEAMS_REFERENCE_STRING = "teams";
     public static final String PENDING_REFERENCE_STRING = "pending_requests";
+    public static final String LEAGUE_KEY_STRING = "league_name";
+    public static final String ADDRESS_KEY_STRING = "address";
+    public static final String STADIUM_KEY_STRING = "stadium";
+    public static final String LOGO_KEY_STRING = "logo";
 
     /* Navigation related constants */
     public static final String LOGGED_USER_EXTRA_STRING = "logged_user_id";
