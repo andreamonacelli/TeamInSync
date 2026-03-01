@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.monacdev.teaminsync.utils.Constants;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText emailInputET;
@@ -50,13 +51,21 @@ public class LoginActivity extends AppCompatActivity {
         this.signInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                userSignIn();
+                if(emailInputET.getText().toString().isEmpty() || passwordET.getText().toString().isEmpty()){
+                    Toast.makeText(LoginActivity.this, R.string.form_not_compiled, Toast.LENGTH_SHORT).show();
+                } else {
+                    userSignIn();
+                }
             }
         });
         this.registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                registerUser();
+                if(emailInputET.getText().toString().isEmpty() || passwordET.getText().toString().isEmpty()){
+                    Toast.makeText(LoginActivity.this, R.string.form_not_compiled, Toast.LENGTH_SHORT).show();
+                } else {
+                    registerUser();
+                }
             }
         });
     }
@@ -107,9 +116,9 @@ public class LoginActivity extends AppCompatActivity {
                 if(task.isSuccessful()){
                     FirebaseUser loggedUser = authClient.getCurrentUser();
                     Toast.makeText(LoginActivity.this, R.string.register_ok, Toast.LENGTH_SHORT).show();
-                    /* TODO: Populating the DB with the newly created user through a wizard */
                     if(loggedUser != null){
-                        navigateToNextActivity(loggedUser);
+                        RegistrationWizardFragment wizard = RegistrationWizardFragment.newInstance(loggedUser.getEmail());
+                        wizard.show(getSupportFragmentManager(), Constants.REG_WIZARD_TAG);
                     } else {
                         Toast.makeText(LoginActivity.this, R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
                     }
@@ -126,7 +135,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void navigateToNextActivity(FirebaseUser loggedUser){
         String userEmail = loggedUser.getEmail();
-        Query q = this.dbRef.getDatabase().getReference("users").orderByChild("email").equalTo(userEmail);
+        Query q = this.dbRef.getDatabase().getReference(Constants.USERS_REFERENCE_STRING).orderByChild(Constants.EMAIL_KEY_STRING).equalTo(userEmail);
         q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -134,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
                     for(DataSnapshot userSnapshot : snapshot.getChildren()){
                         String loggedUserID = userSnapshot.getKey();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        intent.putExtra("logged_user_id", loggedUserID);
+                        intent.putExtra(Constants.LOGGED_USER_EXTRA_STRING, loggedUserID);
                         startActivity(intent);
                         finish(); /* Terminates Login Activity */
                     }

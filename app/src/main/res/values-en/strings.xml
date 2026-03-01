@@ -14,7 +14,22 @@
     <string name="auth_ok">Sign in successful!</string>
     <string name="auth_session_creation_err">WARNING: An error occurred during session creation!</string>
     <string name="auth_generic_err">WARNING: unable to authenticate!</string>
-    <string name="register_ok">Registration successful!</string>
+    <string name="register_ok">Registration successful! Complete your data.</string>
     <string name="register_err">WARNING: unable to register user!</string>
     <string name="connection_err">WARNING: a connection error occurred during authentication!</string>
+    <string name="form_not_compiled">WARNING: Compile all fields!</string>
+    <string name="registration_wizard_title">Complete your profile</string>
+    <string name="reg_wizard_name_label">Name</string>
+    <string name="reg_wizard_surname_label">Surname</string>
+    <string name="reg_wizard_birth_date_label">Birthdate (YYYY-MM-DD)</string>
+    <string name="reg_wizard_select_role_label">Choose your role in the team:</string>
+    <string name="reg_wizard_athlete_label">Player</string>
+    <string name="reg_wizard_coach_label">Coach</string>
+    <string name="reg_wizard_submit">Complete registration!</string>
+    <string name="reg_wizard_team_selector_label">Choose the team you are part of:</string>
+    <string name="teams_load_err">Error while loading the available teams</string>
+    <string name="team_selector_label">Choose a team...</string>
+    <string name="no_team_selected">WARNING: Please select a team!</string>
+    <string name="invalid_date">WARNING: Birthdate invalid or in wrong format!</string>
+    <string name="empty_form_fields">WARNING: fill all fields!</string>
 </resources>

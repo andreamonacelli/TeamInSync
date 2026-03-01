@@ -12,8 +12,24 @@
     <string name="register_button">Registrati</string>
     <string name="auth_ok">Accesso avvenuto correttamente!</string>
     <string name="auth_session_creation_err">ATTENZIONE: Errore nella creazione della sessione!</string>
-    <string name="auth_generic_err">ATTENZIONE: Impossibile effettuare l'accesso!</string>
-    <string name="register_ok">Registrazione avvenuta con successo!</string>
+    <string name="auth_generic_err">ATTENZIONE: Impossibile effettuare l\'accesso!</string>
+    <string name="register_ok">Registrazione avvenuta con successo! Completa i tuoi dati.</string>
     <string name="register_err">ATTENZIONE: Registrazione non riuscita!</string>
-    <string name="connection_err">ATTENZIONE: Si è verificato un errore di connessione durante l'autenticazione!</string>
+    <string name="connection_err">ATTENZIONE: Si è verificato un errore di connessione durante l\'autenticazione!</string>
+    <string name="form_not_compiled">ATTENZIONE: Compilare tutti i campi!</string>
+    <string name="registration_wizard_title">Completa il tuo profilo</string>
+    <string name="reg_wizard_username_hint" translatable="false">Username</string>
+    <string name="reg_wizard_name_label">Nome</string>
+    <string name="reg_wizard_surname_label">Cognome</string>
+    <string name="reg_wizard_birth_date_label">Data di Nascita (AAAA-MM-GG)</string>
+    <string name="reg_wizard_select_role_label">Seleziona il tuo ruolo nella squadra:</string>
+    <string name="reg_wizard_athlete_label">Atleta</string>
+    <string name="reg_wizard_coach_label">Allenatore</string>
+    <string name="reg_wizard_submit">Completa registrazione!</string>
+    <string name="reg_wizard_team_selector_label">Seleziona la squadra di cui fai parte:</string>
+    <string name="teams_load_err">Errore nel caricamento delle squadre</string>
+    <string name="team_selector_label">Seleziona una squadra...</string>
+    <string name="no_team_selected">ATTENZIONE: Per favore selezionare una squadra!</string>
+    <string name="invalid_date">ATTENZIONE: Data di nascita inserita non valida o in formato sbagliato!</string>
+    <string name="empty_form_fields">ATTENZIONE: Compilare tutti i campi!</string>
 </resources>
