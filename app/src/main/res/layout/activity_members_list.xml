@@ -1,10 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:padding="16dp"
     tools:context=".MembersListActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/memberListHeaderTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="@string/member_list_def_header"
+        android:textColor="@color/black"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/coachesLabelTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/coaching_staff_label"
+        android:textColor="#555555"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/coachesListRV"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="16dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/member_tile"
+        tools:itemCount="2"/>
+
+    <TextView
+        android:id="@+id/athletesLabelTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/athletes_label"
+        android:textColor="#555555"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/athletesListRV"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:clipToPadding="false"
+        tools:listitem="@layout/member_tile"
+        tools:itemCount="5"/>
+
+</LinearLayout>

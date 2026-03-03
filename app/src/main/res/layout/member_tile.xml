@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="6dp"
+    android:layout_marginHorizontal="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/memberProfilePicIV"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/openProfileIV"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@android:drawable/ic_media_play"
+            app:tint="#CCCCCC" />
+
+        <TextView
+            android:id="@+id/memberNameTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/openProfileIV"
+            app:layout_constraintStart_toEndOf="@+id/memberProfilePicIV"
+            app:layout_constraintTop_toTopOf="@+id/memberProfilePicIV"
+            tools:text="@string/member_tile_default" />
+
+        <TextView
+            android:id="@+id/memberInfoTV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/openProfileIV"
+            app:layout_constraintStart_toEndOf="@+id/memberProfilePicIV"
+            tools:text="@string/member_tile_info_def" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

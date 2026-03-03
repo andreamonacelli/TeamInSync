@@ -28,9 +28,14 @@
     <string name="reg_wizard_submit">Completa registrazione!</string>
     <string name="reg_wizard_team_selector_label">Seleziona la squadra di cui fai parte:</string>
     <string name="teams_load_err">Errore nel caricamento delle squadre</string>
-    <string name="team_selector_label">Seleziona una squadra...</string>
+    <string name="team_selector_label">Seleziona una squadra…</string>
     <string name="no_team_selected">ATTENZIONE: Per favore selezionare una squadra!</string>
     <string name="invalid_date">ATTENZIONE: Data di nascita inserita non valida o in formato sbagliato!</string>
     <string name="empty_form_fields">ATTENZIONE: Compilare tutti i campi!</string>
     <string name="homepage_welcome">Benvenuto, </string>
+    <string name="member_list_def_header">Membri della squadra</string>
+    <string name="member_tile_default" >Nome Cognome</string>
+    <string name="member_tile_info_def">Username e data di nascita</string>
+    <string name="coaching_staff_label">Staff Tecnico</string>
+    <string name="athletes_label">Atleti</string>
 </resources>
