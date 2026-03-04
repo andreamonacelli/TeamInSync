@@ -3,7 +3,7 @@ package com.monacdev.teaminsync.utils;
 public final class Constants {
     private Constants() {}
 
-    /* Firebase related constants */
+    /* Firebase and data model related constants */
     public static final String EMAIL_KEY_STRING = "email";
     public static final String NAME_KEY_STRING = "name";
     public static final String SURNAME_KEY_STRING = "surname";
@@ -19,6 +19,7 @@ public final class Constants {
     public static final String ADDRESS_KEY_STRING = "address";
     public static final String STADIUM_KEY_STRING = "stadium";
     public static final String LOGO_KEY_STRING = "logo";
+    public static final String USERNAME_KEY_STRING = "username";
 
     /* Navigation related constants */
     public static final String LOGGED_USER_EXTRA_STRING = "logged_user_id";
