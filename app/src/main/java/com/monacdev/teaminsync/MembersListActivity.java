@@ -27,9 +27,7 @@ public class MembersListActivity extends AppCompatActivity {
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private String teamID;
     private RecyclerView coachesListRV;
-    //private MemberListAdapter coachesListAdapter;
     private RecyclerView athletesListRV;
-    //private MemberListAdapter athletesListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

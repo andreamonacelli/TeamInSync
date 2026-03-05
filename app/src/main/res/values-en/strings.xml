@@ -38,4 +38,11 @@
     <string name="coaching_staff_label">Coaching Staff</string>
     <string name="athletes_label">Athletes</string>
     <string name="no_users_found">No member found!</string>
+    <string name="profile_details_label">User Profile</string>
+    <string name="born_on_label_def">Born --/--/----</string>
+    <string name="to_trainings_label">Trainings</string>
+    <string name="to_squad_list_label">To Squad List</string>
+    <string name="athlete_label">Athlete</string>
+    <string name="coach_label">Coach</string>
+    <string name="born_on_label">Born</string>
 </resources>

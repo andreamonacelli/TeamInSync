@@ -39,7 +39,7 @@ public class MemberViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View view) {
                 Intent memberDetailsIntent = new Intent(itemView.getContext(), ProfileActivity.class);
-                memberDetailsIntent.putExtra(Constants.LOGGED_USER_EXTRA_STRING, userData.get(Constants.USERNAME_KEY_STRING));
+                memberDetailsIntent.putExtra(Constants.DISPLAYED_USER_EXTRA_STRING, userData.get(Constants.USERNAME_KEY_STRING));
                 itemView.getContext().startActivity(memberDetailsIntent);
                 /* Here we do not have to terminate the activity because we can get back here */
             }

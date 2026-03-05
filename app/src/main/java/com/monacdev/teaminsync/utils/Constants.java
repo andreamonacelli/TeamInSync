@@ -23,6 +23,7 @@ public final class Constants {
 
     /* Navigation related constants */
     public static final String LOGGED_USER_EXTRA_STRING = "logged_user_id";
+    public static final String DISPLAYED_USER_EXTRA_STRING = "DISPLAYED_USER";
     public static final String REG_WIZARD_TAG = "REGISTRATION_WIZARD";
     public static final String TEAM_ID_TAG = "TEAM_ID";
 

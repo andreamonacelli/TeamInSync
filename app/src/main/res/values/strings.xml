@@ -39,4 +39,12 @@
     <string name="coaching_staff_label">Staff Tecnico</string>
     <string name="athletes_label">Atleti</string>
     <string name="no_users_found">Nessun membro trovato!</string>
+    <string name="profile_details_label">Profilo Utente</string>
+    <string name="born_on_label_def">Nato il: --/--/----</string>
+    <string name="born_on_label">Nato il:</string>
+    <string name="username_label_def" translatable="false">\@username</string>
+    <string name="to_trainings_label">Allenamenti</string>
+    <string name="to_squad_list_label">Alla Rosa</string>
+    <string name="athlete_label">Atleta</string>
+    <string name="coach_label">Allenatore</string>
 </resources>
