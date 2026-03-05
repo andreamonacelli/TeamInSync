@@ -37,4 +37,5 @@
     <string name="member_tile_info_def">Username and birthdate</string>
     <string name="coaching_staff_label">Coaching Staff</string>
     <string name="athletes_label">Athletes</string>
+    <string name="no_users_found">No member found!</string>
 </resources>

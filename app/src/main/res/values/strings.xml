@@ -38,4 +38,5 @@
     <string name="member_tile_info_def">Username e data di nascita</string>
     <string name="coaching_staff_label">Staff Tecnico</string>
     <string name="athletes_label">Atleti</string>
+    <string name="no_users_found">Nessun membro trovato!</string>
 </resources>

@@ -25,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.utils.Constants;
 
 public class MainActivity extends AppCompatActivity {
+    private String teamID;
     private String loggedUserUsername;
     private String loggedUserName;
     private ImageView teamLogoIV;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent squadListIntent = new Intent(MainActivity.this, MembersListActivity.class);
+                squadListIntent.putExtra(Constants.TEAM_ID_TAG, teamID);
                 startActivity(squadListIntent);
             }
         });
@@ -103,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 if(snapshot.exists()){
                     loggedUserName = snapshot.child(Constants.NAME_KEY_STRING).getValue(String.class);
                     homepageHeaderTV.setText(String.format("%s %s", getResources().getText(R.string.homepage_welcome), loggedUserName));
-                    String teamID = snapshot.child(Constants.TEAM_KEY_STRING).getValue(String.class);
+                    teamID = snapshot.child(Constants.TEAM_KEY_STRING).getValue(String.class);
                     if(teamID != null && !teamID.isEmpty()){
                         fetchTeamData(teamID);
                     }
