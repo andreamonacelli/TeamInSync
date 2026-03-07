@@ -1,4 +1,4 @@
-package com.monacdev.teaminsync;
+package com.monacdev.teaminsync.activities;
 
 import android.os.Bundle;
 import android.widget.Toast;
@@ -18,6 +18,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.monacdev.teaminsync.MemberListAdapter;
+import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.utils.Constants;
 
 import java.util.ArrayList;

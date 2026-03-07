@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.monacdev.teaminsync.activities.ProfileActivity;
 import com.monacdev.teaminsync.utils.Constants;
 
 import java.util.HashMap;

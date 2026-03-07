@@ -1,4 +1,4 @@
-package com.monacdev.teaminsync;
+package com.monacdev.teaminsync.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.utils.Constants;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,7 +52,27 @@ public class MainActivity extends AppCompatActivity {
 
         this.bindViewsWithObjects();
         this.populateDataFromDB();
+        this.setListeners();
+    }
 
+    /**
+     * Binds the Views defined within the XML layout file for the activity to their respective Java objects
+     */
+    private void bindViewsWithObjects(){
+        this.teamLogoIV = findViewById(R.id.teamLogoIV);
+        this.homepageHeaderTV = findViewById(R.id.homepageHeaderTV);
+        this.toTrainingPageBtn = findViewById(R.id.toTrainingPageBtn);
+        this.squadListBtn = findViewById(R.id.squadListBtn);
+        this.teamNameTV = findViewById(R.id.teamNameTV);
+        this.leagueNameTV = findViewById(R.id.leagueNameTV);
+        this.cityStadiumTV = findViewById(R.id.cityStadiumTV);
+        this.openNotificationsBtn = findViewById(R.id.openNotificationsBtn);
+    }
+
+    /**
+     * Defines the listeners for the View components within the current activity
+     */
+    private void setListeners(){
         /* Defining Button Listeners */
         this.squadListBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,24 +94,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 /*
-                * TODO: implement a Fragment to show notifications
-                */
+                 * TODO: implement a Fragment to show notifications
+                 */
             }
         });
-    }
-
-    /**
-     * Binds the Views defined within the XML layout file for the activity to their respective Java objects
-     */
-    private void bindViewsWithObjects(){
-        this.teamLogoIV = findViewById(R.id.teamLogoIV);
-        this.homepageHeaderTV = findViewById(R.id.homepageHeaderTV);
-        this.toTrainingPageBtn = findViewById(R.id.toTrainingPageBtn);
-        this.squadListBtn = findViewById(R.id.squadListBtn);
-        this.teamNameTV = findViewById(R.id.teamNameTV);
-        this.leagueNameTV = findViewById(R.id.leagueNameTV);
-        this.cityStadiumTV = findViewById(R.id.cityStadiumTV);
-        this.openNotificationsBtn = findViewById(R.id.openNotificationsBtn);
     }
 
     /**

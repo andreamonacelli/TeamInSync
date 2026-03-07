@@ -1,4 +1,4 @@
-package com.monacdev.teaminsync;
+package com.monacdev.teaminsync.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +13,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.activities.MainActivity;
 import com.monacdev.teaminsync.utils.Constants;
 
 import android.view.LayoutInflater;
@@ -230,7 +232,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                     /* The newly registered user will NOW be automatically added to the pending requests */
                     String sectionString;
                     if(roleRadioGroup.getCheckedRadioButtonId() == R.id.athleteRadioBtn){
-                        sectionString = Constants.PENDING_REFERENCE_STRING;
+                        sectionString = Constants.PENDING_REQUESTS_KEY_STRING;
                     } else {
                         sectionString = Constants.MEMBERS_KEY_STRING;
                     }

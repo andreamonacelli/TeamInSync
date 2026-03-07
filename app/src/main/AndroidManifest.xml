@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TeamInSync">
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,16 +21,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MembersListActivity"
+            android:name=".activities.MembersListActivity"
             android:exported="false" />
         <activity
-            android:name=".ProfileActivity"
+            android:name=".activities.ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".TrainingActivity"
+            android:name=".activities.TrainingActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="false">
             <!--
             <intent-filter>

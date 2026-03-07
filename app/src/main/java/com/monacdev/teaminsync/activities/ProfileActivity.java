@@ -1,4 +1,4 @@
-package com.monacdev.teaminsync;
+package com.monacdev.teaminsync.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.utils.Constants;
 
 public class ProfileActivity extends AppCompatActivity {

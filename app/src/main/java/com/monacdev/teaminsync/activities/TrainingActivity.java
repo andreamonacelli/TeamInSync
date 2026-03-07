@@ -1,8 +1,7 @@
-package com.monacdev.teaminsync;
+package com.monacdev.teaminsync.activities;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,18 +21,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.fragments.TrainingCreationWizardFragment;
 import com.monacdev.teaminsync.utils.Constants;
 
 public class TrainingActivity extends AppCompatActivity {
     private TextView trainingPageHeaderTV;
     private RecyclerView trainingListRV;
-    /** This will be either a training-creation wizard or a training-tracking fragment based on the logged user's role */
-    private Fragment trainingFragment;
+    private View trainingTrackerFragmentContainer;
     private ImageButton createTrainingBtn;
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private String displayedUserID;
+    private String viewedTeamID;
     private boolean isMyTrainingList;
-    private String loggedUserRole;
+    private String loggedUserRole; /* Actually useful only for buttons visibility's sake */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +49,8 @@ public class TrainingActivity extends AppCompatActivity {
 
         this.displayedUserID = getIntent().getStringExtra(Constants.DISPLAYED_USER_EXTRA_STRING);
         this.bindViewsToObjects();
+        this.setListeners();
+        this.isDisplayedUserLogged();
     }
 
     /**
@@ -58,6 +60,7 @@ public class TrainingActivity extends AppCompatActivity {
         this.trainingPageHeaderTV = findViewById(R.id.trainingPageHeaderTV);
         this.trainingListRV = findViewById(R.id.trainingListRV);
         this.createTrainingBtn = findViewById(R.id.createTrainingBtn);
+        this.trainingTrackerFragmentContainer = findViewById(R.id.trainingTrackerFragmentContainer);
     }
 
     /**
@@ -73,6 +76,7 @@ public class TrainingActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()){
+                        viewedTeamID = snapshot.child(Constants.TEAM_KEY_STRING).getValue(String.class);
                         String displayedUserEmail = snapshot.child(Constants.EMAIL_KEY_STRING).getValue(String.class);
                         String displayedUserRole = snapshot.child(Constants.ROLE_KEY_STRING).getValue(String.class);
                         if(loggedUserEmail != null && loggedUserEmail.equals(displayedUserEmail)){
@@ -101,10 +105,28 @@ public class TrainingActivity extends AppCompatActivity {
      * If the displayed user is the currently logged one and the user is a coach then display the "Add Training Button"
      */
     private void setAddTrainingBtnVisibility(String role){
-        if(role != null && role.equals(Constants.COACH_ROLE_STRING)){
-            this.createTrainingBtn.setVisibility(View.VISIBLE);
+        if(this.isMyTrainingList){
+            this.loggedUserRole = role;
+            if(role != null && role.equals(Constants.COACH_ROLE_STRING)){
+                this.createTrainingBtn.setVisibility(View.VISIBLE);
+            } else {
+                this.createTrainingBtn.setVisibility(View.GONE);
+            }
         } else {
             this.createTrainingBtn.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Defines the listeners for the View components within the current activity
+     */
+    private void setListeners(){
+        this.createTrainingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TrainingCreationWizardFragment trainingCreationWizard = TrainingCreationWizardFragment.newInstance(TrainingActivity.this.viewedTeamID, TrainingActivity.this.displayedUserID);
+                trainingCreationWizard.show(getSupportFragmentManager(), Constants.TRAINING_CREATION_WIZARD_TAG);
+            }
+        });
     }
 }

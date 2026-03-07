@@ -1,4 +1,4 @@
-package com.monacdev.teaminsync;
+package com.monacdev.teaminsync.fragments;
 
 public class TrainingTrackingFragment {
 }

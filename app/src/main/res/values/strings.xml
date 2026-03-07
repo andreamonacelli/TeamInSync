@@ -49,4 +49,15 @@
     <string name="coach_label">Allenatore</string>
     <string name="training_list_header">Allenamenti di</string>
     <string name="my_training_list_header">I miei allenamenti</string>
+    <string name="duration_label">Durata</string>
+    <string name="repetitions_label">Ripetizioni</string>
+    <string name="training_target_label">Obiettivo (in minuti o n°ripetizioni)</string>
+    <string name="deadline_label">Scadenza (AAAA-MM-GG)</string>
+    <string name="complete_btn_label">Completa</string>
+    <string name="append_btn_label">Nuovo esercizio</string>
+    <string name="new_training_frag_header">Nuovo Allenamento</string>
+    <string name="exercise_title_hint">Titolo esercizio</string>
+    <string name="training_type_label">Tipologia:</string>
+    <string name="upload_error_label">Errore nel caricamento sul database</string>
+    <string name="exercise_added">Esercizio aggiunto all\'allenamento!</string>
 </resources>

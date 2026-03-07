@@ -1,4 +1,4 @@
-package com.monacdev.teaminsync;
+package com.monacdev.teaminsync.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,6 +25,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.fragments.RegistrationWizardFragment;
 import com.monacdev.teaminsync.utils.Constants;
 
 public class LoginActivity extends AppCompatActivity {
@@ -47,6 +49,23 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         this.bindViewsToObjects();
+        this.setListeners();
+    }
+
+    /**
+     * Binds the Views defined within the XML layout file for the activity to their respective Java objects
+     */
+    private void bindViewsToObjects(){
+        this.emailInputET = findViewById(R.id.emailInputET);
+        this.passwordET = findViewById(R.id.passwordET);
+        this.signInBtn = findViewById(R.id.signInBtn);
+        this.registerBtn = findViewById(R.id.registerBtn);
+    }
+
+    /**
+     * Defines the listeners for the View components within the current activity
+     */
+    private void setListeners(){
         /* Binding listeners to buttons */
         this.signInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,16 +87,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    /**
-     * Binds the Views defined within the XML layout file for the activity to their respective Java objects
-     */
-    private void bindViewsToObjects(){
-        this.emailInputET = findViewById(R.id.emailInputET);
-        this.passwordET = findViewById(R.id.passwordET);
-        this.signInBtn = findViewById(R.id.signInBtn);
-        this.registerBtn = findViewById(R.id.registerBtn);
     }
 
     /**

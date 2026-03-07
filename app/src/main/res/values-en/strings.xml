@@ -47,4 +47,15 @@
     <string name="born_on_label">Born</string>
     <string name="training_list_header">Trainings of</string>
     <string name="my_training_list_header">My trainings</string>
+    <string name="duration_label">Duration</string>
+    <string name="repetitions_label">Repetitions</string>
+    <string name="training_target_label">Target (in minutes or repetitions n.)</string>
+    <string name="deadline_label">Deadline (YYYY-MM-DD)</string>
+    <string name="complete_btn_label">Complete</string>
+    <string name="append_btn_label">New exercise</string>
+    <string name="new_training_frag_header">New Training Session</string>
+    <string name="exercise_title_hint">Exercise title</string>
+    <string name="training_type_label">Type:</string>
+    <string name="upload_error_label">Error while uploading on the database</string>
+    <string name="exercise_added">Exercise added to training session!</string>
 </resources>

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".TrainingActivity">
+    tools:context=".activities.TrainingActivity">
 
     <TextView
         android:id="@+id/trainingPageHeaderTV"
@@ -50,7 +50,7 @@
         tools:listitem="@layout/training_tile" />
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/trainingFragment"
+        android:id="@+id/trainingTrackerFragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="10dp"
