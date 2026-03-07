@@ -47,4 +47,6 @@
     <string name="to_squad_list_label">Alla Rosa</string>
     <string name="athlete_label">Atleta</string>
     <string name="coach_label">Allenatore</string>
+    <string name="training_list_header">Allenamenti di</string>
+    <string name="my_training_list_header">I miei allenamenti</string>
 </resources>

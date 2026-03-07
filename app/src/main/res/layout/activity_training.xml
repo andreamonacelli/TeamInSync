@@ -5,6 +5,56 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".TrainingActivity">
+
+    <TextView
+        android:id="@+id/trainingPageHeaderTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/training_list_header"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/createTrainingBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/createTrainingBtn"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_input_add"
+        android:visibility="gone"
+        app:tint="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/trainingPageHeaderTV"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/trainingPageHeaderTV" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/trainingListRV"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/trainingPageHeaderTV"
+        tools:listitem="@layout/training_tile" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/trainingFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="10dp"
+        android:visibility="gone"
+        tools:layout="@layout/fragment_training_tracking" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

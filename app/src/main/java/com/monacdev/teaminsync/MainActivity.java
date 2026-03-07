@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent trainingPageIntent = new Intent(MainActivity.this, TrainingActivity.class);
+                trainingPageIntent.putExtra(Constants.DISPLAYED_USER_EXTRA_STRING, loggedUserUsername);
                 startActivity(trainingPageIntent);
             }
         });

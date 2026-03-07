@@ -45,4 +45,6 @@
     <string name="athlete_label">Athlete</string>
     <string name="coach_label">Coach</string>
     <string name="born_on_label">Born</string>
+    <string name="training_list_header">Trainings of</string>
+    <string name="my_training_list_header">My trainings</string>
 </resources>
