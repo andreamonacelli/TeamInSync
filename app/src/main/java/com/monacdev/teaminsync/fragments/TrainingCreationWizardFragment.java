@@ -153,6 +153,10 @@ public class TrainingCreationWizardFragment extends DialogFragment {
     private void uploadTrainingToDatabase(String completionEffect){
         String trainingUID = UUID.randomUUID().toString();
         HashMap<String, Object> trainingData = this.prepareDataForUpload();
+        if(trainingData.isEmpty()){
+            /* Do not update if data is empty */
+            return;
+        }
         Map<String, Object> multiUploadMap = new HashMap<>();
         for(String athleteID : this.targetAthletes){
             String dbPath = String.format("%s/%s/%s", Constants.TRAININGS_REFERENCE_STRING, athleteID, trainingUID);
@@ -220,7 +224,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             simpleDateFormat.setLenient(false);
             Date dueDate = simpleDateFormat.parse(dueToDate);
-            return dueDate == null;
+            return dueDate != null;
         } catch(ParseException e) {
             return false;
         }
