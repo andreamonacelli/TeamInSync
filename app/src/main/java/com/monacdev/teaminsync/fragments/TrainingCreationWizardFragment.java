@@ -224,7 +224,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             simpleDateFormat.setLenient(false);
             Date dueDate = simpleDateFormat.parse(dueToDate);
-            return dueDate != null;
+            return true;
         } catch(ParseException e) {
             return false;
         }

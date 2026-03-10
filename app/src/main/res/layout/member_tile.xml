@@ -28,7 +28,7 @@
             tools:srcCompat="@tools:sample/avatars" />
 
         <ImageView
-            android:id="@+id/openProfileIV"
+            android:id="@+id/startTrainingBtn"
             android:layout_width="24dp"
             android:layout_height="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -48,7 +48,7 @@
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/openProfileIV"
+            app:layout_constraintEnd_toStartOf="@+id/startTrainingBtn"
             app:layout_constraintStart_toEndOf="@+id/memberProfilePicIV"
             app:layout_constraintTop_toTopOf="@+id/memberProfilePicIV"
             tools:text="@string/member_tile_default" />
@@ -60,7 +60,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/openProfileIV"
+            app:layout_constraintEnd_toStartOf="@+id/startTrainingBtn"
             app:layout_constraintStart_toEndOf="@+id/memberProfilePicIV"
             tools:text="@string/member_tile_info_def" />
 

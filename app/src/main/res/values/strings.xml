@@ -60,4 +60,8 @@
     <string name="training_type_label">Tipologia:</string>
     <string name="upload_error_label">Errore nel caricamento sul database</string>
     <string name="exercise_added">Esercizio aggiunto all\'allenamento!</string>
+    <string name="training_name_placeholder">Nome Esercizio</string>
+    <string name="training_info_placeholder">Obiettivo: -- | Scadenza: ----/--/--</string>
+    <string name="start_training_btn_label">Inizia</string>
+    <string name="complete_training_label">Completa</string>
 </resources>
