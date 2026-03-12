@@ -22,6 +22,8 @@
         android:layout_height="wrap_content"
         android:hint="@string/exercise_title_hint"
         android:inputType="text"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
         android:layout_marginBottom="16dp"/>
 
     <TextView
@@ -43,6 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/duration_label"
+            android:textColor="@color/black"
             android:checked="true"/>
 
         <RadioButton
@@ -50,6 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:textColor="@color/black"
         android:text="@string/repetitions_label"/>
     </RadioGroup>
 
@@ -58,6 +62,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/training_target_label"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
         android:inputType="number"
         android:layout_marginBottom="16dp"/>
 
@@ -66,6 +72,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/deadline_label"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
         android:inputType="date"
         android:layout_marginBottom="24dp"/>
 

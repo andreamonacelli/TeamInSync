@@ -64,4 +64,5 @@
     <string name="training_info_placeholder">Obiettivo: -- | Scadenza: ----/--/--</string>
     <string name="start_training_btn_label">Inizia</string>
     <string name="complete_training_label">Completa</string>
+    <string name="no_trainings_found">Nessun allenamento trovato</string>
 </resources>

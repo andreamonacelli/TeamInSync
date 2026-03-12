@@ -24,10 +24,12 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
     private TextView trainingInfoTV;
     private boolean isExpired;
     private boolean isCompleted;
+    private boolean actionsActive;
 
-    public TrainingTileViewHolder(@NonNull View itemView) {
+    public TrainingTileViewHolder(@NonNull View itemView, boolean actionsActive) {
         super(itemView);
         this.bindViewsToObjects(itemView);
+        this.actionsActive = actionsActive;
     }
 
     /**
@@ -54,6 +56,11 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
         this.handleTrainingType(trainingData.get(Constants.TRAINING_TYPE_KEY_STRING));
         this.isExpired = isTrainingExpired(trainingData.get(Constants.TRAINING_DUE_TO_KEY_STRING));
         this.isCompleted = Boolean.parseBoolean(trainingData.get(Constants.TRAINING_COMPLETED_KEY_STRING));
+        if(this.actionsActive){
+            this.startTrainingBtn.setVisibility(View.VISIBLE);
+        } else {
+            this.startTrainingBtn.setVisibility(View.GONE);
+        }
         this.restyleBasedOnCompletionExpiry();
     }
 
@@ -150,5 +157,12 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
                 this.itemView.setBackgroundColor(Color.GREEN);
             }
         }
+    }
+
+    /**
+     * Sets whether the buttons should be shown or not
+     */
+    private void setButtonsVisibility(){
+
     }
 }

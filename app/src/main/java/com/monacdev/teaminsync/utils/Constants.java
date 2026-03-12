@@ -25,12 +25,14 @@ public final class Constants {
     public static final String TRAINING_TARGET_KEY_STRING = "target";
     public static final String TRAINING_DUE_TO_KEY_STRING = "due_to";
     public static final String TRAINING_COMPLETED_KEY_STRING = "completed";
+    public static final String TRAINING_UUID_KEY_STRING = "training_uuid";
     public static final String TRAININGS_REFERENCE_STRING = "trainings";
     public static final String NOTIFICATIONS_REFERENCE_STRING = "notifications";
 
     /* Navigation related constants */
     public static final String LOGGED_USER_EXTRA_STRING = "logged_user_id";
     public static final String DISPLAYED_USER_EXTRA_STRING = "DISPLAYED_USER";
+    public static final String DISPLAYED_USER_SURNAME_EXTRA_STRING = "DISPLAYED_USER_SURNAME";
     public static final String REG_WIZARD_TAG = "REGISTRATION_WIZARD";
     public static final String TEAM_ID_TAG = "TEAM_ID";
     public static final String TRAINING_CREATION_WIZARD_TAG = "TRAINING_CREATION_WIZARD";

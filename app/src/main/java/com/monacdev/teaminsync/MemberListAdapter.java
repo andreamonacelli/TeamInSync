@@ -32,7 +32,7 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberViewHolder> {
 
     /**
      * Handles the filling of data for the MemberViewHolder in a specific position
-     * @param memberViewHolder   The MemberViewHolder which should be updated to represent the contents of the item at the given position in the data set.
+     * @param memberViewHolder The MemberViewHolder which should be updated to represent the contents of the item at the given position in the data set.
      * @param position The position of the item within the adapter's data set.
      */
     @Override

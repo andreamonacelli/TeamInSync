@@ -61,6 +61,7 @@ public class MembersListActivity extends AppCompatActivity {
 
     /**
      * Fetches the list of users from the Firebase DB in order to populate the lists
+     * @param targetRecyclerView the RecyclerView into which the results must be put
      * @param role represents the type of users we want to fetch from the DB
      */
     private void fetchUsersFromDB(RecyclerView targetRecyclerView, String role){
@@ -87,13 +88,13 @@ public class MembersListActivity extends AppCompatActivity {
                     MemberListAdapter usersAdapter = new MemberListAdapter(userList);
                     targetRecyclerView.setAdapter(usersAdapter);
                 } else {
-                    Toast.makeText(MembersListActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MembersListActivity.this, R.string.no_users_found, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MembersListActivity.this, R.string.no_users_found, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MembersListActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
         });
     }

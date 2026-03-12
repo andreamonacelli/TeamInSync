@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private String teamID;
     private String loggedUserUsername;
     private String loggedUserName;
+    private String loggedUserSurname;
     private ImageView teamLogoIV;
     private TextView homepageHeaderTV;
     private Button toTrainingPageBtn;
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent trainingPageIntent = new Intent(MainActivity.this, TrainingActivity.class);
                 trainingPageIntent.putExtra(Constants.DISPLAYED_USER_EXTRA_STRING, loggedUserUsername);
+                trainingPageIntent.putExtra(Constants.DISPLAYED_USER_SURNAME_EXTRA_STRING, loggedUserSurname);
                 startActivity(trainingPageIntent);
             }
         });
@@ -112,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     loggedUserName = snapshot.child(Constants.NAME_KEY_STRING).getValue(String.class);
+                    loggedUserSurname = snapshot.child(Constants.SURNAME_KEY_STRING).getValue(String.class);
                     homepageHeaderTV.setText(String.format("%s %s", getResources().getText(R.string.homepage_welcome), loggedUserName));
                     teamID = snapshot.child(Constants.TEAM_KEY_STRING).getValue(String.class);
                     if(teamID != null && !teamID.isEmpty()){

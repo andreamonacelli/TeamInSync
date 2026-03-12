@@ -62,4 +62,5 @@
     <string name="training_info_placeholder">Goal: -- | Deadline: ----/--/--</string>
     <string name="start_training_btn_label">Start</string>
     <string name="complete_training_label">Complete</string>
+    <string name="no_trainings_found">No trainings found</string>
 </resources>

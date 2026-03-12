@@ -26,6 +26,7 @@ import com.monacdev.teaminsync.utils.Constants;
 
 public class ProfileActivity extends AppCompatActivity {
     private String displayedUserID;
+    private String displayedUserSurname;
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private TextView profileNameHeaderTV;
     private ImageView profilePictureIV;
@@ -64,6 +65,7 @@ public class ProfileActivity extends AppCompatActivity {
                 /* Here we are navigating to the page containing the training of the displayed user which might not be the logged one! */
                 Intent trainingsIntent = new Intent(ProfileActivity.this, TrainingActivity.class);
                 trainingsIntent.putExtra(Constants.DISPLAYED_USER_EXTRA_STRING, displayedUserID);
+                trainingsIntent.putExtra(Constants.DISPLAYED_USER_SURNAME_EXTRA_STRING, displayedUserSurname);
                 startActivity(trainingsIntent);
             }
         });
@@ -93,6 +95,7 @@ public class ProfileActivity extends AppCompatActivity {
                 if(snapshot.exists()){
                     String name = snapshot.child(Constants.NAME_KEY_STRING).getValue(String.class);
                     String surname = snapshot.child(Constants.SURNAME_KEY_STRING).getValue(String.class);
+                    ProfileActivity.this.displayedUserSurname = surname;
                     if(name != null && surname != null){
                         profileNameHeaderTV.setText(String.format("%s %s", name, surname));
                     }
