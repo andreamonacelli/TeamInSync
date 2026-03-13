@@ -5,10 +5,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.monacdev.teaminsync.utils.Constants;
 
 import java.text.ParseException;
@@ -25,6 +30,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
     private boolean isExpired;
     private boolean isCompleted;
     private boolean actionsActive;
+    private String trainingUID;
 
     public TrainingTileViewHolder(@NonNull View itemView, boolean actionsActive) {
         super(itemView);
@@ -53,7 +59,8 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
                 trainingData.get(Constants.TRAINING_TARGET_KEY_STRING),
                 trainingData.get(Constants.TRAINING_DUE_TO_KEY_STRING)
         );
-        this.handleTrainingType(trainingData.get(Constants.TRAINING_TYPE_KEY_STRING));
+        this.trainingUID = trainingData.get(Constants.TRAINING_UUID_KEY_STRING);
+        this.handleTrainingType(trainingData.get(Constants.TRAINING_TYPE_KEY_STRING), trainingData.get(Constants.USERNAME_KEY_STRING));
         this.isExpired = isTrainingExpired(trainingData.get(Constants.TRAINING_DUE_TO_KEY_STRING));
         this.isCompleted = Boolean.parseBoolean(trainingData.get(Constants.TRAINING_COMPLETED_KEY_STRING));
         if(this.actionsActive){
@@ -67,8 +74,9 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
     /**
      * Given the type of the training exercise that is going to be shown in the ViewHolder, it sets the respective icon
      * @param trainingType a string containing the type of training
+     * @param userID the ID of the user for which we are showing the trainings
      */
-    private void handleTrainingType(String trainingType){
+    private void handleTrainingType(String trainingType, String userID){
         if(trainingType != null && trainingType.equals(Constants.CHRONO_TRAINING_STRING)){
             this.trainingTypeIconIV.setImageResource(R.drawable.ic_stopwatch);
             this.startTrainingBtn.setText(R.string.start_training_btn_label);
@@ -86,10 +94,42 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
             this.startTrainingBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    /* TODO: simply flag the training as completed (on the DB as well) */
+                    if(TrainingTileViewHolder.this.trainingUID != null && userID != null){
+                        TrainingTileViewHolder.this.updateTrainingOnDB(view, userID);
+                    } else {
+                        Toast.makeText(view.getContext(), R.string.training_completion_error, Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
+    }
+
+    /**
+     * Effectively update the training info on the Firebase DB
+     * @param view the view over which display the Toast message
+     * @param userID the ID of the user for whom the training should be completed
+     */
+    private void updateTrainingOnDB(View view, String userID){
+        DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference();
+        trainingRef.child(Constants.TRAININGS_REFERENCE_STRING).child(userID).child(TrainingTileViewHolder.this.trainingUID)
+                .child(Constants.TRAINING_COMPLETED_KEY_STRING).setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        TrainingTileViewHolder.this.isCompleted = true;
+                        TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
+                        if(TrainingTileViewHolder.this.isExpired) {
+                            Toast.makeText(view.getContext(), R.string.training_reps_completed_late, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(view.getContext(), R.string.training_reps_completed_on_time, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        TrainingTileViewHolder.this.isCompleted = false;
+                        Toast.makeText(view.getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     /**
@@ -157,12 +197,5 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
                 this.itemView.setBackgroundColor(Color.GREEN);
             }
         }
-    }
-
-    /**
-     * Sets whether the buttons should be shown or not
-     */
-    private void setButtonsVisibility(){
-
     }
 }

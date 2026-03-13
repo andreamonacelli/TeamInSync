@@ -63,4 +63,7 @@
     <string name="start_training_btn_label">Start</string>
     <string name="complete_training_label">Complete</string>
     <string name="no_trainings_found">No trainings found</string>
+    <string name="training_completion_error">Error during completion</string>
+    <string name="training_reps_completed_on_time">Exercise completed, congratulations!</string>
+    <string name="training_reps_completed_late">Exercise completed late!</string>
 </resources>

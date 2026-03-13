@@ -225,6 +225,7 @@ public class TrainingActivity extends AppCompatActivity {
                 Constants.TRAINING_COMPLETED_KEY_STRING,
                 String.valueOf(trainingSnapshot.child(Constants.TRAINING_COMPLETED_KEY_STRING).getValue(Boolean.class))
         );
+        training.put(Constants.USERNAME_KEY_STRING, this.displayedUserID);
         training.put(Constants.TRAINING_UUID_KEY_STRING, trainingSnapshot.getKey());
         return training;
     }
