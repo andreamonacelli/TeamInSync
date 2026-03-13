@@ -49,4 +49,11 @@ public final class Constants {
     public static final String REPS_TRAINING_STRING = "reps";
     public static final String EFFECT_DISMISS = "dismiss";
     public static final String EFFECT_NEXT = "clear_fields";
+    public static final String LOGOUT_CANCELED_TAG = "logout_canceled";
+    public static final String LOGOUT_CANCELED_MSG = "Logout dialog dismissed but user has not logged out";
+
+    /* Constants for Notifications management */
+    public static final String NOTIFICATIONS_CHANNEL_ID = "teaminsync_notifications";
+    /* Persistence related constants */
+    public static final String SHARED_PREFERENCES_STRING = "teaminsync_sharedprefs";
 }

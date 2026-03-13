@@ -1,6 +1,7 @@
 package com.monacdev.teaminsync.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -153,8 +154,9 @@ public class LoginActivity extends AppCompatActivity {
                         String loggedUserID = userSnapshot.getKey();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         intent.putExtra(Constants.LOGGED_USER_EXTRA_STRING, loggedUserID);
+                        LoginActivity.this.saveUserForPersistence(loggedUserID);
                         startActivity(intent);
-                        finish(); /* Terminates Login Activity */
+                        finish();
                     }
                 } else {
                     Toast.makeText(LoginActivity.this, "ATTENZIONE: Utente con mail " + userEmail + " non trovato nel sistema!", Toast.LENGTH_SHORT).show();
@@ -166,5 +168,15 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * Saves the currently logged user into the SharedPreferences in order to manage persistence
+     */
+    private void saveUserForPersistence(String username){
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_STRING, MODE_PRIVATE);
+        SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
+        sharedPrefsEditor.putString(Constants.LOGGED_USER_EXTRA_STRING, username);
+        sharedPrefsEditor.apply();
     }
 }

@@ -80,7 +80,6 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
         if(trainingType != null && trainingType.equals(Constants.CHRONO_TRAINING_STRING)){
             this.trainingTypeIconIV.setImageResource(R.drawable.ic_stopwatch);
             this.startTrainingBtn.setText(R.string.start_training_btn_label);
-            this.startTrainingBtn.setOnClickListener(null);
             this.startTrainingBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -90,7 +89,6 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
         } else {
             this.trainingTypeIconIV.setImageResource(R.drawable.ic_weight);
             this.startTrainingBtn.setText(R.string.complete_training_label);
-            this.startTrainingBtn.setOnClickListener(null);
             this.startTrainingBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -1,7 +1,12 @@
 package com.monacdev.teaminsync.activities;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -11,12 +16,15 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView leagueNameTV;
     private TextView cityStadiumTV;
     private ImageButton openNotificationsBtn;
+    private ImageButton logoutBtn;
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
 
     @Override
@@ -68,13 +77,13 @@ public class MainActivity extends AppCompatActivity {
         this.leagueNameTV = findViewById(R.id.leagueNameTV);
         this.cityStadiumTV = findViewById(R.id.cityStadiumTV);
         this.openNotificationsBtn = findViewById(R.id.openNotificationsBtn);
+        this.logoutBtn = findViewById(R.id.logoutBtn);
     }
 
     /**
      * Defines the listeners for the View components within the current activity
      */
     private void setListeners(){
-        /* Defining Button Listeners */
         this.squadListBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,9 +104,13 @@ public class MainActivity extends AppCompatActivity {
         this.openNotificationsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
-                 * TODO: implement a Fragment to show notifications
-                 */
+                /* TODO: implement a Fragment to show notifications */
+            }
+        });
+        this.logoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.this.handleLogoutConfirmation();
             }
         });
     }
@@ -168,5 +181,79 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * Listens for incoming notifications on the Firebase DB
+     */
+    private void listenForNewNotifications(){
+        DatabaseReference notificationsRef = this.dbRef.child(Constants.NOTIFICATIONS_REFERENCE_STRING).child(this.loggedUserUsername);
+        notificationsRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                /* New notification arrived on the DB */
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Creates and sets up the notification channel in order to implement the local-push mechanism for incoming notifications
+     */
+    private void createNotificationChannel() {
+
+    }
+
+    /**
+     * Logs out the currently authenticated user and cleans the persistent SharedPreferences for the application
+     */
+    private void logoutUser(){
+        /* Cleaning the SharedPreferences used for persistence */
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_STRING, MODE_PRIVATE);
+        SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
+        sharedPrefsEditor.remove(Constants.LOGGED_USER_EXTRA_STRING);
+        sharedPrefsEditor.apply();
+        /* Effectively Sign Out */
+        FirebaseAuth.getInstance().signOut();
+        /* Rerouting to the Login Activity */
+        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(loginIntent);
+        finish();
+    }
+
+    /**
+     * Shows a dialog in order to handle logout confirmation before initiating the logout procedure itself
+     */
+    private void handleLogoutConfirmation(){
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        dialogBuilder.setTitle(R.string.confirm_logout);
+        dialogBuilder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                MainActivity.this.logoutUser();
+            }
+        });
+        dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.i(Constants.LOGOUT_CANCELED_TAG, Constants.LOGOUT_CANCELED_MSG);
+            }
+        });
+        AlertDialog logoutDialog = dialogBuilder.create();
+        logoutDialog.show();
     }
 }

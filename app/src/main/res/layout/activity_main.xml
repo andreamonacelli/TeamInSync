@@ -21,16 +21,17 @@
 
     <TextView
         android:id="@+id/homepageHeaderTV"
-        android:layout_width="322dp"
+        android:layout_width="0dp"
         android:layout_height="25dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:fontFamily="sans-serif"
         android:text="@string/welcome_default"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/logoutBtn"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
@@ -104,6 +105,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/leagueNameTV" />
+
+    <ImageButton
+        android:id="@+id/logoutBtn"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Logout"
+        app:layout_constraintEnd_toStartOf="@+id/openNotificationsBtn"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/ic_lock_power_off"
+        app:tint="@color/purple_700" />
 
     <ImageButton
         android:id="@+id/openNotificationsBtn"
