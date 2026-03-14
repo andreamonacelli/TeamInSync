@@ -24,7 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
-import com.monacdev.teaminsync.TrainingListTileAdapter;
+import com.monacdev.teaminsync.adapters.TrainingListTileAdapter;
 import com.monacdev.teaminsync.fragments.TrainingCreationWizardFragment;
 import com.monacdev.teaminsync.utils.Constants;
 

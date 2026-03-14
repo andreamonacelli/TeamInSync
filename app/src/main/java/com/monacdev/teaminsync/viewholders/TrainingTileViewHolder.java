@@ -1,4 +1,4 @@
-package com.monacdev.teaminsync;
+package com.monacdev.teaminsync.viewholders;
 
 import android.graphics.Color;
 import android.view.View;
@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.utils.Constants;
 
 import java.text.ParseException;

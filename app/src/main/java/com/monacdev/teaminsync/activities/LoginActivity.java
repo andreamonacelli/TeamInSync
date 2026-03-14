@@ -29,6 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.fragments.RegistrationWizardFragment;
 import com.monacdev.teaminsync.utils.Constants;
+import com.onesignal.OneSignal;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText emailInputET;
@@ -155,6 +156,9 @@ public class LoginActivity extends AppCompatActivity {
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         intent.putExtra(Constants.LOGGED_USER_EXTRA_STRING, loggedUserID);
                         LoginActivity.this.saveUserForPersistence(loggedUserID);
+                        if(loggedUserID != null) {
+                            OneSignal.login(loggedUserID);
+                        }
                         startActivity(intent);
                         finish();
                     }

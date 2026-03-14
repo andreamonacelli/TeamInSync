@@ -32,6 +32,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.utils.Constants;
+import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
     private String teamID;
@@ -229,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPrefsEditor.apply();
         /* Effectively Sign Out */
         FirebaseAuth.getInstance().signOut();
+        OneSignal.logout();
         /* Rerouting to the Login Activity */
         Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(loginIntent);

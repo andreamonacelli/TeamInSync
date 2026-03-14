@@ -69,4 +69,6 @@
     <string name="splash_welcome_label">Welcome! We are getting everything ready...</string>
     <string name="confirm_logout">Do you want to log out?</string>
     <string name="cancel">Cancel</string>
+    <string name="push_new_training_title">New training session created!</string>
+    <string name="push_new_training_body">A new training session has been created by the coaching staff!</string>
 </resources>

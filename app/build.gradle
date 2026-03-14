@@ -3,6 +3,14 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { instr ->
+        localProperties.load(instr)
+    }
+}
+
 android {
     namespace 'com.monacdev.teaminsync'
     compileSdk {
@@ -19,6 +27,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        def oneSignalKey = localProperties.getProperty("ONESIGNAL_REST_API_KEY")
+        buildConfigField "String", "ONESIGNAL_REST_API_KEY", "\"${oneSignalKey}\""
     }
 
     buildTypes {
@@ -33,6 +44,7 @@ android {
     }
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 }
 
@@ -47,6 +59,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:22.0.1'
     implementation 'com.github.bumptech.glide:glide:5.0.5'
     implementation 'androidx.core:core-splashscreen:1.2.0'
+    implementation 'com.onesignal:OneSignal:5.7.2'
     implementation libs.legacy.support.v4
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

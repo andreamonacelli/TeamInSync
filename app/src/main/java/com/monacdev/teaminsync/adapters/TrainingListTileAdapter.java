@@ -1,4 +1,4 @@
-package com.monacdev.teaminsync;
+package com.monacdev.teaminsync.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -6,6 +6,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.viewholders.TrainingTileViewHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;

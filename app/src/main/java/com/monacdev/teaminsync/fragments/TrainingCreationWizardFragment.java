@@ -25,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.activities.LoginActivity;
 import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.utils.PushNotificationsManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -99,14 +100,12 @@ public class TrainingCreationWizardFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
                 uploadTrainingToDatabase(Constants.EFFECT_NEXT);
-                //clearInputFields();
             }
         });
         this.completeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 uploadTrainingToDatabase(Constants.EFFECT_DISMISS);
-                //dismiss();
             }
         });
     }
@@ -133,7 +132,6 @@ public class TrainingCreationWizardFragment extends DialogFragment {
                     for(DataSnapshot memberSnapshot : snapshot.getChildren()){
                         String role = memberSnapshot.child(Constants.ROLE_KEY_STRING).getValue(String.class);
                         if(role != null && role.equals(Constants.PLAYER_ROLE_STRING)){
-                            /* Since the athlete username is the key of the entity on the DB, we use that directly */
                             targetAthletes.add(memberSnapshot.getKey());
                         }
                     }
@@ -159,13 +157,24 @@ public class TrainingCreationWizardFragment extends DialogFragment {
         }
         Map<String, Object> multiUploadMap = new HashMap<>();
         for(String athleteID : this.targetAthletes){
-            String dbPath = String.format("%s/%s/%s", Constants.TRAININGS_REFERENCE_STRING, athleteID, trainingUID);
-            multiUploadMap.put(dbPath, trainingData);
+            /* Upload training data */
+            String trainingPath = String.format("%s/%s/%s", Constants.TRAININGS_REFERENCE_STRING, athleteID, trainingUID);
+            multiUploadMap.put(trainingPath, trainingData);
+            /* Upload notification data and send push notification */
+            String notificationUID = UUID.randomUUID().toString();
+            String notificationPath = String.format("%s/%s/%s", Constants.NOTIFICATIONS_REFERENCE_STRING, athleteID, notificationUID);
+            HashMap<String, Object> notificationData = this.prepareNotification();
+            multiUploadMap.put(notificationPath, notificationData);
         }
         this.dbRef.updateChildren(multiUploadMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
+                    PushNotificationsManager.sendPushNotification(
+                            TrainingCreationWizardFragment.this.targetAthletes,
+                            getString(R.string.push_new_training_title),
+                            getString(R.string.push_new_training_body)
+                    );
                     Toast.makeText(getContext(), R.string.exercise_added, Toast.LENGTH_SHORT).show();
                     if(completionEffect.equals(Constants.EFFECT_DISMISS)){
                         dismiss();
@@ -189,7 +198,6 @@ public class TrainingCreationWizardFragment extends DialogFragment {
         String target = this.trainingTargetET.getText().toString().trim();
         String dueToDate = this.trainingDueToET.getText().toString().trim();
         if(validateInputData(target, dueToDate)){
-            /* If data is valid upload to DB */
             String trainingType;
             if(this.trainingTypeRG.getCheckedRadioButtonId() == R.id.chronoRB){
                 trainingType = Constants.CHRONO_TRAINING_STRING;
@@ -219,7 +227,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
         if(!target.matches("[0-9]*?[0-9]:[0-9][0-9]") && !target.matches("[0-9]+")){
             return false;
         }
-        /* Here we can assume that the checks on target have passed */
+        /* Here we can assume that the checks on the target string have passed */
         try{
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             simpleDateFormat.setLenient(false);
@@ -228,5 +236,18 @@ public class TrainingCreationWizardFragment extends DialogFragment {
         } catch(ParseException e) {
             return false;
         }
+    }
+
+    /**
+     * Prepares a HashMap containing all the notification info to be uploaded on the Firebase DB
+     * @return the filled HashMap object
+     */
+    private HashMap<String, Object> prepareNotification(){
+        HashMap<String, Object> notificationData = new HashMap<>();
+        notificationData.put(Constants.NOTIFICATIONS_TITLE_KEY, getString(R.string.push_new_training_title));
+        notificationData.put(Constants.NOTIFICATIONS_MSG_KEY, getString(R.string.push_new_training_body));
+        notificationData.put(Constants.NOTIFICATIONS_READ_KEY, false);
+        notificationData.put(Constants.NOTIFICATIONS_TIMESTAMP_KEY, System.currentTimeMillis());
+        return notificationData;
     }
 }

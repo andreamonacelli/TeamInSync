@@ -54,6 +54,12 @@ public final class Constants {
 
     /* Constants for Notifications management */
     public static final String NOTIFICATIONS_CHANNEL_ID = "teaminsync_notifications";
+    public static final String NOTIFICATIONS_TITLE_KEY = "title";
+    public static final String NOTIFICATIONS_MSG_KEY = "message";
+    public static final String NOTIFICATIONS_READ_KEY = "is_read";
+    public static final String NOTIFICATIONS_TIMESTAMP_KEY = "timestamp";
+    public static final String NOTIFICATIONS_MANAGER_TAG = "PushNotificationsManager";
+
     /* Persistence related constants */
     public static final String SHARED_PREFERENCES_STRING = "teaminsync_sharedprefs";
 }

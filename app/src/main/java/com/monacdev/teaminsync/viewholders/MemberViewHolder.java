@@ -1,4 +1,4 @@
-package com.monacdev.teaminsync;
+package com.monacdev.teaminsync.viewholders;
 
 import android.content.Intent;
 import android.view.View;
@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.activities.ProfileActivity;
 import com.monacdev.teaminsync.utils.Constants;
 

@@ -7,15 +7,15 @@ import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
 import androidx.core.splashscreen.SplashScreen;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.utils.PushNotificationsManager;
+import com.onesignal.Continue;
+import com.onesignal.OneSignal;
+import com.onesignal.debug.LogLevel;
 
 @SuppressLint("CustomSplashScreen")
 public class SplashScreenActivity extends AppCompatActivity {
@@ -25,6 +25,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        this.initializeNotificationsSystem();
         this.defineNextRoute();
     }
 
@@ -39,6 +40,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             if(loggedUsername != null){
                 Intent homepageIntent = new Intent(SplashScreenActivity.this, MainActivity.class);
                 homepageIntent.putExtra(Constants.LOGGED_USER_EXTRA_STRING, loggedUsername);
+                OneSignal.login(loggedUsername);
                 startActivity(homepageIntent);
                 finish();
                 return;
@@ -48,5 +50,16 @@ public class SplashScreenActivity extends AppCompatActivity {
         Intent loginIntent = new Intent(SplashScreenActivity.this, LoginActivity.class);
         startActivity(loginIntent);
         finish();
+    }
+
+    /**
+     * Initializes the notification system based on OneSignal
+     */
+    private void initializeNotificationsSystem(){
+        OneSignal.getDebug().setAlertLevel(LogLevel.FATAL);
+        OneSignal.initWithContext(SplashScreenActivity.this, PushNotificationsManager.ONESIGNAL_APP_ID);
+        OneSignal.getNotifications().requestPermission(true, Continue.with(r -> {
+            /* Do nothing */
+        }));
     }
 }
