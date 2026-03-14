@@ -160,24 +160,26 @@ public class TrainingCreationWizardFragment extends DialogFragment {
             /* Upload training data */
             String trainingPath = String.format("%s/%s/%s", Constants.TRAININGS_REFERENCE_STRING, athleteID, trainingUID);
             multiUploadMap.put(trainingPath, trainingData);
-            /* Upload notification data and send push notification */
-            String notificationUID = UUID.randomUUID().toString();
-            String notificationPath = String.format("%s/%s/%s", Constants.NOTIFICATIONS_REFERENCE_STRING, athleteID, notificationUID);
-            HashMap<String, Object> notificationData = this.prepareNotification();
-            multiUploadMap.put(notificationPath, notificationData);
+            if(completionEffect.equals(Constants.EFFECT_DISMISS)) {
+                /* Upload notification data and send push notification */
+                String notificationUID = UUID.randomUUID().toString();
+                String notificationPath = String.format("%s/%s/%s", Constants.NOTIFICATIONS_REFERENCE_STRING, athleteID, notificationUID);
+                HashMap<String, Object> notificationData = this.prepareNotification();
+                multiUploadMap.put(notificationPath, notificationData);
+            }
         }
         this.dbRef.updateChildren(multiUploadMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
-                    PushNotificationsManager.sendPushNotification(
-                            TrainingCreationWizardFragment.this.targetAthletes,
-                            getString(R.string.push_new_training_title),
-                            getString(R.string.push_new_training_body)
-                    );
                     Toast.makeText(getContext(), R.string.exercise_added, Toast.LENGTH_SHORT).show();
                     if(completionEffect.equals(Constants.EFFECT_DISMISS)){
                         dismiss();
+                        PushNotificationsManager.sendPushNotification(
+                                TrainingCreationWizardFragment.this.targetAthletes,
+                                getString(R.string.push_new_training_title),
+                                getString(R.string.push_new_training_body)
+                        );
                     } else {
                         clearInputFields();
                     }

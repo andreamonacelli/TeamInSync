@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -231,10 +233,16 @@ public class MainActivity extends AppCompatActivity {
         /* Effectively Sign Out */
         FirebaseAuth.getInstance().signOut();
         OneSignal.logout();
-        /* Rerouting to the Login Activity */
-        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(loginIntent);
-        finish();
+        /* Delay activity destruction to allow OneSignal to complete logout */
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                /* Rerouting to the Login Activity */
+                Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(loginIntent);
+                finish();
+            }
+        }, 500);
     }
 
     /**
