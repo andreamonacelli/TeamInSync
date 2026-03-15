@@ -33,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.fragments.NotificationsFragment;
 import com.monacdev.teaminsync.utils.Constants;
 import com.onesignal.OneSignal;
 
@@ -108,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 /* TODO: implement a Fragment to show notifications */
+                NotificationsFragment notificationsDialog = NotificationsFragment.newInstance(loggedUserUsername);
+                notificationsDialog.show(getSupportFragmentManager(), Constants.NOTIFICATIONS_FRAGMENT_TAG);
             }
         });
         this.logoutBtn.setOnClickListener(new View.OnClickListener() {
@@ -184,41 +187,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    /**
-     * Listens for incoming notifications on the Firebase DB
-     */
-    private void listenForNewNotifications(){
-        DatabaseReference notificationsRef = this.dbRef.child(Constants.NOTIFICATIONS_REFERENCE_STRING).child(this.loggedUserUsername);
-        notificationsRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                /* New notification arrived on the DB */
-
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /**
-     * Creates and sets up the notification channel in order to implement the local-push mechanism for incoming notifications
-     */
-    private void createNotificationChannel() {
-
     }
 
     /**

@@ -37,6 +37,7 @@ public final class Constants {
     public static final String TEAM_ID_TAG = "TEAM_ID";
     public static final String TRAINING_CREATION_WIZARD_TAG = "TRAINING_CREATION_WIZARD";
     public static final String TRAINING_TRACKER_TAG = "TRAINING_TRACKER";
+    public static final String NOTIFICATIONS_FRAGMENT_TAG = "NOTIFICATION_FRAGMENT";
 
     /* Numeric constants */
     public static final int INVALID_SELECTION = -1;
@@ -58,6 +59,7 @@ public final class Constants {
     public static final String NOTIFICATIONS_MSG_KEY = "message";
     public static final String NOTIFICATIONS_READ_KEY = "is_read";
     public static final String NOTIFICATIONS_TIMESTAMP_KEY = "timestamp";
+    public static final String NOTIFICATIONS_UID_KEY = "notification_uid";
     public static final String NOTIFICATIONS_MANAGER_TAG = "PushNotificationsManager";
 
     /* Persistence related constants */

@@ -71,4 +71,10 @@
     <string name="cancel">Cancel</string>
     <string name="push_new_training_title">New training session created!</string>
     <string name="push_new_training_body">A new training session has been created by the coaching staff!</string>
+    <string name="notification_tile_title_def">Notification title</string>
+    <string name="notification_tile_msg_def">Notification content</string>
+    <string name="marked_as_read">Marked as read</string>
+    <string name="marked_unread">Marked as unread</string>
+    <string name="notif_fragment_title">Notifications</string>
+    <string name="no_notifications_found">No notifications to show</string>
 </resources>

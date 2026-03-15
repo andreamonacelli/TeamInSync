@@ -74,4 +74,10 @@
     <string name="cancel">Annulla</string>
     <string name="push_new_training_title">Nuovo allenamento creato!</string>
     <string name="push_new_training_body">É stata creata una nuova sessione di allenamento!</string>
+    <string name="notification_tile_title_def">Titolo notifica</string>
+    <string name="notification_tile_msg_def">Contenuto notifica</string>
+    <string name="marked_as_read">Segnata come letta</string>
+    <string name="marked_unread">Segnata come da leggere</string>
+    <string name="notif_fragment_title">Notifiche</string>
+    <string name="no_notifications_found">Nessuna notifica da mostrare</string>
 </resources>

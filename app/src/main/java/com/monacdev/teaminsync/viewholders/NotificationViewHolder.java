@@ -1,0 +1,110 @@
+package com.monacdev.teaminsync.viewholders;
+
+import android.graphics.Color;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.utils.Constants;
+
+import java.util.HashMap;
+
+public class NotificationViewHolder extends RecyclerView.ViewHolder {
+    private TextView notificationTitleTV;
+    private TextView notificationMessageTV;
+    private ImageButton markAsReadBtn;
+    private boolean isRead;
+    private String notificationAthleteID;
+    private String notificationUID;
+
+    public NotificationViewHolder(@NonNull View itemView) {
+        super(itemView);
+        this.bindViewsToObjects(itemView);
+    }
+
+    /**
+     * Given the respective XML file, this method binds each view to its corresponding Java object
+     * @param view the view object to which the TrainingTileViewHolder is bound
+     */
+    private void bindViewsToObjects(@NonNull View view){
+        this.notificationTitleTV = view.findViewById(R.id.notificationTitleTV);
+        this.notificationMessageTV = view.findViewById(R.id.notificationMessageTV);
+        this.markAsReadBtn = view.findViewById(R.id.markAsReadBtn);
+    }
+
+    /**
+     * Handles the binding of given notification data to the actual view that will be drawn on screen
+     * @param notificationData the data to be shown in the view
+     */
+    public void bindData(HashMap<String, Object> notificationData){
+        this.notificationTitleTV.setText(notificationData.get(Constants.NOTIFICATIONS_TITLE_KEY).toString());
+        this.notificationMessageTV.setText(notificationData.get(Constants.NOTIFICATIONS_MSG_KEY).toString());
+        this.notificationUID = notificationData.get(Constants.NOTIFICATIONS_UID_KEY).toString();
+        this.notificationAthleteID = notificationData.get(Constants.USERNAME_KEY_STRING).toString();
+        this.isRead = Boolean.parseBoolean(notificationData.get(Constants.NOTIFICATIONS_READ_KEY).toString());
+        this.configureImageButton();
+    }
+
+    /**
+     * Based on the current status of the notification (isRead) define how to color the icon and what action perform when the button is clicked
+     */
+    private void configureImageButton(){
+        if(this.isRead){
+            this.markAsReadBtn.setColorFilter(Color.BLACK);
+            this.markAsReadBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    NotificationViewHolder.this.isRead = false;
+                    NotificationViewHolder.this.markAsReadBtn.setColorFilter(Color.RED);
+                    NotificationViewHolder.this.updateNotificationDataOnDB(view, false);
+                    NotificationViewHolder.this.configureImageButton();
+                }
+            });
+        } else {
+            this.markAsReadBtn.setColorFilter(Color.RED);
+            this.markAsReadBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    NotificationViewHolder.this.isRead = true;
+                    NotificationViewHolder.this.markAsReadBtn.setColorFilter(Color.BLACK);
+                    NotificationViewHolder.this.updateNotificationDataOnDB(view, true);
+                    NotificationViewHolder.this.configureImageButton();
+                }
+            });
+        }
+    }
+
+    /**
+     * Toggles the status (read/unread) of the notification on the DB
+     * @param view the view over which display the Toast message
+     * @param newStatus the status that has to be put on the DB
+     */
+    private void updateNotificationDataOnDB(View view, boolean newStatus){
+        DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference();
+        notificationRef.child(Constants.NOTIFICATIONS_REFERENCE_STRING).child(this.notificationAthleteID).child(this.notificationUID)
+                .child(Constants.NOTIFICATIONS_READ_KEY).setValue(newStatus).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        if(newStatus){
+                            Toast.makeText(view.getContext(), R.string.marked_as_read, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(view.getContext(), R.string.marked_unread, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(view.getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+}

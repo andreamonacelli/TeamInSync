@@ -46,7 +46,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
     private String teamID;
     private String coachID;
     private ArrayList<String> targetAthletes;
-    private DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+    private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
 
     public static TrainingCreationWizardFragment newInstance(String teamID, String coachID) {
         final TrainingCreationWizardFragment fragment = new TrainingCreationWizardFragment();
