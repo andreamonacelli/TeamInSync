@@ -80,4 +80,15 @@
     <string name="marked_unread">Segnata come da leggere</string>
     <string name="notif_fragment_title">Notifiche</string>
     <string name="no_notifications_found">Nessuna notifica da mostrare</string>
+    <string name="tracking_frag_title">Tracking Allenamento</string>
+    <string name="tracking_frag_time_placeholder" translatable="false">00:00.00</string>
+    <string name="tracking_frag_current_exercise">Esercizio corrente</string>
+    <string name="tracking_frag_name_placeholder">Nome esercizio</string>
+    <string name="tracking_frag_target_placeholder">Obiettivo da raggiungere</string>
+    <string name="tracking_frag_complete_training">Concludi allenamento</string>
+    <string name="training_completed_label">Obiettivo raggiunto, complimenti!</string>
+    <string name="training_canceled_label">Allenamento annullato. Obiettivo non raggiunto!</string>
+    <string name="training_auto_completed">Obiettivo raggiunto, progressi allenamento salvati!</string>
+    <string name="target_label">Obiettivo</string>
+    <string name="reps_label">ripetizioni</string>
 </resources>

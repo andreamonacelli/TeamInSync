@@ -42,6 +42,8 @@ public final class Constants {
     /* Numeric constants */
     public static final int INVALID_SELECTION = -1;
     public static final int DEFAULT_SELECTION_INDEX = 0;
+    public static final int MSG_UPDATE_TIMER = 1;
+    public static final int MSG_TRAINING_TARGET_REACHED = 2;
 
     /* Textual constants */
     public static final String PLAYER_ROLE_STRING = "player";

@@ -93,7 +93,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
     }
 
     /**
-     * Defines the listeners for the View components within the current activity
+     * Defines the listeners for the View components within the current fragment
      */
     private void setListeners(){
         this.appendBtn.setOnClickListener(new View.OnClickListener() {

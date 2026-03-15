@@ -108,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
         this.openNotificationsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /* TODO: implement a Fragment to show notifications */
                 NotificationsFragment notificationsDialog = NotificationsFragment.newInstance(loggedUserUsername);
                 notificationsDialog.show(getSupportFragmentManager(), Constants.NOTIFICATIONS_FRAGMENT_TAG);
             }

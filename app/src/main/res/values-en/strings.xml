@@ -77,4 +77,14 @@
     <string name="marked_unread">Marked as unread</string>
     <string name="notif_fragment_title">Notifications</string>
     <string name="no_notifications_found">No notifications to show</string>
+    <string name="tracking_frag_title">Training Tracking</string>
+    <string name="tracking_frag_current_exercise">Current exercise</string>
+    <string name="tracking_frag_name_placeholder">Exercise name</string>
+    <string name="tracking_frag_target_placeholder">Target to reach</string>
+    <string name="tracking_frag_complete_training">Finish training</string>
+    <string name="training_completed_label">Target reached, congratulations!</string>
+    <string name="training_canceled_label">Training canceled. Target not reached!</string>
+    <string name="training_auto_completed">Target reached, training progress saved!</string>
+    <string name="target_label">Target</string>
+    <string name="reps_label">repetitions</string>
 </resources>

@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -15,6 +16,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.fragments.TrainingTrackingFragment;
 import com.monacdev.teaminsync.utils.Constants;
 
 import java.text.ParseException;
@@ -32,6 +34,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
     private boolean isCompleted;
     private boolean actionsActive;
     private String trainingUID;
+    private String athleteUsername;
 
     public TrainingTileViewHolder(@NonNull View itemView, boolean actionsActive) {
         super(itemView);
@@ -61,6 +64,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
                 trainingData.get(Constants.TRAINING_DUE_TO_KEY_STRING)
         );
         this.trainingUID = trainingData.get(Constants.TRAINING_UUID_KEY_STRING);
+        this.athleteUsername = trainingData.get(Constants.USERNAME_KEY_STRING);
         this.handleTrainingType(trainingData.get(Constants.TRAINING_TYPE_KEY_STRING), trainingData.get(Constants.USERNAME_KEY_STRING));
         this.isExpired = isTrainingExpired(trainingData.get(Constants.TRAINING_DUE_TO_KEY_STRING));
         this.isCompleted = Boolean.parseBoolean(trainingData.get(Constants.TRAINING_COMPLETED_KEY_STRING));
@@ -84,7 +88,9 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
             this.startTrainingBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    /* TODO: Start the training tracking in a fragment */
+                    TrainingTrackingFragment trackingFragment = TrainingTrackingFragment.newInstance(TrainingTileViewHolder.this.trainingUID, TrainingTileViewHolder.this.athleteUsername);
+                    AppCompatActivity activity = (AppCompatActivity) view.getContext();
+                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.trainingTrackerFragmentContainer, trackingFragment).addToBackStack(null).commit();
                 }
             });
         } else {
