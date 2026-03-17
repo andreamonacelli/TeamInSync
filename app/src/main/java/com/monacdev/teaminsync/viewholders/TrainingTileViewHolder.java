@@ -1,6 +1,9 @@
 package com.monacdev.teaminsync.viewholders;
 
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -9,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -68,7 +72,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
         this.handleTrainingType(trainingData.get(Constants.TRAINING_TYPE_KEY_STRING), trainingData.get(Constants.USERNAME_KEY_STRING));
         this.isExpired = isTrainingExpired(trainingData.get(Constants.TRAINING_DUE_TO_KEY_STRING));
         this.isCompleted = Boolean.parseBoolean(trainingData.get(Constants.TRAINING_COMPLETED_KEY_STRING));
-        if(this.actionsActive){
+        if(this.actionsActive && !this.isCompleted){
             this.startTrainingBtn.setVisibility(View.VISIBLE);
         } else {
             this.startTrainingBtn.setVisibility(View.GONE);
@@ -89,8 +93,35 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
                 @Override
                 public void onClick(View view) {
                     TrainingTrackingFragment trackingFragment = TrainingTrackingFragment.newInstance(TrainingTileViewHolder.this.trainingUID, TrainingTileViewHolder.this.athleteUsername);
-                    AppCompatActivity activity = (AppCompatActivity) view.getContext();
-                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.trainingTrackerFragmentContainer, trackingFragment).addToBackStack(null).commit();
+                    AppCompatActivity activity = null;
+                    Context context = view.getContext();
+                    while(context instanceof ContextWrapper){
+                        if(context instanceof AppCompatActivity){
+                            activity = (AppCompatActivity) context;
+                            break;
+                        }
+                        context = ((ContextWrapper) context).getBaseContext();
+                    }
+                    if(activity != null) {
+                        activity.getSupportFragmentManager().setFragmentResultListener(
+                                Constants.TRAINING_RESULT_BUNDLE_STRING,
+                                activity,
+                                new FragmentResultListener() {
+                                    @Override
+                                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                                        boolean completed = result.getBoolean(Constants.TRAINING_COMPLETED_EXTRA_STRING);
+                                        if(completed){
+                                            TrainingTileViewHolder.this.isCompleted = true;
+                                            TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
+                                        }
+                                    }
+                                }
+                        );
+                        activity.findViewById(R.id.trainingTrackerFragmentContainer).setVisibility(View.VISIBLE);
+                        activity.getSupportFragmentManager().beginTransaction().replace(R.id.trainingTrackerFragmentContainer, trackingFragment).addToBackStack(null).commit();
+                    } else {
+                        Toast.makeText(view.getContext(), R.string.generic_error, Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         } else {
@@ -101,6 +132,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
                 public void onClick(View view) {
                     if(TrainingTileViewHolder.this.trainingUID != null && userID != null){
                         TrainingTileViewHolder.this.updateTrainingOnDB(view, userID);
+                        TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
                     } else {
                         Toast.makeText(view.getContext(), R.string.training_completion_error, Toast.LENGTH_SHORT).show();
                     }
@@ -184,21 +216,23 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
         if(this.isExpired){
             if(this.isCompleted){
                 /* Make the button non-clickable and color background in soft orange */
-                this.startTrainingBtn.setClickable(false);
+                this.startTrainingBtn.setVisibility(View.GONE);
                 this.itemView.setBackgroundColor(Color.YELLOW);
             } else {
                 /* Make the button clickable and color background in red */
-                this.startTrainingBtn.setClickable(true);
+                this.startTrainingBtn.setEnabled(true);
+                this.startTrainingBtn.setVisibility(View.VISIBLE);
                 this.itemView.setBackgroundColor(Color.RED);
             }
         } else {
             if(this.isCompleted){
                 /* Make the button non-clickable and color background in light gray */
-                this.startTrainingBtn.setClickable(false);
+                this.startTrainingBtn.setVisibility(View.GONE);
                 this.itemView.setBackgroundColor(Color.LTGRAY);
             } else {
                 /* Make the button clickable and color background in green */
-                this.startTrainingBtn.setClickable(true);
+                this.startTrainingBtn.setEnabled(true);
+                this.startTrainingBtn.setVisibility(View.VISIBLE);
                 this.itemView.setBackgroundColor(Color.GREEN);
             }
         }

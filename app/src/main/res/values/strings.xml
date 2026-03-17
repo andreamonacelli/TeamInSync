@@ -91,4 +91,5 @@
     <string name="training_auto_completed">Obiettivo raggiunto, progressi allenamento salvati!</string>
     <string name="target_label">Obiettivo</string>
     <string name="reps_label">ripetizioni</string>
+    <string name="generic_error">Si è verificato un errore!</string>
 </resources>

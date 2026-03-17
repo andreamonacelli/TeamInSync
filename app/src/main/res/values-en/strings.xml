@@ -87,4 +87,5 @@
     <string name="training_auto_completed">Target reached, training progress saved!</string>
     <string name="target_label">Target</string>
     <string name="reps_label">repetitions</string>
+    <string name="generic_error">An error occurred!</string>
 </resources>

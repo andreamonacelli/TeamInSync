@@ -83,7 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 tools:text="@string/tracking_frag_target_placeholder" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

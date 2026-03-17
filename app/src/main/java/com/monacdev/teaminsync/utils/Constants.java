@@ -36,7 +36,6 @@ public final class Constants {
     public static final String REG_WIZARD_TAG = "REGISTRATION_WIZARD";
     public static final String TEAM_ID_TAG = "TEAM_ID";
     public static final String TRAINING_CREATION_WIZARD_TAG = "TRAINING_CREATION_WIZARD";
-    public static final String TRAINING_TRACKER_TAG = "TRAINING_TRACKER";
     public static final String NOTIFICATIONS_FRAGMENT_TAG = "NOTIFICATION_FRAGMENT";
 
     /* Numeric constants */
@@ -54,6 +53,8 @@ public final class Constants {
     public static final String EFFECT_NEXT = "clear_fields";
     public static final String LOGOUT_CANCELED_TAG = "logout_canceled";
     public static final String LOGOUT_CANCELED_MSG = "Logout dialog dismissed but user has not logged out";
+    public static final String TRAINING_COMPLETED_EXTRA_STRING = "trainingCompleted";
+    public static final String TRAINING_RESULT_BUNDLE_STRING = "TRAINING_RESULT";
 
     /* Constants for Notifications management */
     public static final String NOTIFICATIONS_CHANNEL_ID = "teaminsync_notifications";

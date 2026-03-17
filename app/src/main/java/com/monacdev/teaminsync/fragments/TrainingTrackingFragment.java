@@ -132,6 +132,8 @@ public class TrainingTrackingFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 TrainingTrackingFragment.this.flagTrainingAsCompleted();
+                Toast.makeText(getContext(), getString(R.string.training_auto_completed), Toast.LENGTH_SHORT).show();
+                requireActivity().getSupportFragmentManager().popBackStack();
             }
         });
     }
@@ -143,7 +145,7 @@ public class TrainingTrackingFragment extends Fragment {
         this.trainingTrackerManager = new TrainingTrackerManager(this.timerHandler);
         this.trainingTrackerManager.setTargetSeconds(targetSeconds);
         this.trainingTrackerManager.startTimer();
-        this.stopResumeTrainingBtn.setImageResource(android.R.drawable.ic_media_play);
+        this.stopResumeTrainingBtn.setImageResource(android.R.drawable.ic_media_pause);
     }
 
     /**
@@ -178,9 +180,13 @@ public class TrainingTrackingFragment extends Fragment {
                     if(exerciseName != null){
                         TrainingTrackingFragment.this.exerciseNameTV.setText(exerciseName);
                     }
-                    Integer targetValue = Integer.parseInt(snapshot.child(Constants.TRAINING_TARGET_KEY_STRING).getValue(String.class));
-                    int targetSeconds = (targetValue != null) ? (targetValue * 60) : 0;
-                    TrainingTrackingFragment.this.initializeTrackerManager(targetSeconds);
+                    String targetValueString = snapshot.child(Constants.TRAINING_TARGET_KEY_STRING).getValue(String.class);
+                    if(targetValueString != null){
+                        int targetValue = Integer.parseInt(targetValueString);
+                        int targetSeconds = targetValue * 60;
+                        TrainingTrackingFragment.this.exerciseTargetTV.setText(String.format(Locale.getDefault(), "%s -> %s", getString(R.string.tracking_frag_target_placeholder), TrainingTrackingFragment.this.formatTargetIntoHHMM(targetValue)));
+                        TrainingTrackingFragment.this.initializeTrackerManager(targetSeconds);
+                    }
                 } else {
                     Toast.makeText(getContext(), R.string.no_trainings_found, Toast.LENGTH_SHORT).show();
                 }
@@ -197,6 +203,10 @@ public class TrainingTrackingFragment extends Fragment {
      * Flags the current training as completed on the Firebase DB
      */
     private void flagTrainingAsCompleted(){
+        /* Sending a Bundle to the activity in order to invoke the training completion */
+        Bundle trainingResult = new Bundle();
+        trainingResult.putBoolean(Constants.TRAINING_COMPLETED_EXTRA_STRING, true);
+        requireActivity().getSupportFragmentManager().setFragmentResult(Constants.TRAINING_RESULT_BUNDLE_STRING, trainingResult);
         DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference().child(Constants.TRAININGS_REFERENCE_STRING).child(this.athleteUsername).child(this.trainingUID);
         trainingRef.child(Constants.TRAINING_COMPLETED_KEY_STRING).setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -209,5 +219,16 @@ public class TrainingTrackingFragment extends Fragment {
                 Toast.makeText(getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * Given the target value in minutes it formats such value into a HH:MM string
+     * @param targetValue the target value in minutes
+     * @return a HH:MM formatted string holding a user readable value
+     */
+    private String formatTargetIntoHHMM(int targetValue){
+        int targetMinutes = targetValue % 60;
+        int targetHours = targetValue / 60;
+        return String.format(Locale.getDefault(), "%02d:%02d", targetHours, targetMinutes);
     }
 }

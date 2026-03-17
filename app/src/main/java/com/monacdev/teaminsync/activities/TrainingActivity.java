@@ -60,6 +60,8 @@ public class TrainingActivity extends AppCompatActivity {
         this.setListeners();
         this.isDisplayedUserLogged();
         this.trainingPageHeaderTV.setText(String.format("%s %s", getString(R.string.training_list_header), this.displayedUserSurname));
+        this.trainingTrackerFragmentContainer = findViewById(R.id.trainingTrackerFragmentContainer);
+        this.trainingTrackerFragmentContainer.setVisibility(View.GONE);
     }
 
     /**
