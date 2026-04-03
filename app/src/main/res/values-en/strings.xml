@@ -88,4 +88,8 @@
     <string name="target_label">Target</string>
     <string name="reps_label">repetitions</string>
     <string name="generic_error">An error occurred!</string>
+    <string name="photo_source_camera">Take photo</string>
+    <string name="photo_source_gallery">Choose from Gallery</string>
+    <string name="photo_source_selection_title">Choose your profile picture</string>
+    <string name="photo_upload_error">Error during the profile picture upload</string>
 </resources>

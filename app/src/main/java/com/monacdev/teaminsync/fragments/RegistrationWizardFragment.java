@@ -1,10 +1,21 @@
 package com.monacdev.teaminsync.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -15,28 +26,33 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.activities.MainActivity;
+import com.monacdev.teaminsync.utils.CloudinaryManager;
 import com.monacdev.teaminsync.utils.Constants;
 
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 
 public class RegistrationWizardFragment extends BottomSheetDialogFragment {
-    private String loggedUserEmail;
+    private ImageView profilePicIV;
     private EditText usernameET;
     private EditText nameET;
     private EditText surnameET;
@@ -44,8 +60,45 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     private RadioGroup roleRadioGroup;
     private Spinner teamSelectorSpinner;
     private Button submitBtn;
+    private String loggedUserEmail;
+    private Uri selectedImageUri = null; // In case the user selects an existing photo
+    private byte[] cameraImageBytes = null; // In case the user takes a new photo from camera
     private final ArrayList<String> teamNames = new ArrayList<>();
     private final ArrayList<String> teamIDs = new ArrayList<>();
+
+    private final ActivityResultLauncher<Intent> deviceGalleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if(result.getResultCode() == getActivity().RESULT_OK && result.getData() != null){
+                        RegistrationWizardFragment.this.selectedImageUri = result.getData().getData();
+                        RegistrationWizardFragment.this.cameraImageBytes = null;
+                        RegistrationWizardFragment.this.profilePicIV.setImageURI(RegistrationWizardFragment.this.selectedImageUri);
+                    }
+                }
+            }
+    );
+
+    private final ActivityResultLauncher<Intent> cameraLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if(result.getResultCode() == getActivity().RESULT_OK && result.getData() != null && result.getData().getExtras() != null){
+                        Bitmap capturedPhoto = (Bitmap) result.getData().getExtras().get("data");
+                        RegistrationWizardFragment.this.profilePicIV.setImageBitmap(capturedPhoto);
+                        /* Conversion of the image for the upload on Cloudinary */
+                        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+                        if(capturedPhoto != null) {
+                            capturedPhoto.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
+                            RegistrationWizardFragment.this.cameraImageBytes = byteStream.toByteArray();
+                            RegistrationWizardFragment.this.selectedImageUri = null;
+                        }
+                    }
+                }
+            }
+    );
 
     public static RegistrationWizardFragment newInstance(String userEmail) {
         final RegistrationWizardFragment fragment = new RegistrationWizardFragment();
@@ -97,7 +150,8 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 /* if all the form validations checks passed, then we proceed to store the data */
                 selectedTeam = teamIDs.get(selectedTeamID);
                 HashMap<String, Object> newUserData = userDataMapping(selectedTeam);
-                uploadUserOnDatabase(newUserData);
+                //uploadUserOnDatabase(newUserData);
+                RegistrationWizardFragment.this.uploadUserWithProfilePicture(newUserData);
             }
         });
     }
@@ -112,6 +166,13 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
      * @param view The view to be taken as reference for the binding
      */
     private void bindViewsToObjects(@NonNull View view){
+        this.profilePicIV = view.findViewById(R.id.profilePicIV);
+        this.profilePicIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                RegistrationWizardFragment.this.selectImageSourceDialog();
+            }
+        });
         this.usernameET = view.findViewById(R.id.usernameET);
         this.nameET = view.findViewById(R.id.nameET);
         this.surnameET = view.findViewById(R.id.surnameET);
@@ -139,7 +200,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         newUserMap.put(Constants.SURNAME_KEY_STRING, this.surnameET.getText().toString().trim());
         newUserMap.put(Constants.BIRTHDATE_KEY_STRING, this.birthDateET.getText().toString().trim());
         newUserMap.put(Constants.ROLE_KEY_STRING, role);
-        newUserMap.put(Constants.PROFILE_PIC_KEY_STRING, ""); /* To be handled later */
+        newUserMap.put(Constants.PROFILE_PIC_KEY_STRING, "");
         newUserMap.put(Constants.TEAM_KEY_STRING, selectedTeam);
         return newUserMap;
     }
@@ -245,5 +306,68 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 }
             }
         });
+    }
+
+    /**
+     * Gives the user the choice regarding the source from which selecting the image to be set as profile picture
+     */
+    private void selectImageSourceDialog(){
+        String[] options = {getString(R.string.photo_source_camera), getString(R.string.photo_source_gallery)};
+        new AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.photo_source_selection_title))
+                .setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int clickedOption) {
+                        if(clickedOption == 0){
+                            /* Launch camera */
+                            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            RegistrationWizardFragment.this.cameraLauncher.launch(cameraIntent);
+                        } else if(clickedOption == 1){
+                            /* Launch gallery explorer */
+                            Intent galleryExplorerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            RegistrationWizardFragment.this.deviceGalleryLauncher.launch(galleryExplorerIntent);
+                        }
+                    }
+                })
+                .show();
+    }
+
+    /**
+     * Manages the user upload on the remote database as well as dealing with the profile picture uploading
+     * over the remote object storage
+     * @param userData the data to be uploaded
+     */
+    private void uploadUserWithProfilePicture(HashMap<String, Object> userData){
+        if(this.cameraImageBytes == null && this.selectedImageUri == null){
+            this.uploadUserOnDatabase(userData);
+            return;
+        }
+        /* If we get to this point, there is a photo that we need to upload to Cloudinary */
+        CloudinaryManager cloudinaryManager = new CloudinaryManager();
+        UploadCallback cloudinaryCallback = new UploadCallback() {
+            @Override public void onStart(String requestId) {}
+
+            @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
+
+            @Override
+            public void onSuccess(String requestId, Map resultData) {
+                String imageUrl = (String) resultData.get(Constants.CLOUDINARY_UPLOAD_RESULT_STRING);
+                userData.put(Constants.PROFILE_PIC_KEY_STRING, imageUrl);
+                RegistrationWizardFragment.this.uploadUserOnDatabase(userData);
+            }
+
+
+            @Override
+            public void onError(String requestId, ErrorInfo error) {
+                Toast.makeText(getContext(), getString(R.string.photo_upload_error), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override public void onReschedule(String requestId, ErrorInfo error) {}
+        };
+        if(this.cameraImageBytes != null){
+            cloudinaryManager.uploadFromBytes(this.cameraImageBytes, cloudinaryCallback);
+        } else {
+            cloudinaryManager.uploadFromURI(this.selectedImageUri, cloudinaryCallback);
+        }
     }
 }

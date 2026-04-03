@@ -18,6 +18,16 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
 
+        <ImageView
+            android:id="@+id/profilePicIV"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_camera" />
+
         <EditText
             android:id="@+id/usernameET"
             android:layout_width="match_parent"

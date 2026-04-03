@@ -92,4 +92,8 @@
     <string name="target_label">Obiettivo</string>
     <string name="reps_label">ripetizioni</string>
     <string name="generic_error">Si è verificato un errore!</string>
+    <string name="photo_source_camera">Scatta foto</string>
+    <string name="photo_source_gallery">Scegli dalla Galleria</string>
+    <string name="photo_source_selection_title">Scegli la foto profilo</string>
+    <string name="photo_upload_error">Errore nel caricamento della foto profilo</string>
 </resources>

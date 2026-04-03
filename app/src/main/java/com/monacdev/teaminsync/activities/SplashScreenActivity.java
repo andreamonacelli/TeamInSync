@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import androidx.core.splashscreen.SplashScreen;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.monacdev.teaminsync.utils.CloudinaryManager;
 import com.monacdev.teaminsync.utils.Constants;
 import com.monacdev.teaminsync.utils.PushNotificationsManager;
 import com.onesignal.Continue;
@@ -26,6 +28,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         this.initializeNotificationsSystem();
+        CloudinaryManager.init(this);
         this.defineNextRoute();
     }
 
@@ -59,7 +62,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         OneSignal.getDebug().setAlertLevel(LogLevel.FATAL);
         OneSignal.initWithContext(SplashScreenActivity.this, PushNotificationsManager.ONESIGNAL_APP_ID);
         OneSignal.getNotifications().requestPermission(true, Continue.with(r -> {
-            /* Do nothing */
+            Log.i("no_action_needed", "No action is needed, OneSignal initialization completed!");
         }));
     }
 }
