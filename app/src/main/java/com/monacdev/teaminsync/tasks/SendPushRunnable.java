@@ -19,10 +19,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class SendPushRunnable implements Runnable{
-    private ArrayList<String> targetUsernames;
-    private String title;
-    private String message;
-    private Handler mainThreadHandler;
+    private final ArrayList<String> targetUsernames;
+    private final String title;
+    private final String message;
+    private final Handler mainThreadHandler;
 
     public SendPushRunnable(ArrayList<String> targetUsernames, String title, String message, Handler mainThreadHandler) {
         this.targetUsernames = targetUsernames;

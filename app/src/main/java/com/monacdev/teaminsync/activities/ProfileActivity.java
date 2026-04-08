@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.FragmentResultListener;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,7 +38,7 @@ import java.util.HashMap;
 public class ProfileActivity extends AppCompatActivity {
     private String displayedUserID;
     private String displayedUserSurname;
-    private HashMap<String, String> editData = new HashMap<>();
+    private final HashMap<String, String> editData = new HashMap<>();
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private TextView profileNameHeaderTV;
     private ImageView profilePictureIV;
@@ -62,13 +61,10 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         this.displayedUserID = getIntent().getStringExtra(IntentExtrasTags.DISPLAYED_USER);
-        getSupportFragmentManager().setFragmentResultListener(NavigationTags.EDIT_FRAGMENT_RESULT, this, new FragmentResultListener() {
-                @Override
-                public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                    ProfileActivity.this.fillUserDataFromDB();
-                    Log.i("user_profile_updated", "User profile has been updated and reloaded");
-                }
-            }
+        getSupportFragmentManager().setFragmentResultListener(NavigationTags.EDIT_FRAGMENT_RESULT, this, (requestKey, result) -> {
+            ProfileActivity.this.fillUserDataFromDB();
+            Log.i("user_profile_updated", "User profile has been updated and reloaded");
+        }
         );
         this.bindViewsToObjects();
         this.fillUserDataFromDB();
@@ -93,29 +89,20 @@ public class ProfileActivity extends AppCompatActivity {
      * Defines the listeners for the View components within the current activity
      */
     private void setListeners(){
-        this.toSquadListBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /* We can safely assume that we got here from either the squad list page */
-                finish();
-            }
+        this.toSquadListBtn.setOnClickListener(view -> {
+            /* We can safely assume that we got here from either the squad list page */
+            finish();
         });
-        this.toMyTrainingsPageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /* Here we are navigating to the page containing the training of the displayed user which might not be the logged one! */
-                Intent trainingsIntent = new Intent(ProfileActivity.this, TrainingActivity.class);
-                trainingsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER, displayedUserID);
-                trainingsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME, displayedUserSurname);
-                startActivity(trainingsIntent);
-            }
+        this.toMyTrainingsPageBtn.setOnClickListener(view -> {
+            /* Here we are navigating to the page containing the training of the displayed user which might not be the logged one! */
+            Intent trainingsIntent = new Intent(ProfileActivity.this, TrainingActivity.class);
+            trainingsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER, displayedUserID);
+            trainingsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME, displayedUserSurname);
+            startActivity(trainingsIntent);
         });
-        this.editProfileBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                RegistrationWizardFragment editWizard = RegistrationWizardFragment.newEditingInstance(ProfileActivity.this.editData);
-                editWizard.show(getSupportFragmentManager(), NavigationTags.EDIT_WIZARD);
-            }
+        this.editProfileBtn.setOnClickListener(view -> {
+            RegistrationWizardFragment editWizard = RegistrationWizardFragment.newEditingInstance(ProfileActivity.this.editData);
+            editWizard.show(getSupportFragmentManager(), NavigationTags.EDIT_WIZARD);
         });
     }
 

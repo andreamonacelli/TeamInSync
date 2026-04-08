@@ -42,10 +42,8 @@ public class TrainingActivity extends AppCompatActivity {
     private ImageButton createTrainingBtn;
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private String displayedUserID;
-    private String displayedUserSurname;
     private String viewedTeamID;
     private boolean isMyTrainingList;
-    private String loggedUserRole; /* Actually useful only for buttons visibility's sake */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +57,11 @@ public class TrainingActivity extends AppCompatActivity {
         });
 
         this.displayedUserID = getIntent().getStringExtra(IntentExtrasTags.DISPLAYED_USER);
-        this.displayedUserSurname = getIntent().getStringExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME);
+        String displayedUserSurname = getIntent().getStringExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME);
         this.bindViewsToObjects();
         this.setListeners();
         this.isDisplayedUserLogged();
-        this.trainingPageHeaderTV.setText(String.format("%s %s", getString(R.string.training_list_header), this.displayedUserSurname));
+        this.trainingPageHeaderTV.setText(String.format("%s %s", getString(R.string.training_list_header), displayedUserSurname));
         this.trainingTrackerFragmentContainer = findViewById(R.id.trainingTrackerFragmentContainer);
         this.trainingTrackerFragmentContainer.setVisibility(View.GONE);
     }
@@ -125,7 +123,7 @@ public class TrainingActivity extends AppCompatActivity {
      */
     private void setAddTrainingBtnVisibility(String role){
         if(this.isMyTrainingList){
-            this.loggedUserRole = role;
+            /* Actually useful only for buttons visibility's sake */
             if(role != null && role.equals(Constants.COACH_ROLE_STRING)){
                 this.createTrainingBtn.setVisibility(View.VISIBLE);
             } else {
@@ -140,12 +138,9 @@ public class TrainingActivity extends AppCompatActivity {
      * Defines the listeners for the View components within the current activity
      */
     private void setListeners(){
-        this.createTrainingBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                TrainingCreationWizardFragment trainingCreationWizard = TrainingCreationWizardFragment.newInstance(TrainingActivity.this.viewedTeamID, TrainingActivity.this.displayedUserID);
-                trainingCreationWizard.show(getSupportFragmentManager(), NavigationTags.TRAINING_CREATION_WIZARD);
-            }
+        this.createTrainingBtn.setOnClickListener(view -> {
+            TrainingCreationWizardFragment trainingCreationWizard = TrainingCreationWizardFragment.newInstance(TrainingActivity.this.viewedTeamID, TrainingActivity.this.displayedUserID);
+            trainingCreationWizard.show(getSupportFragmentManager(), NavigationTags.TRAINING_CREATION_WIZARD);
         });
     }
 

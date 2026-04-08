@@ -13,7 +13,7 @@ public class TrainingTrackerManager {
     private Timer workoutTimer;
     private int elapsedSeconds = 0;
     private boolean timerRunning = false;
-    private Handler UIHandler;
+    private final Handler UIHandler;
     private int targetSeconds;
     private boolean targetReachedMsgSent = false;
 

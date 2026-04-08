@@ -81,12 +81,7 @@ public class NotificationsFragment extends DialogFragment {
      * Defines the listeners for the View components within the current activity
      */
     private void setListeners(){
-        this.closeNotificationsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-            }
-        });
+        this.closeNotificationsBtn.setOnClickListener(view -> dismiss());
     }
 
     /**

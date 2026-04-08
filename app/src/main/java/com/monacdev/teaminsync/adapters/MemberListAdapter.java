@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MemberListAdapter extends RecyclerView.Adapter<MemberViewHolder> {
-    private ArrayList<HashMap<String, String>> membersList;
+    private final ArrayList<HashMap<String, String>> membersList;
 
     public MemberListAdapter(ArrayList<HashMap<String, String>> membersList){
         this.membersList = membersList;

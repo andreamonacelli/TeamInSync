@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class NotificationListAdapter extends RecyclerView.Adapter<NotificationViewHolder> {
-    private ArrayList<HashMap<String, Object>> notificationsList;
+    private final ArrayList<HashMap<String, Object>> notificationsList;
 
     public NotificationListAdapter(ArrayList<HashMap<String, Object>> notificationsList){
         this.notificationsList = notificationsList;

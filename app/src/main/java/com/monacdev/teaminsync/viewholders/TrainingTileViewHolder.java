@@ -3,7 +3,6 @@ package com.monacdev.teaminsync.viewholders;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -12,11 +11,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.monacdev.teaminsync.R;
@@ -40,7 +36,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
     private TextView trainingInfoTV;
     private boolean isExpired;
     private boolean isCompleted;
-    private boolean actionsActive;
+    private final boolean actionsActive;
     private String trainingUID;
     private String athleteUsername;
 
@@ -93,53 +89,44 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
         if(trainingType != null && trainingType.equals(Constants.CHRONO_TRAINING_STRING)){
             this.trainingTypeIconIV.setImageResource(R.drawable.ic_stopwatch);
             this.startTrainingBtn.setText(R.string.start_training_btn_label);
-            this.startTrainingBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    TrainingTrackingFragment trackingFragment = TrainingTrackingFragment.newInstance(TrainingTileViewHolder.this.trainingUID, TrainingTileViewHolder.this.athleteUsername);
-                    AppCompatActivity activity = null;
-                    Context context = view.getContext();
-                    while(context instanceof ContextWrapper){
-                        if(context instanceof AppCompatActivity){
-                            activity = (AppCompatActivity) context;
-                            break;
-                        }
-                        context = ((ContextWrapper) context).getBaseContext();
+            this.startTrainingBtn.setOnClickListener(view -> {
+                TrainingTrackingFragment trackingFragment = TrainingTrackingFragment.newInstance(TrainingTileViewHolder.this.trainingUID, TrainingTileViewHolder.this.athleteUsername);
+                AppCompatActivity activity = null;
+                Context context = view.getContext();
+                while(context instanceof ContextWrapper){
+                    if(context instanceof AppCompatActivity){
+                        activity = (AppCompatActivity) context;
+                        break;
                     }
-                    if(activity != null) {
-                        activity.getSupportFragmentManager().setFragmentResultListener(
-                                NavigationTags.TRAINING_BUNDLE_RESULT,
-                                activity,
-                                new FragmentResultListener() {
-                                    @Override
-                                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                                        boolean completed = result.getBoolean(IntentExtrasTags.TRAINING_COMPLETED);
-                                        if(completed){
-                                            TrainingTileViewHolder.this.isCompleted = true;
-                                            TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
-                                        }
-                                    }
+                    context = ((ContextWrapper) context).getBaseContext();
+                }
+                if(activity != null) {
+                    activity.getSupportFragmentManager().setFragmentResultListener(
+                            NavigationTags.TRAINING_BUNDLE_RESULT,
+                            activity,
+                            (requestKey, result) -> {
+                                boolean completed = result.getBoolean(IntentExtrasTags.TRAINING_COMPLETED);
+                                if(completed){
+                                    TrainingTileViewHolder.this.isCompleted = true;
+                                    TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
                                 }
-                        );
-                        activity.findViewById(R.id.trainingTrackerFragmentContainer).setVisibility(View.VISIBLE);
-                        activity.getSupportFragmentManager().beginTransaction().replace(R.id.trainingTrackerFragmentContainer, trackingFragment).addToBackStack(null).commit();
-                    } else {
-                        Toast.makeText(view.getContext(), R.string.generic_error, Toast.LENGTH_SHORT).show();
-                    }
+                            }
+                    );
+                    activity.findViewById(R.id.trainingTrackerFragmentContainer).setVisibility(View.VISIBLE);
+                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.trainingTrackerFragmentContainer, trackingFragment).addToBackStack(null).commit();
+                } else {
+                    Toast.makeText(view.getContext(), R.string.generic_error, Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
             this.trainingTypeIconIV.setImageResource(R.drawable.ic_weight);
             this.startTrainingBtn.setText(R.string.complete_training_label);
-            this.startTrainingBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(TrainingTileViewHolder.this.trainingUID != null && userID != null){
-                        TrainingTileViewHolder.this.updateTrainingOnDB(view, userID);
-                        TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
-                    } else {
-                        Toast.makeText(view.getContext(), R.string.training_completion_error, Toast.LENGTH_SHORT).show();
-                    }
+            this.startTrainingBtn.setOnClickListener(view -> {
+                if(TrainingTileViewHolder.this.trainingUID != null && userID != null){
+                    TrainingTileViewHolder.this.updateTrainingOnDB(view, userID);
+                    TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
+                } else {
+                    Toast.makeText(view.getContext(), R.string.training_completion_error, Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -153,23 +140,17 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
     private void updateTrainingOnDB(View view, String userID){
         DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference();
         trainingRef.child(ReferenceStrings.TRAININGS).child(userID).child(TrainingTileViewHolder.this.trainingUID)
-                .child(KeyStrings.TRAINING_COMPLETED).setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        TrainingTileViewHolder.this.isCompleted = true;
-                        TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
-                        if(TrainingTileViewHolder.this.isExpired) {
-                            Toast.makeText(view.getContext(), R.string.training_reps_completed_late, Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(view.getContext(), R.string.training_reps_completed_on_time, Toast.LENGTH_SHORT).show();
-                        }
+                .child(KeyStrings.TRAINING_COMPLETED).setValue(true).addOnSuccessListener(unused -> {
+                    TrainingTileViewHolder.this.isCompleted = true;
+                    TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
+                    if(TrainingTileViewHolder.this.isExpired) {
+                        Toast.makeText(view.getContext(), R.string.training_reps_completed_late, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(view.getContext(), R.string.training_reps_completed_on_time, Toast.LENGTH_SHORT).show();
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        TrainingTileViewHolder.this.isCompleted = false;
-                        Toast.makeText(view.getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show();
-                    }
+                }).addOnFailureListener(e -> {
+                    TrainingTileViewHolder.this.isCompleted = false;
+                    Toast.makeText(view.getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -203,11 +184,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             simpleDateFormat.setLenient(false);
             Date deadlineDate = simpleDateFormat.parse(deadline);
-            if(deadlineDate != null && deadlineDate.after(currentDate)){
-                return false;
-            } else {
-                return true;
-            }
+            return !(deadlineDate != null && deadlineDate.after(currentDate));
         } catch(ParseException e) {
             return true;
         }

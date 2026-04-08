@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TrainingListTileAdapter extends RecyclerView.Adapter<TrainingTileViewHolder> {
-    private ArrayList<HashMap<String, String>> trainingsList;
-    private boolean activateActions;
+    private final ArrayList<HashMap<String, String>> trainingsList;
+    private final boolean activateActions;
 
     public TrainingListTileAdapter(ArrayList<HashMap<String, String>> trainingsList, boolean activateActions){
         this.trainingsList = trainingsList;

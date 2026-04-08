@@ -3,7 +3,6 @@ package com.monacdev.teaminsync.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -15,9 +14,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -73,24 +69,18 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void setListeners(){
         /* Binding listeners to buttons */
-        this.signInBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(emailInputET.getText().toString().isEmpty() || passwordET.getText().toString().isEmpty()){
-                    Toast.makeText(LoginActivity.this, R.string.form_not_compiled, Toast.LENGTH_SHORT).show();
-                } else {
-                    userSignIn();
-                }
+        this.signInBtn.setOnClickListener(view -> {
+            if(emailInputET.getText().toString().isEmpty() || passwordET.getText().toString().isEmpty()){
+                Toast.makeText(LoginActivity.this, R.string.form_not_compiled, Toast.LENGTH_SHORT).show();
+            } else {
+                userSignIn();
             }
         });
-        this.registerBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(emailInputET.getText().toString().isEmpty() || passwordET.getText().toString().isEmpty()){
-                    Toast.makeText(LoginActivity.this, R.string.form_not_compiled, Toast.LENGTH_SHORT).show();
-                } else {
-                    registerUser();
-                }
+        this.registerBtn.setOnClickListener(view -> {
+            if(emailInputET.getText().toString().isEmpty() || passwordET.getText().toString().isEmpty()){
+                Toast.makeText(LoginActivity.this, R.string.form_not_compiled, Toast.LENGTH_SHORT).show();
+            } else {
+                registerUser();
             }
         });
     }
@@ -101,20 +91,17 @@ public class LoginActivity extends AppCompatActivity {
     private void userSignIn(){
         String email = this.emailInputET.getText().toString();
         String password = this.passwordET.getText().toString();
-        this.authClient.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    FirebaseUser loggedUser = authClient.getCurrentUser();
-                    Toast.makeText(LoginActivity.this, R.string.auth_ok, Toast.LENGTH_SHORT).show();
-                    if(loggedUser != null){
-                        navigateToNextActivity(loggedUser);
-                    } else {
-                        Toast.makeText(LoginActivity.this, R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
-                    }
+        this.authClient.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                FirebaseUser loggedUser = authClient.getCurrentUser();
+                Toast.makeText(LoginActivity.this, R.string.auth_ok, Toast.LENGTH_SHORT).show();
+                if(loggedUser != null){
+                    navigateToNextActivity(loggedUser);
                 } else {
-                    Toast.makeText(LoginActivity.this, R.string.auth_generic_err, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
                 }
+            } else {
+                Toast.makeText(LoginActivity.this, R.string.auth_generic_err, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -125,21 +112,18 @@ public class LoginActivity extends AppCompatActivity {
     private void registerUser(){
         String email = this.emailInputET.getText().toString();
         String password = this.passwordET.getText().toString();
-        this.authClient.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    FirebaseUser loggedUser = authClient.getCurrentUser();
-                    Toast.makeText(LoginActivity.this, R.string.register_ok, Toast.LENGTH_SHORT).show();
-                    if(loggedUser != null){
-                        RegistrationWizardFragment wizard = RegistrationWizardFragment.newInstance(loggedUser.getEmail());
-                        wizard.show(getSupportFragmentManager(), NavigationTags.REG_WIZARD);
-                    } else {
-                        Toast.makeText(LoginActivity.this, R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
-                    }
+        this.authClient.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                FirebaseUser loggedUser = authClient.getCurrentUser();
+                Toast.makeText(LoginActivity.this, R.string.register_ok, Toast.LENGTH_SHORT).show();
+                if(loggedUser != null){
+                    RegistrationWizardFragment wizard = RegistrationWizardFragment.newInstance(loggedUser.getEmail());
+                    wizard.show(getSupportFragmentManager(), NavigationTags.REG_WIZARD);
                 } else {
-                    Toast.makeText(LoginActivity.this, R.string.register_err, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
                 }
+            } else {
+                Toast.makeText(LoginActivity.this, R.string.register_err, Toast.LENGTH_SHORT).show();
             }
         });
     }

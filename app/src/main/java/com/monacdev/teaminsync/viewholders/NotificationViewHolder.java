@@ -9,8 +9,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.monacdev.teaminsync.R;
@@ -19,6 +17,7 @@ import com.monacdev.teaminsync.constants.ReferenceStrings;
 import com.monacdev.teaminsync.constants.NotificationsKeys;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class NotificationViewHolder extends RecyclerView.ViewHolder {
     private TextView notificationTitleTV;
@@ -48,11 +47,11 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder {
      * @param notificationData the data to be shown in the view
      */
     public void bindData(HashMap<String, Object> notificationData){
-        this.notificationTitleTV.setText(notificationData.get(NotificationsKeys.NOTIFICATIONS_TITLE).toString());
-        this.notificationMessageTV.setText(notificationData.get(NotificationsKeys.NOTIFICATIONS_MSG).toString());
-        this.notificationUID = notificationData.get(NotificationsKeys.NOTIFICATIONS_UID).toString();
-        this.notificationAthleteID = notificationData.get(KeyStrings.USERNAME).toString();
-        this.isRead = Boolean.parseBoolean(notificationData.get(NotificationsKeys.NOTIFICATIONS_READ).toString());
+        this.notificationTitleTV.setText(Objects.requireNonNull(notificationData.get(NotificationsKeys.NOTIFICATIONS_TITLE)).toString());
+        this.notificationMessageTV.setText(Objects.requireNonNull(notificationData.get(NotificationsKeys.NOTIFICATIONS_MSG)).toString());
+        this.notificationUID = Objects.requireNonNull(notificationData.get(NotificationsKeys.NOTIFICATIONS_UID)).toString();
+        this.notificationAthleteID = Objects.requireNonNull(notificationData.get(KeyStrings.USERNAME)).toString();
+        this.isRead = Boolean.parseBoolean(Objects.requireNonNull(notificationData.get(NotificationsKeys.NOTIFICATIONS_READ)).toString());
         this.configureImageButton();
     }
 
@@ -62,25 +61,19 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder {
     private void configureImageButton(){
         if(this.isRead){
             this.markAsReadBtn.setColorFilter(Color.BLACK);
-            this.markAsReadBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    NotificationViewHolder.this.isRead = false;
-                    NotificationViewHolder.this.markAsReadBtn.setColorFilter(Color.RED);
-                    NotificationViewHolder.this.updateNotificationDataOnDB(view, false);
-                    NotificationViewHolder.this.configureImageButton();
-                }
+            this.markAsReadBtn.setOnClickListener(view -> {
+                NotificationViewHolder.this.isRead = false;
+                NotificationViewHolder.this.markAsReadBtn.setColorFilter(Color.RED);
+                NotificationViewHolder.this.updateNotificationDataOnDB(view, false);
+                NotificationViewHolder.this.configureImageButton();
             });
         } else {
             this.markAsReadBtn.setColorFilter(Color.RED);
-            this.markAsReadBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    NotificationViewHolder.this.isRead = true;
-                    NotificationViewHolder.this.markAsReadBtn.setColorFilter(Color.BLACK);
-                    NotificationViewHolder.this.updateNotificationDataOnDB(view, true);
-                    NotificationViewHolder.this.configureImageButton();
-                }
+            this.markAsReadBtn.setOnClickListener(view -> {
+                NotificationViewHolder.this.isRead = true;
+                NotificationViewHolder.this.markAsReadBtn.setColorFilter(Color.BLACK);
+                NotificationViewHolder.this.updateNotificationDataOnDB(view, true);
+                NotificationViewHolder.this.configureImageButton();
             });
         }
     }
@@ -93,20 +86,12 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder {
     private void updateNotificationDataOnDB(View view, boolean newStatus){
         DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference();
         notificationRef.child(ReferenceStrings.NOTIFICATIONS).child(this.notificationAthleteID).child(this.notificationUID)
-                .child(NotificationsKeys.NOTIFICATIONS_READ).setValue(newStatus).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        if(newStatus){
-                            Toast.makeText(view.getContext(), R.string.marked_as_read, Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(view.getContext(), R.string.marked_unread, Toast.LENGTH_SHORT).show();
-                        }
+                .child(NotificationsKeys.NOTIFICATIONS_READ).setValue(newStatus).addOnSuccessListener(unused -> {
+                    if(newStatus){
+                        Toast.makeText(view.getContext(), R.string.marked_as_read, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(view.getContext(), R.string.marked_unread, Toast.LENGTH_SHORT).show();
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(view.getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                }).addOnFailureListener(e -> Toast.makeText(view.getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show());
     }
 }

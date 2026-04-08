@@ -5,7 +5,7 @@ import android.util.Log;
 import com.monacdev.teaminsync.constants.NavigationTags;
 
 public class SendPushResultRunnable implements Runnable{
-    private boolean pushSentSuccess;
+    private final boolean pushSentSuccess;
 
     public SendPushResultRunnable(boolean pushSentSuccess) {
         this.pushSentSuccess = pushSentSuccess;

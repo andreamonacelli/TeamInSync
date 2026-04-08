@@ -1,14 +1,12 @@
 package com.monacdev.teaminsync.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
@@ -17,8 +15,6 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Glide;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -55,6 +51,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class RegistrationWizardFragment extends BottomSheetDialogFragment {
@@ -66,44 +63,39 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     private RadioGroup roleRadioGroup;
     private Spinner teamSelectorSpinner;
     private Button submitBtn;
-    private TextView regWizardTitle;
     private String loggedUserEmail;
     private Uri selectedImageUri = null; // In case the user selects an existing photo
     private byte[] cameraImageBytes = null; // In case the user takes a new photo from camera
     private boolean isEditMode;
-    private HashMap<String, String> editingData = new HashMap<>();
+    private final HashMap<String, String> editingData = new HashMap<>();
     private final ArrayList<String> teamNames = new ArrayList<>();
     private final ArrayList<String> teamIDs = new ArrayList<>();
 
     private final ActivityResultLauncher<Intent> deviceGalleryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if(result.getResultCode() == getActivity().RESULT_OK && result.getData() != null){
-                        RegistrationWizardFragment.this.selectedImageUri = result.getData().getData();
-                        RegistrationWizardFragment.this.cameraImageBytes = null;
-                        RegistrationWizardFragment.this.profilePicIV.setImageURI(RegistrationWizardFragment.this.selectedImageUri);
-                    }
+            result -> {
+                getActivity();
+                if(result.getResultCode() == Activity.RESULT_OK && result.getData() != null){
+                    RegistrationWizardFragment.this.selectedImageUri = result.getData().getData();
+                    RegistrationWizardFragment.this.cameraImageBytes = null;
+                    RegistrationWizardFragment.this.profilePicIV.setImageURI(RegistrationWizardFragment.this.selectedImageUri);
                 }
             }
     );
 
     private final ActivityResultLauncher<Intent> cameraLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if(result.getResultCode() == getActivity().RESULT_OK && result.getData() != null && result.getData().getExtras() != null){
-                        Bitmap capturedPhoto = (Bitmap) result.getData().getExtras().get("data");
-                        RegistrationWizardFragment.this.profilePicIV.setImageBitmap(capturedPhoto);
-                        /* Conversion of the image for the upload on Cloudinary */
-                        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                        if(capturedPhoto != null) {
-                            capturedPhoto.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
-                            RegistrationWizardFragment.this.cameraImageBytes = byteStream.toByteArray();
-                            RegistrationWizardFragment.this.selectedImageUri = null;
-                        }
+            result -> {
+                getActivity();
+                if(result.getResultCode() == Activity.RESULT_OK && result.getData() != null && result.getData().getExtras() != null){
+                    Bitmap capturedPhoto = (Bitmap) result.getData().getExtras().get("data");
+                    RegistrationWizardFragment.this.profilePicIV.setImageBitmap(capturedPhoto);
+                    /* Conversion of the image for the upload on Cloudinary */
+                    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+                    if(capturedPhoto != null) {
+                        capturedPhoto.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
+                        RegistrationWizardFragment.this.cameraImageBytes = byteStream.toByteArray();
+                        RegistrationWizardFragment.this.selectedImageUri = null;
                     }
                 }
             }
@@ -123,7 +115,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         for(String key : userData.keySet()){
             args.putString(key, userData.get(key));
         }
-        args.putBoolean(Constants.EDITING_MODE_KEY_STRING, true);
+        args.putBoolean(Constants.EDITING_MODE_STRING, true);
         fragment.setArguments(args);
         return fragment;
     }
@@ -132,7 +124,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getArguments() != null){
-            this.isEditMode = getArguments().getBoolean(Constants.EDITING_MODE_KEY_STRING, false);
+            this.isEditMode = getArguments().getBoolean(Constants.EDITING_MODE_STRING, false);
             if(this.isEditMode){
                 this.editingData.put(KeyStrings.USERNAME, getArguments().getString(KeyStrings.USERNAME));
                 this.editingData.put(KeyStrings.NAME, getArguments().getString(KeyStrings.NAME));
@@ -164,36 +156,33 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
             this.fieldPreCompilation(view);
         }
         /* Setting the listener for the Submit button */
-        this.submitBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!validateFieldCompilation()){
-                    Toast.makeText(getContext(), R.string.empty_form_fields,Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if(!validateBirthDateInput(birthDateET.getText().toString().trim())){
-                    Toast.makeText(getContext(), R.string.invalid_date,Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                String selectedTeam;
-                int selectedTeamID = validateTeamSelection();
-                if(selectedTeamID == Constants.INVALID_SELECTION){
-                    Toast.makeText(getContext(), R.string.no_team_selected, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                /* if all the form validations checks passed, then we proceed to store the data */
-                selectedTeam = teamIDs.get(selectedTeamID);
-                if(RegistrationWizardFragment.this.isEditMode){
-                    HashMap<String, Object> updateMap = new HashMap<>();
-                    updateMap.put(KeyStrings.NAME, RegistrationWizardFragment.this.nameET.getText().toString().trim());
-                    updateMap.put(KeyStrings.SURNAME, RegistrationWizardFragment.this.surnameET.getText().toString().trim());
-                    updateMap.put(KeyStrings.BIRTHDATE, RegistrationWizardFragment.this.birthDateET.getText().toString().trim());
-                    updateMap.put(KeyStrings.TEAM, selectedTeam);
-                    RegistrationWizardFragment.this.uploadUserOnDatabase(updateMap);
-                } else {
-                    HashMap<String, Object> newUserData = userDataMapping(selectedTeam);
-                    RegistrationWizardFragment.this.uploadUserWithProfilePicture(newUserData);
-                }
+        this.submitBtn.setOnClickListener(view1 -> {
+            if(!validateFieldCompilation()){
+                Toast.makeText(getContext(), R.string.empty_form_fields,Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(!validateBirthDateInput(birthDateET.getText().toString().trim())){
+                Toast.makeText(getContext(), R.string.invalid_date,Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String selectedTeam;
+            int selectedTeamID = validateTeamSelection();
+            if(selectedTeamID == Constants.INVALID_SELECTION){
+                Toast.makeText(getContext(), R.string.no_team_selected, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            /* if all the form validations checks passed, then we proceed to store the data */
+            selectedTeam = teamIDs.get(selectedTeamID);
+            if(RegistrationWizardFragment.this.isEditMode){
+                HashMap<String, Object> updateMap = new HashMap<>();
+                updateMap.put(KeyStrings.NAME, RegistrationWizardFragment.this.nameET.getText().toString().trim());
+                updateMap.put(KeyStrings.SURNAME, RegistrationWizardFragment.this.surnameET.getText().toString().trim());
+                updateMap.put(KeyStrings.BIRTHDATE, RegistrationWizardFragment.this.birthDateET.getText().toString().trim());
+                updateMap.put(KeyStrings.TEAM, selectedTeam);
+                RegistrationWizardFragment.this.uploadUserOnDatabase(updateMap);
+            } else {
+                HashMap<String, Object> newUserData = userDataMapping(selectedTeam);
+                RegistrationWizardFragment.this.uploadUserWithProfilePicture(newUserData);
             }
         });
     }
@@ -209,12 +198,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
      */
     private void bindViewsToObjects(@NonNull View view){
         this.profilePicIV = view.findViewById(R.id.profilePicIV);
-        this.profilePicIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                RegistrationWizardFragment.this.selectImageSourceDialog();
-            }
-        });
+        this.profilePicIV.setOnClickListener(view1 -> RegistrationWizardFragment.this.selectImageSourceDialog());
         this.usernameET = view.findViewById(R.id.usernameET);
         this.nameET = view.findViewById(R.id.nameET);
         this.surnameET = view.findViewById(R.id.surnameET);
@@ -222,11 +206,11 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         this.roleRadioGroup = view.findViewById(R.id.roleRadioGroup);
         this.teamSelectorSpinner = view.findViewById(R.id.teamSelectorSpinner);
         this.submitBtn = view.findViewById(R.id.submitBtn);
-        this.regWizardTitle = view.findViewById(R.id.regWizardTitle);
+        TextView regWizardTitle = view.findViewById(R.id.regWizardTitle);
         if(this.isEditMode){
-            this.regWizardTitle.setText(R.string.edit_wizard_title);
+            regWizardTitle.setText(R.string.edit_wizard_title);
         } else {
-            this.regWizardTitle.setText(R.string.registration_wizard_title);
+            regWizardTitle.setText(R.string.registration_wizard_title);
         }
     }
 
@@ -259,7 +243,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     private void setupTeamSelector(){
         this.teamNames.add(getResources().getString(R.string.team_selector_label));
         this.teamIDs.add("");
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, this.teamNames);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, this.teamNames);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.teamSelectorSpinner.setAdapter(adapter);
         /* Populating the Spinner component with the teams available on the Firebase DB */
@@ -317,10 +301,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
             simpleDateFormat.setLenient(false);
             Date birthDate = simpleDateFormat.parse(birthDateString);
             /* Check if the inserted date is in the future (which will result in an invalid date) */
-            if(birthDate != null && birthDate.after(new Date())){
-                return false;
-            }
-            return true;
+            return !(birthDate != null && birthDate.after(new Date()));
         } catch(ParseException e) {
             return false;
         }
@@ -334,10 +315,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         if(this.nameET.getText().toString().isEmpty() || this.surnameET.getText().toString().isEmpty() || this.birthDateET.getText().toString().isEmpty()){
             return false;
         }
-        if(!this.isEditMode && this.usernameET.getText().toString().isEmpty()){
-            return false;
-        }
-        return true;
+        return !(!this.isEditMode && this.usernameET.getText().toString().isEmpty());
     }
 
     /**
@@ -351,37 +329,31 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 Toast.makeText(getContext(), getString(R.string.error_changes_save), Toast.LENGTH_SHORT).show();
                 return;
             }
-            FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).updateChildren(userData).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()){
-                        String previousTeam = RegistrationWizardFragment.this.editingData.get(KeyStrings.TEAM);
-                        String newTeam = (String) userData.get(KeyStrings.TEAM);
-                        if(previousTeam != null && newTeam != null && !previousTeam.equals(newTeam)){
-                            DatabaseReference teamsRef = FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS);
-                            teamsRef.child(previousTeam).child(KeyStrings.MEMBERS).child(username).removeValue();
-                            teamsRef.child(newTeam).child(KeyStrings.MEMBERS).child(username).setValue(true);
-                        }
-                        Toast.makeText(getContext(), getString(R.string.changes_saved_label), Toast.LENGTH_SHORT).show();
-                        requireActivity().getSupportFragmentManager().setFragmentResult(NavigationTags.EDIT_FRAGMENT_RESULT, new Bundle());
-                        dismiss();
+            FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).updateChildren(userData).addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    String previousTeam = RegistrationWizardFragment.this.editingData.get(KeyStrings.TEAM);
+                    String newTeam = (String) userData.get(KeyStrings.TEAM);
+                    if(previousTeam != null && newTeam != null && !previousTeam.equals(newTeam)){
+                        DatabaseReference teamsRef = FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS);
+                        teamsRef.child(previousTeam).child(KeyStrings.MEMBERS).child(username).removeValue();
+                        teamsRef.child(newTeam).child(KeyStrings.MEMBERS).child(username).setValue(true);
                     }
+                    Toast.makeText(getContext(), getString(R.string.changes_saved_label), Toast.LENGTH_SHORT).show();
+                    requireActivity().getSupportFragmentManager().setFragmentResult(NavigationTags.EDIT_FRAGMENT_RESULT, new Bundle());
+                    dismiss();
                 }
             });
         } else {
             String username = this.usernameET.getText().toString();
-            FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).setValue(userData).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        /* The newly registered user will be automatically added to the team */
-                        FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS)
-                                .child(userData.get(KeyStrings.TEAM).toString()).child(KeyStrings.MEMBERS)
-                                .child(username).setValue(true);
-                        Intent intent = new Intent(getContext(), MainActivity.class);
-                        intent.putExtra(IntentExtrasTags.LOGGED_USER, username);
-                        startActivity(intent);
-                    }
+            FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).setValue(userData).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    /* The newly registered user will be automatically added to the team */
+                    FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS)
+                            .child(Objects.requireNonNull(userData.get(KeyStrings.TEAM)).toString()).child(KeyStrings.MEMBERS)
+                            .child(username).setValue(true);
+                    Intent intent = new Intent(getContext(), MainActivity.class);
+                    intent.putExtra(IntentExtrasTags.LOGGED_USER, username);
+                    startActivity(intent);
                 }
             });
         }
@@ -394,18 +366,15 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         String[] options = {getString(R.string.photo_source_camera), getString(R.string.photo_source_gallery)};
         new AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.photo_source_selection_title))
-                .setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int clickedOption) {
-                        if(clickedOption == 0){
-                            /* Launch camera */
-                            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            RegistrationWizardFragment.this.cameraLauncher.launch(cameraIntent);
-                        } else if(clickedOption == 1){
-                            /* Launch gallery explorer */
-                            Intent galleryExplorerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                            RegistrationWizardFragment.this.deviceGalleryLauncher.launch(galleryExplorerIntent);
-                        }
+                .setItems(options, (dialogInterface, clickedOption) -> {
+                    if(clickedOption == 0){
+                        /* Launch camera */
+                        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        RegistrationWizardFragment.this.cameraLauncher.launch(cameraIntent);
+                    } else if(clickedOption == 1){
+                        /* Launch gallery explorer */
+                        Intent galleryExplorerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        RegistrationWizardFragment.this.deviceGalleryLauncher.launch(galleryExplorerIntent);
                     }
                 })
                 .show();

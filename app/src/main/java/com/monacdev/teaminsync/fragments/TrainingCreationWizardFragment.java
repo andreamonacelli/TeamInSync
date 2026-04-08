@@ -14,8 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,7 +30,6 @@ import com.monacdev.teaminsync.utils.PushNotificationsManager;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -98,18 +95,8 @@ public class TrainingCreationWizardFragment extends DialogFragment {
      * Defines the listeners for the View components within the current fragment
      */
     private void setListeners(){
-        this.appendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                uploadTrainingToDatabase(Constants.EFFECT_NEXT);
-            }
-        });
-        this.completeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                uploadTrainingToDatabase(Constants.EFFECT_DISMISS);
-            }
-        });
+        this.appendBtn.setOnClickListener(view -> uploadTrainingToDatabase(Constants.EFFECT_NEXT));
+        this.completeBtn.setOnClickListener(view -> uploadTrainingToDatabase(Constants.EFFECT_DISMISS));
     }
 
     /**
@@ -170,24 +157,21 @@ public class TrainingCreationWizardFragment extends DialogFragment {
                 multiUploadMap.put(notificationPath, notificationData);
             }
         }
-        this.dbRef.updateChildren(multiUploadMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
-                    Toast.makeText(getContext(), R.string.exercise_added, Toast.LENGTH_SHORT).show();
-                    if(completionEffect.equals(Constants.EFFECT_DISMISS)){
-                        dismiss();
-                        PushNotificationsManager.sendPushNotification(
-                                TrainingCreationWizardFragment.this.targetAthletes,
-                                getString(R.string.push_new_training_title),
-                                getString(R.string.push_new_training_body)
-                        );
-                    } else {
-                        clearInputFields();
-                    }
+        this.dbRef.updateChildren(multiUploadMap).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                Toast.makeText(getContext(), R.string.exercise_added, Toast.LENGTH_SHORT).show();
+                if(completionEffect.equals(Constants.EFFECT_DISMISS)){
+                    dismiss();
+                    PushNotificationsManager.sendPushNotification(
+                            TrainingCreationWizardFragment.this.targetAthletes,
+                            getString(R.string.push_new_training_title),
+                            getString(R.string.push_new_training_body)
+                    );
                 } else {
-                    Toast.makeText(getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show();
+                    clearInputFields();
                 }
+            } else {
+                Toast.makeText(getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -235,7 +219,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
         try{
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             simpleDateFormat.setLenient(false);
-            Date dueDate = simpleDateFormat.parse(dueToDate);
+            simpleDateFormat.parse(dueToDate);
             return true;
         } catch(ParseException e) {
             return false;

@@ -1,14 +1,12 @@
 package com.monacdev.teaminsync.activities;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -96,36 +94,22 @@ public class MainActivity extends AppCompatActivity {
      * Defines the listeners for the View components within the current activity
      */
     private void setListeners(){
-        this.squadListBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent squadListIntent = new Intent(MainActivity.this, MembersListActivity.class);
-                squadListIntent.putExtra(IntentExtrasTags.TEAM_ID, teamID);
-                startActivity(squadListIntent);
-            }
+        this.squadListBtn.setOnClickListener(view -> {
+            Intent squadListIntent = new Intent(MainActivity.this, MembersListActivity.class);
+            squadListIntent.putExtra(IntentExtrasTags.TEAM_ID, teamID);
+            startActivity(squadListIntent);
         });
-        this.toTrainingPageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent trainingPageIntent = new Intent(MainActivity.this, TrainingActivity.class);
-                trainingPageIntent.putExtra(IntentExtrasTags.DISPLAYED_USER, loggedUserUsername);
-                trainingPageIntent.putExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME, loggedUserSurname);
-                startActivity(trainingPageIntent);
-            }
+        this.toTrainingPageBtn.setOnClickListener(view -> {
+            Intent trainingPageIntent = new Intent(MainActivity.this, TrainingActivity.class);
+            trainingPageIntent.putExtra(IntentExtrasTags.DISPLAYED_USER, loggedUserUsername);
+            trainingPageIntent.putExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME, loggedUserSurname);
+            startActivity(trainingPageIntent);
         });
-        this.openNotificationsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NotificationsFragment notificationsDialog = NotificationsFragment.newInstance(loggedUserUsername);
-                notificationsDialog.show(getSupportFragmentManager(), NavigationTags.NOTIFICATIONS_FRAGMENT);
-            }
+        this.openNotificationsBtn.setOnClickListener(view -> {
+            NotificationsFragment notificationsDialog = NotificationsFragment.newInstance(loggedUserUsername);
+            notificationsDialog.show(getSupportFragmentManager(), NavigationTags.NOTIFICATIONS_FRAGMENT);
         });
-        this.logoutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MainActivity.this.handleLogoutConfirmation();
-            }
-        });
+        this.logoutBtn.setOnClickListener(view -> MainActivity.this.handleLogoutConfirmation());
     }
 
     /**
@@ -208,14 +192,11 @@ public class MainActivity extends AppCompatActivity {
         FirebaseAuth.getInstance().signOut();
         OneSignal.logout();
         /* Delay activity destruction to allow OneSignal to complete logout */
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                /* Rerouting to the Login Activity */
-                Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(loginIntent);
-                finish();
-            }
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            /* Rerouting to the Login Activity */
+            Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(loginIntent);
+            finish();
         }, 500);
     }
 
@@ -225,18 +206,8 @@ public class MainActivity extends AppCompatActivity {
     private void handleLogoutConfirmation(){
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
         dialogBuilder.setTitle(R.string.confirm_logout);
-        dialogBuilder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                MainActivity.this.logoutUser();
-            }
-        });
-        dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Log.i(NavigationTags.LOGOUT_CANCELED, Constants.LOGOUT_CANCELED_MSG);
-            }
-        });
+        dialogBuilder.setPositiveButton(R.string.confirm, (dialogInterface, i) -> MainActivity.this.logoutUser());
+        dialogBuilder.setNegativeButton(R.string.cancel, (dialogInterface, i) -> Log.i(NavigationTags.LOGOUT_CANCELED, Constants.LOGOUT_CANCELED_MSG));
         AlertDialog logoutDialog = dialogBuilder.create();
         logoutDialog.show();
     }

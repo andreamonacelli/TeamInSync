@@ -25,7 +25,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+        SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         this.initializeNotificationsSystem();
@@ -62,8 +62,6 @@ public class SplashScreenActivity extends AppCompatActivity {
     private void initializeNotificationsSystem(){
         OneSignal.getDebug().setAlertLevel(LogLevel.FATAL);
         OneSignal.initWithContext(SplashScreenActivity.this, PushNotificationsManager.ONESIGNAL_APP_ID);
-        OneSignal.getNotifications().requestPermission(true, Continue.with(r -> {
-            Log.i("no_action_needed", "No action is needed, OneSignal initialization completed!");
-        }));
+        OneSignal.getNotifications().requestPermission(true, Continue.with(r -> Log.i("no_action_needed", "No action is needed, OneSignal initialization completed!")));
     }
 }

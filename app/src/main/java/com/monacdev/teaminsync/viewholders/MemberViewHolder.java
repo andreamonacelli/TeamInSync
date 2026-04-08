@@ -39,14 +39,11 @@ public class MemberViewHolder extends RecyclerView.ViewHolder {
                 userData.get(KeyStrings.BIRTHDATE)
         );
         this.setProfilePictureOnView(userData.get(KeyStrings.PROFILE_PIC), userData.get(KeyStrings.ROLE));
-        this.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent memberDetailsIntent = new Intent(itemView.getContext(), ProfileActivity.class);
-                memberDetailsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER, userData.get(KeyStrings.USERNAME));
-                itemView.getContext().startActivity(memberDetailsIntent);
-                /* Here we do not have to terminate the activity because we can get back here */
-            }
+        this.itemView.setOnClickListener(view -> {
+            Intent memberDetailsIntent = new Intent(itemView.getContext(), ProfileActivity.class);
+            memberDetailsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER, userData.get(KeyStrings.USERNAME));
+            itemView.getContext().startActivity(memberDetailsIntent);
+            /* Here we do not have to terminate the activity because we can get back here later on */
         });
     }
 

@@ -18,8 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,7 +42,7 @@ public class TrainingTrackingFragment extends Fragment {
     private String trainingUID;
     private String athleteUsername;
     private TrainingTrackerManager trainingTrackerManager;
-    private Handler timerHandler = new Handler(Looper.getMainLooper()) {
+    private final Handler timerHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             if(msg.what == Constants.MSG_UPDATE_TIMER){
@@ -97,9 +95,7 @@ public class TrainingTrackingFragment extends Fragment {
         if(this.trainingTrackerManager != null){
             this.trainingTrackerManager.pauseTimer();
         }
-        if(this.timerHandler != null){
-            this.timerHandler.removeCallbacksAndMessages(null);
-        }
+        this.timerHandler.removeCallbacksAndMessages(null);
     }
 
     /**
@@ -119,25 +115,19 @@ public class TrainingTrackingFragment extends Fragment {
      * Defines the listeners for the View components within the current fragment
      */
     private void setListeners(){
-        this.stopResumeTrainingBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(TrainingTrackingFragment.this.trainingTrackerManager.isTimerRunning()){
-                    TrainingTrackingFragment.this.trainingTrackerManager.pauseTimer();
-                    TrainingTrackingFragment.this.stopResumeTrainingBtn.setImageResource(android.R.drawable.ic_media_play);
-                } else {
-                    TrainingTrackingFragment.this.trainingTrackerManager.startTimer();
-                    TrainingTrackingFragment.this.stopResumeTrainingBtn.setImageResource(android.R.drawable.ic_media_pause);
-                }
+        this.stopResumeTrainingBtn.setOnClickListener(view -> {
+            if(TrainingTrackingFragment.this.trainingTrackerManager.isTimerRunning()){
+                TrainingTrackingFragment.this.trainingTrackerManager.pauseTimer();
+                TrainingTrackingFragment.this.stopResumeTrainingBtn.setImageResource(android.R.drawable.ic_media_play);
+            } else {
+                TrainingTrackingFragment.this.trainingTrackerManager.startTimer();
+                TrainingTrackingFragment.this.stopResumeTrainingBtn.setImageResource(android.R.drawable.ic_media_pause);
             }
         });
-        this.completeTrainingBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                TrainingTrackingFragment.this.flagTrainingAsCompleted();
-                Toast.makeText(getContext(), getString(R.string.training_auto_completed), Toast.LENGTH_SHORT).show();
-                requireActivity().getSupportFragmentManager().popBackStack();
-            }
+        this.completeTrainingBtn.setOnClickListener(view -> {
+            TrainingTrackingFragment.this.flagTrainingAsCompleted();
+            Toast.makeText(getContext(), getString(R.string.training_auto_completed), Toast.LENGTH_SHORT).show();
+            requireActivity().getSupportFragmentManager().popBackStack();
         });
     }
 
@@ -211,17 +201,7 @@ public class TrainingTrackingFragment extends Fragment {
         trainingResult.putBoolean(IntentExtrasTags.TRAINING_COMPLETED, true);
         requireActivity().getSupportFragmentManager().setFragmentResult(NavigationTags.TRAINING_BUNDLE_RESULT, trainingResult);
         DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference().child(ReferenceStrings.TRAININGS).child(this.athleteUsername).child(this.trainingUID);
-        trainingRef.child(KeyStrings.TRAINING_COMPLETED).setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Log.i("TRAINING_COMPLETED", "Training has been flagged as completed");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show();
-            }
-        });
+        trainingRef.child(KeyStrings.TRAINING_COMPLETED).setValue(true).addOnSuccessListener(unused -> Log.i("TRAINING_COMPLETED", "Training has been flagged as completed")).addOnFailureListener(e -> Toast.makeText(getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show());
     }
 
     /**
