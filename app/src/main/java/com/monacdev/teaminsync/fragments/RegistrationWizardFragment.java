@@ -155,8 +155,10 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         this.bindViewsToObjects(view);
         /* Setting up the dropdown menu for the teams */
         this.setupTeamSelector();
-        /* In case we are in edit-mode, pre-compile the fields */
-        this.fieldPreCompilation(view);
+        if(this.isEditMode) {
+            /* In case we are in edit-mode, pre-compile the fields */
+            this.fieldPreCompilation(view);
+        }
         /* Setting the listener for the Submit button */
         this.submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -354,8 +356,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                         if(previousTeam != null && newTeam != null && !previousTeam.equals(newTeam)){
                             DatabaseReference teamsRef = FirebaseDatabase.getInstance().getReference(Constants.TEAMS_REFERENCE_STRING);
                             teamsRef.child(previousTeam).child(Constants.MEMBERS_KEY_STRING).child(username).removeValue();
-                            teamsRef.child(previousTeam).child(Constants.PENDING_REQUESTS_KEY_STRING).child(username).removeValue();
-                            teamsRef.child(newTeam).child(Constants.PENDING_REQUESTS_KEY_STRING).child(username).setValue(true);
+                            teamsRef.child(newTeam).child(Constants.MEMBERS_KEY_STRING).child(username).setValue(true);
                         }
                         Toast.makeText(getContext(), getString(R.string.changes_saved_label), Toast.LENGTH_SHORT).show();
                         requireActivity().getSupportFragmentManager().setFragmentResult(Constants.EDIT_FRAGMENT_RESULT, new Bundle());
@@ -369,15 +370,9 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
-                        /* The newly registered user will NOW be automatically added to the pending requests */
-                        String sectionString;
-                        if (roleRadioGroup.getCheckedRadioButtonId() == R.id.athleteRadioBtn) {
-                            sectionString = Constants.PENDING_REQUESTS_KEY_STRING;
-                        } else {
-                            sectionString = Constants.MEMBERS_KEY_STRING;
-                        }
+                        /* The newly registered user will be automatically added to the team */
                         FirebaseDatabase.getInstance().getReference(Constants.TEAMS_REFERENCE_STRING)
-                                .child(userData.get(Constants.TEAM_KEY_STRING).toString()).child(sectionString)
+                                .child(userData.get(Constants.TEAM_KEY_STRING).toString()).child(Constants.MEMBERS_KEY_STRING)
                                 .child(username).setValue(true);
                         Intent intent = new Intent(getContext(), MainActivity.class);
                         intent.putExtra(Constants.LOGGED_USER_EXTRA_STRING, username);

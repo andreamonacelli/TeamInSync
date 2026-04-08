@@ -145,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
                     if(teamID != null && !teamID.isEmpty()){
                         fetchTeamData(teamID);
                     }
-                    /* TODO: handle the pending request scenario (workflow yet to be clearly defined) */
                 }
             }
 
