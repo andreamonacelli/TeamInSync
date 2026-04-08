@@ -26,8 +26,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
-import com.monacdev.teaminsync.activities.MainActivity;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.Constants;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.ReferenceStrings;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
+import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.utils.TrainingTrackerManager;
 
 import java.util.Locale;
@@ -61,8 +64,8 @@ public class TrainingTrackingFragment extends Fragment {
     public static TrainingTrackingFragment newInstance(String trainingUID, String athleteUsername){
         TrainingTrackingFragment fragment = new TrainingTrackingFragment();
         Bundle args = new Bundle();
-        args.putString(Constants.TRAINING_UUID_KEY_STRING, trainingUID);
-        args.putString(Constants.LOGGED_USER_EXTRA_STRING, athleteUsername);
+        args.putString(KeyStrings.TRAINING_UUID, trainingUID);
+        args.putString(IntentExtrasTags.LOGGED_USER, athleteUsername);
         fragment.setArguments(args);
         return fragment;
     }
@@ -71,8 +74,8 @@ public class TrainingTrackingFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getArguments() != null){
-            this.trainingUID = getArguments().getString(Constants.TRAINING_UUID_KEY_STRING);
-            this.athleteUsername = getArguments().getString(Constants.LOGGED_USER_EXTRA_STRING);
+            this.trainingUID = getArguments().getString(KeyStrings.TRAINING_UUID);
+            this.athleteUsername = getArguments().getString(IntentExtrasTags.LOGGED_USER);
         }
     }
 
@@ -171,16 +174,16 @@ public class TrainingTrackingFragment extends Fragment {
      * Fetches the details related to the displayed training directly from the Firebase DB
      */
     private void fetchTrainingData(){
-        DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference().child(Constants.TRAININGS_REFERENCE_STRING).child(this.athleteUsername).child(this.trainingUID);
+        DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference().child(ReferenceStrings.TRAININGS).child(this.athleteUsername).child(this.trainingUID);
         trainingRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    String exerciseName = snapshot.child(Constants.TRAINING_TITLE_KEY_STRING).getValue(String.class);
+                    String exerciseName = snapshot.child(KeyStrings.TRAINING_TITLE).getValue(String.class);
                     if(exerciseName != null){
                         TrainingTrackingFragment.this.exerciseNameTV.setText(exerciseName);
                     }
-                    String targetValueString = snapshot.child(Constants.TRAINING_TARGET_KEY_STRING).getValue(String.class);
+                    String targetValueString = snapshot.child(KeyStrings.TRAINING_TARGET).getValue(String.class);
                     if(targetValueString != null){
                         int targetValue = Integer.parseInt(targetValueString);
                         int targetSeconds = targetValue * 60;
@@ -205,10 +208,10 @@ public class TrainingTrackingFragment extends Fragment {
     private void flagTrainingAsCompleted(){
         /* Sending a Bundle to the activity in order to invoke the training completion */
         Bundle trainingResult = new Bundle();
-        trainingResult.putBoolean(Constants.TRAINING_COMPLETED_EXTRA_STRING, true);
-        requireActivity().getSupportFragmentManager().setFragmentResult(Constants.TRAINING_RESULT_BUNDLE_STRING, trainingResult);
-        DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference().child(Constants.TRAININGS_REFERENCE_STRING).child(this.athleteUsername).child(this.trainingUID);
-        trainingRef.child(Constants.TRAINING_COMPLETED_KEY_STRING).setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+        trainingResult.putBoolean(IntentExtrasTags.TRAINING_COMPLETED, true);
+        requireActivity().getSupportFragmentManager().setFragmentResult(NavigationTags.TRAINING_BUNDLE_RESULT, trainingResult);
+        DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference().child(ReferenceStrings.TRAININGS).child(this.athleteUsername).child(this.trainingUID);
+        trainingRef.child(KeyStrings.TRAINING_COMPLETED).setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 Log.i("TRAINING_COMPLETED", "Training has been flagged as completed");

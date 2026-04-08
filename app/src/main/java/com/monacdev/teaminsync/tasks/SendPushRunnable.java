@@ -3,10 +3,8 @@ package com.monacdev.teaminsync.tasks;
 import android.os.Handler;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.monacdev.teaminsync.BuildConfig;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.utils.PushNotificationsManager;
 
 import org.json.JSONArray;
@@ -49,7 +47,7 @@ public class SendPushRunnable implements Runnable{
             int responseCode = connection.getResponseCode();
             pushSent = (responseCode == 200);
         } catch (Exception e){
-            Log.e(Constants.NOTIFICATIONS_MANAGER_TAG, "Error while sending the push notification to the remote system", e);
+            Log.e(NavigationTags.NOTIFICATIONS_MANAGER, "Error while sending the push notification to the remote system", e);
         }
         SendPushResultRunnable pushResultTask = new SendPushResultRunnable(pushSent);
         this.mainThreadHandler.post(pushResultTask);

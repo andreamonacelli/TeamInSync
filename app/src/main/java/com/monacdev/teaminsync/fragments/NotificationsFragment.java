@@ -22,7 +22,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.adapters.NotificationListAdapter;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.ReferenceStrings;
+import com.monacdev.teaminsync.constants.NotificationsKeys;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +40,7 @@ public class NotificationsFragment extends DialogFragment {
     public static NotificationsFragment newInstance(String loggedUsername){
         NotificationsFragment fragment = new NotificationsFragment();
         Bundle args = new Bundle();
-        args.putString(Constants.USERNAME_KEY_STRING, loggedUsername);
+        args.putString(KeyStrings.USERNAME, loggedUsername);
         fragment.setArguments(args);
         return fragment;
     }
@@ -47,7 +49,7 @@ public class NotificationsFragment extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getArguments() != null){
-            this.loggedUsername = getArguments().getString(Constants.USERNAME_KEY_STRING);
+            this.loggedUsername = getArguments().getString(KeyStrings.USERNAME);
         }
     }
 
@@ -91,7 +93,7 @@ public class NotificationsFragment extends DialogFragment {
      * Given the logged user, fetches the list of notifications associated to it
      */
     private void fetchNotifications(){
-        this.dbRef.child(Constants.NOTIFICATIONS_REFERENCE_STRING).child(this.loggedUsername).orderByChild(Constants.NOTIFICATIONS_TIMESTAMP_KEY)
+        this.dbRef.child(ReferenceStrings.NOTIFICATIONS).child(this.loggedUsername).orderByChild(NotificationsKeys.NOTIFICATIONS_TIMESTAMP)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -127,15 +129,15 @@ public class NotificationsFragment extends DialogFragment {
      */
     private HashMap<String, Object> parseNotification(DataSnapshot notificationSnapshot){
         HashMap<String, Object> notificationData = new HashMap<>();
-        notificationData.put(Constants.NOTIFICATIONS_UID_KEY, notificationSnapshot.getKey());
-        notificationData.put(Constants.USERNAME_KEY_STRING, this.loggedUsername);
-        notificationData.put(Constants.NOTIFICATIONS_TITLE_KEY, notificationSnapshot.child(Constants.NOTIFICATIONS_TITLE_KEY).getValue(String.class));
-        notificationData.put(Constants.NOTIFICATIONS_MSG_KEY, notificationSnapshot.child(Constants.NOTIFICATIONS_MSG_KEY).getValue(String.class));
-        Boolean isRead = notificationSnapshot.child(Constants.NOTIFICATIONS_READ_KEY).getValue(Boolean.class);
+        notificationData.put(NotificationsKeys.NOTIFICATIONS_UID, notificationSnapshot.getKey());
+        notificationData.put(KeyStrings.USERNAME, this.loggedUsername);
+        notificationData.put(NotificationsKeys.NOTIFICATIONS_TITLE, notificationSnapshot.child(NotificationsKeys.NOTIFICATIONS_TITLE).getValue(String.class));
+        notificationData.put(NotificationsKeys.NOTIFICATIONS_MSG, notificationSnapshot.child(NotificationsKeys.NOTIFICATIONS_MSG).getValue(String.class));
+        Boolean isRead = notificationSnapshot.child(NotificationsKeys.NOTIFICATIONS_READ).getValue(Boolean.class);
         if(isRead == null){
             isRead = false;
         }
-        notificationData.put(Constants.NOTIFICATIONS_READ_KEY, isRead);
+        notificationData.put(NotificationsKeys.NOTIFICATIONS_READ, isRead);
         return notificationData;
     }
 }

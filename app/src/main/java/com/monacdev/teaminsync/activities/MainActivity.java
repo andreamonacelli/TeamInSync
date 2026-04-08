@@ -1,7 +1,6 @@
 package com.monacdev.teaminsync.activities;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,7 +17,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -26,15 +24,18 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.ReferenceStrings;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
+import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.fragments.NotificationsFragment;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.Constants;
 import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent squadListIntent = new Intent(MainActivity.this, MembersListActivity.class);
-                squadListIntent.putExtra(Constants.TEAM_ID_TAG, teamID);
+                squadListIntent.putExtra(IntentExtrasTags.TEAM_ID, teamID);
                 startActivity(squadListIntent);
             }
         });
@@ -107,8 +108,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent trainingPageIntent = new Intent(MainActivity.this, TrainingActivity.class);
-                trainingPageIntent.putExtra(Constants.DISPLAYED_USER_EXTRA_STRING, loggedUserUsername);
-                trainingPageIntent.putExtra(Constants.DISPLAYED_USER_SURNAME_EXTRA_STRING, loggedUserSurname);
+                trainingPageIntent.putExtra(IntentExtrasTags.DISPLAYED_USER, loggedUserUsername);
+                trainingPageIntent.putExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME, loggedUserSurname);
                 startActivity(trainingPageIntent);
             }
         });
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 NotificationsFragment notificationsDialog = NotificationsFragment.newInstance(loggedUserUsername);
-                notificationsDialog.show(getSupportFragmentManager(), Constants.NOTIFICATIONS_FRAGMENT_TAG);
+                notificationsDialog.show(getSupportFragmentManager(), NavigationTags.NOTIFICATIONS_FRAGMENT);
             }
         });
         this.logoutBtn.setOnClickListener(new View.OnClickListener() {
@@ -132,16 +133,16 @@ public class MainActivity extends AppCompatActivity {
      */
     private void populateDataFromDB(){
         Intent callerIntent = this.getIntent();
-        this.loggedUserUsername = callerIntent.getStringExtra(Constants.LOGGED_USER_EXTRA_STRING);
-        DatabaseReference userRef = this.dbRef.child(Constants.USERS_REFERENCE_STRING).child(this.loggedUserUsername);
+        this.loggedUserUsername = callerIntent.getStringExtra(IntentExtrasTags.LOGGED_USER);
+        DatabaseReference userRef = this.dbRef.child(ReferenceStrings.USERS).child(this.loggedUserUsername);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    loggedUserName = snapshot.child(Constants.NAME_KEY_STRING).getValue(String.class);
-                    loggedUserSurname = snapshot.child(Constants.SURNAME_KEY_STRING).getValue(String.class);
+                    loggedUserName = snapshot.child(KeyStrings.NAME).getValue(String.class);
+                    loggedUserSurname = snapshot.child(KeyStrings.SURNAME).getValue(String.class);
                     homepageHeaderTV.setText(String.format("%s %s", getResources().getText(R.string.homepage_welcome), loggedUserName));
-                    teamID = snapshot.child(Constants.TEAM_KEY_STRING).getValue(String.class);
+                    teamID = snapshot.child(KeyStrings.TEAM).getValue(String.class);
                     if(teamID != null && !teamID.isEmpty()){
                         fetchTeamData(teamID);
                     }
@@ -160,16 +161,16 @@ public class MainActivity extends AppCompatActivity {
      * @param teamID the ID of the team to which the logged user belongs
      */
     private void fetchTeamData(String teamID){
-        DatabaseReference teamRef = this.dbRef.child(Constants.TEAMS_REFERENCE_STRING).child(teamID);
+        DatabaseReference teamRef = this.dbRef.child(ReferenceStrings.TEAMS).child(teamID);
         teamRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    String teamName = snapshot.child(Constants.NAME_KEY_STRING).getValue(String.class);
-                    String leagueName = snapshot.child(Constants.LEAGUE_KEY_STRING).getValue(String.class);
-                    String address = snapshot.child(Constants.ADDRESS_KEY_STRING).getValue(String.class);
-                    String stadium = snapshot.child(Constants.STADIUM_KEY_STRING).getValue(String.class);
-                    String logoPath = snapshot.child(Constants.LOGO_KEY_STRING).getValue(String.class);
+                    String teamName = snapshot.child(KeyStrings.NAME).getValue(String.class);
+                    String leagueName = snapshot.child(KeyStrings.LEAGUE).getValue(String.class);
+                    String address = snapshot.child(KeyStrings.ADDRESS).getValue(String.class);
+                    String stadium = snapshot.child(KeyStrings.STADIUM).getValue(String.class);
+                    String logoPath = snapshot.child(KeyStrings.LOGO).getValue(String.class);
                     if(teamName != null){
                         teamNameTV.setText(teamName);
                     }
@@ -201,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         /* Cleaning the SharedPreferences used for persistence */
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_STRING, MODE_PRIVATE);
         SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
-        sharedPrefsEditor.remove(Constants.LOGGED_USER_EXTRA_STRING);
+        sharedPrefsEditor.remove(IntentExtrasTags.LOGGED_USER);
         sharedPrefsEditor.apply();
         /* Effectively Sign Out */
         FirebaseAuth.getInstance().signOut();
@@ -233,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
         dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Log.i(Constants.LOGOUT_CANCELED_TAG, Constants.LOGOUT_CANCELED_MSG);
+                Log.i(NavigationTags.LOGOUT_CANCELED, Constants.LOGOUT_CANCELED_MSG);
             }
         });
         AlertDialog logoutDialog = dialogBuilder.create();

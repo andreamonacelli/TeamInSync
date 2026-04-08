@@ -12,8 +12,9 @@ import androidx.core.splashscreen.SplashScreen;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
 import com.monacdev.teaminsync.utils.CloudinaryManager;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.Constants;
 import com.monacdev.teaminsync.utils.PushNotificationsManager;
 import com.onesignal.Continue;
 import com.onesignal.OneSignal;
@@ -39,10 +40,10 @@ public class SplashScreenActivity extends AppCompatActivity {
         FirebaseUser loggedUser = FirebaseAuth.getInstance().getCurrentUser();
         if(loggedUser != null){
             SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_STRING, MODE_PRIVATE);
-            String loggedUsername = sharedPreferences.getString(Constants.LOGGED_USER_EXTRA_STRING, null);
+            String loggedUsername = sharedPreferences.getString(IntentExtrasTags.LOGGED_USER, null);
             if(loggedUsername != null){
                 Intent homepageIntent = new Intent(SplashScreenActivity.this, MainActivity.class);
-                homepageIntent.putExtra(Constants.LOGGED_USER_EXTRA_STRING, loggedUsername);
+                homepageIntent.putExtra(IntentExtrasTags.LOGGED_USER, loggedUsername);
                 OneSignal.login(loggedUsername);
                 startActivity(homepageIntent);
                 finish();

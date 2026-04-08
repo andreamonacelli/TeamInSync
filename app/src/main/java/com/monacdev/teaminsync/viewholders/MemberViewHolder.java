@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.activities.ProfileActivity;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.Constants;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
 
 import java.util.HashMap;
 
@@ -31,17 +33,17 @@ public class MemberViewHolder extends RecyclerView.ViewHolder {
      */
     public void bindData(HashMap<String, String> userData){
         this.setUpTextViews(
-                userData.get(Constants.NAME_KEY_STRING),
-                userData.get(Constants.SURNAME_KEY_STRING),
-                userData.get(Constants.USERNAME_KEY_STRING),
-                userData.get(Constants.BIRTHDATE_KEY_STRING)
+                userData.get(KeyStrings.NAME),
+                userData.get(KeyStrings.SURNAME),
+                userData.get(KeyStrings.USERNAME),
+                userData.get(KeyStrings.BIRTHDATE)
         );
-        this.setProfilePictureOnView(userData.get(Constants.PROFILE_PIC_KEY_STRING), userData.get(Constants.ROLE_KEY_STRING));
+        this.setProfilePictureOnView(userData.get(KeyStrings.PROFILE_PIC), userData.get(KeyStrings.ROLE));
         this.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent memberDetailsIntent = new Intent(itemView.getContext(), ProfileActivity.class);
-                memberDetailsIntent.putExtra(Constants.DISPLAYED_USER_EXTRA_STRING, userData.get(Constants.USERNAME_KEY_STRING));
+                memberDetailsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER, userData.get(KeyStrings.USERNAME));
                 itemView.getContext().startActivity(memberDetailsIntent);
                 /* Here we do not have to terminate the activity because we can get back here */
             }

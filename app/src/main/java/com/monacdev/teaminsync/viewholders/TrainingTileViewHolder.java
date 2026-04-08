@@ -20,8 +20,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.ReferenceStrings;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
+import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.fragments.TrainingTrackingFragment;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.Constants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -63,15 +67,15 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
      */
     public void bindData(HashMap<String, String> trainingData){
         this.fillTextFields(
-                trainingData.get(Constants.TRAINING_TITLE_KEY_STRING),
-                trainingData.get(Constants.TRAINING_TARGET_KEY_STRING),
-                trainingData.get(Constants.TRAINING_DUE_TO_KEY_STRING)
+                trainingData.get(KeyStrings.TRAINING_TITLE),
+                trainingData.get(KeyStrings.TRAINING_TARGET),
+                trainingData.get(KeyStrings.TRAINING_DUE_TO)
         );
-        this.trainingUID = trainingData.get(Constants.TRAINING_UUID_KEY_STRING);
-        this.athleteUsername = trainingData.get(Constants.USERNAME_KEY_STRING);
-        this.handleTrainingType(trainingData.get(Constants.TRAINING_TYPE_KEY_STRING), trainingData.get(Constants.USERNAME_KEY_STRING));
-        this.isExpired = isTrainingExpired(trainingData.get(Constants.TRAINING_DUE_TO_KEY_STRING));
-        this.isCompleted = Boolean.parseBoolean(trainingData.get(Constants.TRAINING_COMPLETED_KEY_STRING));
+        this.trainingUID = trainingData.get(KeyStrings.TRAINING_UUID);
+        this.athleteUsername = trainingData.get(KeyStrings.USERNAME);
+        this.handleTrainingType(trainingData.get(KeyStrings.TRAINING_TYPE), trainingData.get(KeyStrings.USERNAME));
+        this.isExpired = isTrainingExpired(trainingData.get(KeyStrings.TRAINING_DUE_TO));
+        this.isCompleted = Boolean.parseBoolean(trainingData.get(KeyStrings.TRAINING_COMPLETED));
         if(this.actionsActive && !this.isCompleted){
             this.startTrainingBtn.setVisibility(View.VISIBLE);
         } else {
@@ -104,12 +108,12 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
                     }
                     if(activity != null) {
                         activity.getSupportFragmentManager().setFragmentResultListener(
-                                Constants.TRAINING_RESULT_BUNDLE_STRING,
+                                NavigationTags.TRAINING_BUNDLE_RESULT,
                                 activity,
                                 new FragmentResultListener() {
                                     @Override
                                     public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                                        boolean completed = result.getBoolean(Constants.TRAINING_COMPLETED_EXTRA_STRING);
+                                        boolean completed = result.getBoolean(IntentExtrasTags.TRAINING_COMPLETED);
                                         if(completed){
                                             TrainingTileViewHolder.this.isCompleted = true;
                                             TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
@@ -148,8 +152,8 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
      */
     private void updateTrainingOnDB(View view, String userID){
         DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference();
-        trainingRef.child(Constants.TRAININGS_REFERENCE_STRING).child(userID).child(TrainingTileViewHolder.this.trainingUID)
-                .child(Constants.TRAINING_COMPLETED_KEY_STRING).setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+        trainingRef.child(ReferenceStrings.TRAININGS).child(userID).child(TrainingTileViewHolder.this.trainingUID)
+                .child(KeyStrings.TRAINING_COMPLETED).setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
                         TrainingTileViewHolder.this.isCompleted = true;

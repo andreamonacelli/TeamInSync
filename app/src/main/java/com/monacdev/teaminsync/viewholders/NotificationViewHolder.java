@@ -14,7 +14,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.monacdev.teaminsync.R;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.ReferenceStrings;
+import com.monacdev.teaminsync.constants.NotificationsKeys;
 
 import java.util.HashMap;
 
@@ -46,11 +48,11 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder {
      * @param notificationData the data to be shown in the view
      */
     public void bindData(HashMap<String, Object> notificationData){
-        this.notificationTitleTV.setText(notificationData.get(Constants.NOTIFICATIONS_TITLE_KEY).toString());
-        this.notificationMessageTV.setText(notificationData.get(Constants.NOTIFICATIONS_MSG_KEY).toString());
-        this.notificationUID = notificationData.get(Constants.NOTIFICATIONS_UID_KEY).toString();
-        this.notificationAthleteID = notificationData.get(Constants.USERNAME_KEY_STRING).toString();
-        this.isRead = Boolean.parseBoolean(notificationData.get(Constants.NOTIFICATIONS_READ_KEY).toString());
+        this.notificationTitleTV.setText(notificationData.get(NotificationsKeys.NOTIFICATIONS_TITLE).toString());
+        this.notificationMessageTV.setText(notificationData.get(NotificationsKeys.NOTIFICATIONS_MSG).toString());
+        this.notificationUID = notificationData.get(NotificationsKeys.NOTIFICATIONS_UID).toString();
+        this.notificationAthleteID = notificationData.get(KeyStrings.USERNAME).toString();
+        this.isRead = Boolean.parseBoolean(notificationData.get(NotificationsKeys.NOTIFICATIONS_READ).toString());
         this.configureImageButton();
     }
 
@@ -90,8 +92,8 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder {
      */
     private void updateNotificationDataOnDB(View view, boolean newStatus){
         DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference();
-        notificationRef.child(Constants.NOTIFICATIONS_REFERENCE_STRING).child(this.notificationAthleteID).child(this.notificationUID)
-                .child(Constants.NOTIFICATIONS_READ_KEY).setValue(newStatus).addOnSuccessListener(new OnSuccessListener<Void>() {
+        notificationRef.child(ReferenceStrings.NOTIFICATIONS).child(this.notificationAthleteID).child(this.notificationUID)
+                .child(NotificationsKeys.NOTIFICATIONS_READ).setValue(newStatus).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
                         if(newStatus){

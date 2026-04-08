@@ -1,4 +1,4 @@
-package com.monacdev.teaminsync.utils;
+package com.monacdev.teaminsync.constants;
 
 public final class Constants {
     private Constants() {}

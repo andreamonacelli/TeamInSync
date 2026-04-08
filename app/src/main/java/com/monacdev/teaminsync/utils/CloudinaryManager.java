@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.UploadCallback;
+import com.monacdev.teaminsync.constants.Constants;
 
 import java.util.HashMap;
 import java.util.Map;

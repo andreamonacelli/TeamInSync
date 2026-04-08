@@ -23,8 +23,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
-import com.monacdev.teaminsync.activities.LoginActivity;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.Constants;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.ReferenceStrings;
+import com.monacdev.teaminsync.constants.NotificationsKeys;
 import com.monacdev.teaminsync.utils.PushNotificationsManager;
 
 import java.text.ParseException;
@@ -51,7 +53,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
     public static TrainingCreationWizardFragment newInstance(String teamID, String coachID) {
         final TrainingCreationWizardFragment fragment = new TrainingCreationWizardFragment();
         final Bundle args = new Bundle();
-        args.putString(Constants.TEAM_KEY_STRING, teamID);
+        args.putString(KeyStrings.TEAM, teamID);
         args.putString(Constants.COACH_ROLE_STRING, coachID);
         fragment.setArguments(args);
         return fragment;
@@ -61,7 +63,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getArguments() != null){
-            this.teamID = getArguments().getString(Constants.TEAM_KEY_STRING);
+            this.teamID = getArguments().getString(KeyStrings.TEAM);
             this.coachID = getArguments().getString(Constants.COACH_ROLE_STRING);
         }
     }
@@ -124,13 +126,13 @@ public class TrainingCreationWizardFragment extends DialogFragment {
      */
     private void fetchTargetAthletes(){
         this.targetAthletes = new ArrayList<>();
-        Query teamRef = this.dbRef.child(Constants.USERS_REFERENCE_STRING).orderByChild(Constants.TEAM_KEY_STRING).equalTo(this.teamID);
+        Query teamRef = this.dbRef.child(ReferenceStrings.USERS).orderByChild(KeyStrings.TEAM).equalTo(this.teamID);
         teamRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     for(DataSnapshot memberSnapshot : snapshot.getChildren()){
-                        String role = memberSnapshot.child(Constants.ROLE_KEY_STRING).getValue(String.class);
+                        String role = memberSnapshot.child(KeyStrings.ROLE).getValue(String.class);
                         if(role != null && role.equals(Constants.PLAYER_ROLE_STRING)){
                             targetAthletes.add(memberSnapshot.getKey());
                         }
@@ -158,12 +160,12 @@ public class TrainingCreationWizardFragment extends DialogFragment {
         Map<String, Object> multiUploadMap = new HashMap<>();
         for(String athleteID : this.targetAthletes){
             /* Upload training data */
-            String trainingPath = String.format("%s/%s/%s", Constants.TRAININGS_REFERENCE_STRING, athleteID, trainingUID);
+            String trainingPath = String.format("%s/%s/%s", ReferenceStrings.TRAININGS, athleteID, trainingUID);
             multiUploadMap.put(trainingPath, trainingData);
             if(completionEffect.equals(Constants.EFFECT_DISMISS)) {
                 /* Upload notification data and send push notification */
                 String notificationUID = UUID.randomUUID().toString();
-                String notificationPath = String.format("%s/%s/%s", Constants.NOTIFICATIONS_REFERENCE_STRING, athleteID, notificationUID);
+                String notificationPath = String.format("%s/%s/%s", ReferenceStrings.NOTIFICATIONS, athleteID, notificationUID);
                 HashMap<String, Object> notificationData = this.prepareNotification();
                 multiUploadMap.put(notificationPath, notificationData);
             }
@@ -206,12 +208,12 @@ public class TrainingCreationWizardFragment extends DialogFragment {
             } else {
                 trainingType = Constants.REPS_TRAINING_STRING;
             }
-            trainingData.put(Constants.TRAINING_TITLE_KEY_STRING, title);
-            trainingData.put(Constants.TRAINING_TYPE_KEY_STRING, trainingType);
-            trainingData.put(Constants.TRAINING_TARGET_KEY_STRING, target);
-            trainingData.put(Constants.TRAINING_DUE_TO_KEY_STRING, dueToDate);
+            trainingData.put(KeyStrings.TRAINING_TITLE, title);
+            trainingData.put(KeyStrings.TRAINING_TYPE, trainingType);
+            trainingData.put(KeyStrings.TRAINING_TARGET, target);
+            trainingData.put(KeyStrings.TRAINING_DUE_TO, dueToDate);
             trainingData.put(Constants.COACH_ROLE_STRING, this.coachID);
-            trainingData.put(Constants.TRAINING_COMPLETED_KEY_STRING, false);
+            trainingData.put(KeyStrings.TRAINING_COMPLETED, false);
         }
         return trainingData;
     }
@@ -246,10 +248,10 @@ public class TrainingCreationWizardFragment extends DialogFragment {
      */
     private HashMap<String, Object> prepareNotification(){
         HashMap<String, Object> notificationData = new HashMap<>();
-        notificationData.put(Constants.NOTIFICATIONS_TITLE_KEY, getString(R.string.push_new_training_title));
-        notificationData.put(Constants.NOTIFICATIONS_MSG_KEY, getString(R.string.push_new_training_body));
-        notificationData.put(Constants.NOTIFICATIONS_READ_KEY, false);
-        notificationData.put(Constants.NOTIFICATIONS_TIMESTAMP_KEY, System.currentTimeMillis());
+        notificationData.put(NotificationsKeys.NOTIFICATIONS_TITLE, getString(R.string.push_new_training_title));
+        notificationData.put(NotificationsKeys.NOTIFICATIONS_MSG, getString(R.string.push_new_training_body));
+        notificationData.put(NotificationsKeys.NOTIFICATIONS_READ, false);
+        notificationData.put(NotificationsKeys.NOTIFICATIONS_TIMESTAMP, System.currentTimeMillis());
         return notificationData;
     }
 }

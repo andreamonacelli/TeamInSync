@@ -27,8 +27,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.ReferenceStrings;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
+import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.fragments.RegistrationWizardFragment;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.Constants;
 
 import java.util.HashMap;
 
@@ -57,8 +61,8 @@ public class ProfileActivity extends AppCompatActivity {
             return insets;
         });
 
-        this.displayedUserID = getIntent().getStringExtra(Constants.DISPLAYED_USER_EXTRA_STRING);
-        getSupportFragmentManager().setFragmentResultListener(Constants.EDIT_FRAGMENT_RESULT, this, new FragmentResultListener() {
+        this.displayedUserID = getIntent().getStringExtra(IntentExtrasTags.DISPLAYED_USER);
+        getSupportFragmentManager().setFragmentResultListener(NavigationTags.EDIT_FRAGMENT_RESULT, this, new FragmentResultListener() {
                 @Override
                 public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
                     ProfileActivity.this.fillUserDataFromDB();
@@ -101,8 +105,8 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View view) {
                 /* Here we are navigating to the page containing the training of the displayed user which might not be the logged one! */
                 Intent trainingsIntent = new Intent(ProfileActivity.this, TrainingActivity.class);
-                trainingsIntent.putExtra(Constants.DISPLAYED_USER_EXTRA_STRING, displayedUserID);
-                trainingsIntent.putExtra(Constants.DISPLAYED_USER_SURNAME_EXTRA_STRING, displayedUserSurname);
+                trainingsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER, displayedUserID);
+                trainingsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME, displayedUserSurname);
                 startActivity(trainingsIntent);
             }
         });
@@ -110,7 +114,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 RegistrationWizardFragment editWizard = RegistrationWizardFragment.newEditingInstance(ProfileActivity.this.editData);
-                editWizard.show(getSupportFragmentManager(), Constants.EDIT_WIZARD_TAG);
+                editWizard.show(getSupportFragmentManager(), NavigationTags.EDIT_WIZARD);
             }
         });
     }
@@ -119,18 +123,18 @@ public class ProfileActivity extends AppCompatActivity {
      * Given the user that is displayed in the page, fetch its data from the Firebase DB
      */
     private void fillUserDataFromDB(){
-        DatabaseReference userRef = this.dbRef.child(Constants.USERS_REFERENCE_STRING).child(this.displayedUserID);
+        DatabaseReference userRef = this.dbRef.child(ReferenceStrings.USERS).child(this.displayedUserID);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    String name = snapshot.child(Constants.NAME_KEY_STRING).getValue(String.class);
-                    String surname = snapshot.child(Constants.SURNAME_KEY_STRING).getValue(String.class);
+                    String name = snapshot.child(KeyStrings.NAME).getValue(String.class);
+                    String surname = snapshot.child(KeyStrings.SURNAME).getValue(String.class);
                     ProfileActivity.this.displayedUserSurname = surname;
                     if(name != null && surname != null){
                         ProfileActivity.this.profileNameHeaderTV.setText(String.format("%s %s", name, surname));
                     }
-                    String role = snapshot.child(Constants.ROLE_KEY_STRING).getValue(String.class);
+                    String role = snapshot.child(KeyStrings.ROLE).getValue(String.class);
                     if(role != null){
                         if(role.equals(Constants.COACH_ROLE_STRING)){
                             ProfileActivity.this.roleLabelTV.setText(R.string.coach_label);
@@ -138,13 +142,13 @@ public class ProfileActivity extends AppCompatActivity {
                             ProfileActivity.this.roleLabelTV.setText(R.string.athlete_label);
                         }
                     }
-                    String birthDate = snapshot.child(Constants.BIRTHDATE_KEY_STRING).getValue(String.class);
+                    String birthDate = snapshot.child(KeyStrings.BIRTHDATE).getValue(String.class);
                     ProfileActivity.this.birthDateLabelTV.setText(String.format("%s %s", getString(R.string.born_on_label), birthDate));
                     ProfileActivity.this.userUsernameTV.setText(String.format("@%s", snapshot.getKey()));
-                    String logoPath = snapshot.child(Constants.PROFILE_PIC_KEY_STRING).getValue(String.class);
+                    String logoPath = snapshot.child(KeyStrings.PROFILE_PIC).getValue(String.class);
                     ProfileActivity.this.setProfilePicture(logoPath, role);
                     ProfileActivity.this.populateEditData(snapshot);
-                    ProfileActivity.this.showingLoggedUser(snapshot.child(Constants.EMAIL_KEY_STRING).getValue(String.class));
+                    ProfileActivity.this.showingLoggedUser(snapshot.child(KeyStrings.EMAIL).getValue(String.class));
                 }
             }
 
@@ -197,17 +201,17 @@ public class ProfileActivity extends AppCompatActivity {
      * @param snapshot the DataSnapshot for the displayed user
      */
     private void populateEditData(DataSnapshot snapshot){
-        String name = snapshot.child(Constants.NAME_KEY_STRING).getValue(String.class);
-        String surname = snapshot.child(Constants.SURNAME_KEY_STRING).getValue(String.class);
-        String birthDate = snapshot.child(Constants.BIRTHDATE_KEY_STRING).getValue(String.class);
-        String logoPath = snapshot.child(Constants.PROFILE_PIC_KEY_STRING).getValue(String.class);
-        String team = snapshot.child(Constants.TEAM_KEY_STRING).getValue(String.class);
+        String name = snapshot.child(KeyStrings.NAME).getValue(String.class);
+        String surname = snapshot.child(KeyStrings.SURNAME).getValue(String.class);
+        String birthDate = snapshot.child(KeyStrings.BIRTHDATE).getValue(String.class);
+        String logoPath = snapshot.child(KeyStrings.PROFILE_PIC).getValue(String.class);
+        String team = snapshot.child(KeyStrings.TEAM).getValue(String.class);
         ProfileActivity.this.displayedUserSurname = surname;
-        ProfileActivity.this.editData.put(Constants.USERNAME_KEY_STRING, ProfileActivity.this.displayedUserID);
-        ProfileActivity.this.editData.put(Constants.NAME_KEY_STRING, name);
-        ProfileActivity.this.editData.put(Constants.SURNAME_KEY_STRING, surname);
-        ProfileActivity.this.editData.put(Constants.BIRTHDATE_KEY_STRING, birthDate);
-        ProfileActivity.this.editData.put(Constants.PROFILE_PIC_KEY_STRING, logoPath);
-        ProfileActivity.this.editData.put(Constants.TEAM_KEY_STRING, team);
+        ProfileActivity.this.editData.put(KeyStrings.USERNAME, ProfileActivity.this.displayedUserID);
+        ProfileActivity.this.editData.put(KeyStrings.NAME, name);
+        ProfileActivity.this.editData.put(KeyStrings.SURNAME, surname);
+        ProfileActivity.this.editData.put(KeyStrings.BIRTHDATE, birthDate);
+        ProfileActivity.this.editData.put(KeyStrings.PROFILE_PIC, logoPath);
+        ProfileActivity.this.editData.put(KeyStrings.TEAM, team);
     }
 }

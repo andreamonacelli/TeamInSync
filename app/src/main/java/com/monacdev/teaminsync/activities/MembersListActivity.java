@@ -21,7 +21,10 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.adapters.MemberListAdapter;
 import com.monacdev.teaminsync.R;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.Constants;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.ReferenceStrings;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +46,7 @@ public class MembersListActivity extends AppCompatActivity {
             return insets;
         });
 
-        this.teamID = getIntent().getStringExtra(Constants.TEAM_ID_TAG);
+        this.teamID = getIntent().getStringExtra(IntentExtrasTags.TEAM_ID);
         this.bindViewsToObjects();
     }
 
@@ -52,13 +55,13 @@ public class MembersListActivity extends AppCompatActivity {
         super.onResume();
         /* The following lines allow to reflect eventual changes in data */
         SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFERENCES_STRING, MODE_PRIVATE);
-        String loggedUsername = sharedPrefs.getString(Constants.LOGGED_USER_EXTRA_STRING, null);
+        String loggedUsername = sharedPrefs.getString(IntentExtrasTags.LOGGED_USER, null);
         if (loggedUsername != null) {
-            this.dbRef.child(Constants.USERS_REFERENCE_STRING).child(loggedUsername).addListenerForSingleValueEvent(new ValueEventListener() {
+            this.dbRef.child(ReferenceStrings.USERS).child(loggedUsername).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            String updatedTeamID = snapshot.child(Constants.TEAM_KEY_STRING).getValue(String.class);
+                            String updatedTeamID = snapshot.child(KeyStrings.TEAM).getValue(String.class);
                             if (updatedTeamID != null) {
                                 MembersListActivity.this.teamID = updatedTeamID;
                             }
@@ -95,7 +98,7 @@ public class MembersListActivity extends AppCompatActivity {
      */
     private void fetchUsersFromDB(RecyclerView targetRecyclerView, String role){
         ArrayList<HashMap<String, String>> userList = new ArrayList<>();
-        Query q = this.dbRef.child(Constants.USERS_REFERENCE_STRING).orderByChild(Constants.TEAM_KEY_STRING).equalTo(this.teamID);
+        Query q = this.dbRef.child(ReferenceStrings.USERS).orderByChild(KeyStrings.TEAM).equalTo(this.teamID);
         q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -103,14 +106,14 @@ public class MembersListActivity extends AppCompatActivity {
                 if(snapshot.exists()){
                     for(DataSnapshot userSnapshot : snapshot.getChildren()){
                         /* Only fetch users based on the desired role */
-                        if(role.equals(userSnapshot.child(Constants.ROLE_KEY_STRING).getValue(String.class))){
+                        if(role.equals(userSnapshot.child(KeyStrings.ROLE).getValue(String.class))){
                             HashMap<String, String> user = new HashMap<>();
-                            user.put(Constants.USERNAME_KEY_STRING, userSnapshot.getKey());
-                            user.put(Constants.NAME_KEY_STRING, userSnapshot.child(Constants.NAME_KEY_STRING).getValue(String.class));
-                            user.put(Constants.SURNAME_KEY_STRING, userSnapshot.child(Constants.SURNAME_KEY_STRING).getValue(String.class));
-                            user.put(Constants.BIRTHDATE_KEY_STRING, userSnapshot.child(Constants.BIRTHDATE_KEY_STRING).getValue(String.class));
-                            user.put(Constants.PROFILE_PIC_KEY_STRING, userSnapshot.child(Constants.PROFILE_PIC_KEY_STRING).getValue(String.class));
-                            user.put(Constants.ROLE_KEY_STRING, userSnapshot.child(Constants.ROLE_KEY_STRING).getValue(String.class));
+                            user.put(KeyStrings.USERNAME, userSnapshot.getKey());
+                            user.put(KeyStrings.NAME, userSnapshot.child(KeyStrings.NAME).getValue(String.class));
+                            user.put(KeyStrings.SURNAME, userSnapshot.child(KeyStrings.SURNAME).getValue(String.class));
+                            user.put(KeyStrings.BIRTHDATE, userSnapshot.child(KeyStrings.BIRTHDATE).getValue(String.class));
+                            user.put(KeyStrings.PROFILE_PIC, userSnapshot.child(KeyStrings.PROFILE_PIC).getValue(String.class));
+                            user.put(KeyStrings.ROLE, userSnapshot.child(KeyStrings.ROLE).getValue(String.class));
                             userList.add(user);
                         }
                     }

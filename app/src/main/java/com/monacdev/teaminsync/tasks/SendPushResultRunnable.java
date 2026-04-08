@@ -2,7 +2,7 @@ package com.monacdev.teaminsync.tasks;
 
 import android.util.Log;
 
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.NavigationTags;
 
 public class SendPushResultRunnable implements Runnable{
     private boolean pushSentSuccess;
@@ -17,9 +17,9 @@ public class SendPushResultRunnable implements Runnable{
     @Override
     public void run() {
         if(this.pushSentSuccess){
-            Log.d(Constants.NOTIFICATIONS_MANAGER_TAG, "Push notification sent successfully!");
+            Log.d(NavigationTags.NOTIFICATIONS_MANAGER, "Push notification sent successfully!");
         } else {
-            Log.e(Constants.NOTIFICATIONS_MANAGER_TAG, "Failure while sending push notification");
+            Log.e(NavigationTags.NOTIFICATIONS_MANAGER, "Failure while sending push notification");
         }
     }
 }

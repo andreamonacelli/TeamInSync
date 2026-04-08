@@ -27,8 +27,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.ReferenceStrings;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
+import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.fragments.RegistrationWizardFragment;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.Constants;
 import com.onesignal.OneSignal;
 
 public class LoginActivity extends AppCompatActivity {
@@ -129,7 +133,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, R.string.register_ok, Toast.LENGTH_SHORT).show();
                     if(loggedUser != null){
                         RegistrationWizardFragment wizard = RegistrationWizardFragment.newInstance(loggedUser.getEmail());
-                        wizard.show(getSupportFragmentManager(), Constants.REG_WIZARD_TAG);
+                        wizard.show(getSupportFragmentManager(), NavigationTags.REG_WIZARD);
                     } else {
                         Toast.makeText(LoginActivity.this, R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
                     }
@@ -146,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void navigateToNextActivity(FirebaseUser loggedUser){
         String userEmail = loggedUser.getEmail();
-        Query q = this.dbRef.getDatabase().getReference(Constants.USERS_REFERENCE_STRING).orderByChild(Constants.EMAIL_KEY_STRING).equalTo(userEmail);
+        Query q = this.dbRef.getDatabase().getReference(ReferenceStrings.USERS).orderByChild(KeyStrings.EMAIL).equalTo(userEmail);
         q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -154,7 +158,7 @@ public class LoginActivity extends AppCompatActivity {
                     for(DataSnapshot userSnapshot : snapshot.getChildren()){
                         String loggedUserID = userSnapshot.getKey();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        intent.putExtra(Constants.LOGGED_USER_EXTRA_STRING, loggedUserID);
+                        intent.putExtra(IntentExtrasTags.LOGGED_USER, loggedUserID);
                         LoginActivity.this.saveUserForPersistence(loggedUserID);
                         if(loggedUserID != null) {
                             OneSignal.login(loggedUserID);
@@ -180,7 +184,7 @@ public class LoginActivity extends AppCompatActivity {
     private void saveUserForPersistence(String username){
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_STRING, MODE_PRIVATE);
         SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
-        sharedPrefsEditor.putString(Constants.LOGGED_USER_EXTRA_STRING, username);
+        sharedPrefsEditor.putString(IntentExtrasTags.LOGGED_USER, username);
         sharedPrefsEditor.apply();
     }
 }

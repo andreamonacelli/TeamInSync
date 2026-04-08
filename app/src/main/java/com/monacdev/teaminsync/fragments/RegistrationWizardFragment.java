@@ -27,8 +27,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.activities.MainActivity;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.ReferenceStrings;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
+import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.utils.CloudinaryManager;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.Constants;
 
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -108,7 +112,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     public static RegistrationWizardFragment newInstance(String userEmail) {
         final RegistrationWizardFragment fragment = new RegistrationWizardFragment();
         final Bundle args = new Bundle();
-        args.putString(Constants.EMAIL_KEY_STRING, userEmail);
+        args.putString(KeyStrings.EMAIL, userEmail);
         fragment.setArguments(args);
         return fragment;
     }
@@ -130,14 +134,14 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         if(getArguments() != null){
             this.isEditMode = getArguments().getBoolean(Constants.EDITING_MODE_KEY_STRING, false);
             if(this.isEditMode){
-                this.editingData.put(Constants.USERNAME_KEY_STRING, getArguments().getString(Constants.USERNAME_KEY_STRING));
-                this.editingData.put(Constants.NAME_KEY_STRING, getArguments().getString(Constants.NAME_KEY_STRING));
-                this.editingData.put(Constants.SURNAME_KEY_STRING, getArguments().getString(Constants.SURNAME_KEY_STRING));
-                this.editingData.put(Constants.BIRTHDATE_KEY_STRING, getArguments().getString(Constants.BIRTHDATE_KEY_STRING));
-                this.editingData.put(Constants.PROFILE_PIC_KEY_STRING, getArguments().getString(Constants.PROFILE_PIC_KEY_STRING));
-                this.editingData.put(Constants.TEAM_KEY_STRING, getArguments().getString(Constants.TEAM_KEY_STRING));
+                this.editingData.put(KeyStrings.USERNAME, getArguments().getString(KeyStrings.USERNAME));
+                this.editingData.put(KeyStrings.NAME, getArguments().getString(KeyStrings.NAME));
+                this.editingData.put(KeyStrings.SURNAME, getArguments().getString(KeyStrings.SURNAME));
+                this.editingData.put(KeyStrings.BIRTHDATE, getArguments().getString(KeyStrings.BIRTHDATE));
+                this.editingData.put(KeyStrings.PROFILE_PIC, getArguments().getString(KeyStrings.PROFILE_PIC));
+                this.editingData.put(KeyStrings.TEAM, getArguments().getString(KeyStrings.TEAM));
             } else {
-                this.loggedUserEmail = getArguments().getString(Constants.EMAIL_KEY_STRING);
+                this.loggedUserEmail = getArguments().getString(KeyStrings.EMAIL);
             }
         }
     }
@@ -181,10 +185,10 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 selectedTeam = teamIDs.get(selectedTeamID);
                 if(RegistrationWizardFragment.this.isEditMode){
                     HashMap<String, Object> updateMap = new HashMap<>();
-                    updateMap.put(Constants.NAME_KEY_STRING, RegistrationWizardFragment.this.nameET.getText().toString().trim());
-                    updateMap.put(Constants.SURNAME_KEY_STRING, RegistrationWizardFragment.this.surnameET.getText().toString().trim());
-                    updateMap.put(Constants.BIRTHDATE_KEY_STRING, RegistrationWizardFragment.this.birthDateET.getText().toString().trim());
-                    updateMap.put(Constants.TEAM_KEY_STRING, selectedTeam);
+                    updateMap.put(KeyStrings.NAME, RegistrationWizardFragment.this.nameET.getText().toString().trim());
+                    updateMap.put(KeyStrings.SURNAME, RegistrationWizardFragment.this.surnameET.getText().toString().trim());
+                    updateMap.put(KeyStrings.BIRTHDATE, RegistrationWizardFragment.this.birthDateET.getText().toString().trim());
+                    updateMap.put(KeyStrings.TEAM, selectedTeam);
                     RegistrationWizardFragment.this.uploadUserOnDatabase(updateMap);
                 } else {
                     HashMap<String, Object> newUserData = userDataMapping(selectedTeam);
@@ -239,13 +243,13 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
             role = Constants.COACH_ROLE_STRING;
         }
         HashMap<String, Object> newUserMap = new HashMap<>();
-        newUserMap.put(Constants.EMAIL_KEY_STRING, this.loggedUserEmail);
-        newUserMap.put(Constants.NAME_KEY_STRING, this.nameET.getText().toString().trim());
-        newUserMap.put(Constants.SURNAME_KEY_STRING, this.surnameET.getText().toString().trim());
-        newUserMap.put(Constants.BIRTHDATE_KEY_STRING, this.birthDateET.getText().toString().trim());
-        newUserMap.put(Constants.ROLE_KEY_STRING, role);
-        newUserMap.put(Constants.PROFILE_PIC_KEY_STRING, "");
-        newUserMap.put(Constants.TEAM_KEY_STRING, selectedTeam);
+        newUserMap.put(KeyStrings.EMAIL, this.loggedUserEmail);
+        newUserMap.put(KeyStrings.NAME, this.nameET.getText().toString().trim());
+        newUserMap.put(KeyStrings.SURNAME, this.surnameET.getText().toString().trim());
+        newUserMap.put(KeyStrings.BIRTHDATE, this.birthDateET.getText().toString().trim());
+        newUserMap.put(KeyStrings.ROLE, role);
+        newUserMap.put(KeyStrings.PROFILE_PIC, "");
+        newUserMap.put(KeyStrings.TEAM, selectedTeam);
         return newUserMap;
     }
 
@@ -259,13 +263,13 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.teamSelectorSpinner.setAdapter(adapter);
         /* Populating the Spinner component with the teams available on the Firebase DB */
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference(Constants.TEAMS_REFERENCE_STRING);
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS);
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot teamSnapshot : snapshot.getChildren()){
                     String teamID = teamSnapshot.getKey();
-                    String teamName = teamSnapshot.child(Constants.NAME_KEY_STRING).getValue(String.class);
+                    String teamName = teamSnapshot.child(KeyStrings.NAME).getValue(String.class);
                     if(teamName != null){
                         teamNames.add(teamName);
                         teamIDs.add(teamID);
@@ -273,7 +277,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 }
                 adapter.notifyDataSetChanged();
                 if(RegistrationWizardFragment.this.isEditMode){
-                    String currentTeamID = RegistrationWizardFragment.this.editingData.get(Constants.TEAM_KEY_STRING);
+                    String currentTeamID = RegistrationWizardFragment.this.editingData.get(KeyStrings.TEAM);
                     if(currentTeamID != null){
                         int selectedSpinnerPosition = RegistrationWizardFragment.this.teamIDs.indexOf(currentTeamID);
                         if(selectedSpinnerPosition >= 0){
@@ -342,40 +346,40 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
      */
     private void uploadUserOnDatabase(HashMap<String, Object> userData){
         if(this.isEditMode){
-            String username = this.editingData.get(Constants.USERNAME_KEY_STRING);
+            String username = this.editingData.get(KeyStrings.USERNAME);
             if(username == null){
                 Toast.makeText(getContext(), getString(R.string.error_changes_save), Toast.LENGTH_SHORT).show();
                 return;
             }
-            FirebaseDatabase.getInstance().getReference(Constants.USERS_REFERENCE_STRING).child(username).updateChildren(userData).addOnCompleteListener(new OnCompleteListener<Void>() {
+            FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).updateChildren(userData).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()){
-                        String previousTeam = RegistrationWizardFragment.this.editingData.get(Constants.TEAM_KEY_STRING);
-                        String newTeam = (String) userData.get(Constants.TEAM_KEY_STRING);
+                        String previousTeam = RegistrationWizardFragment.this.editingData.get(KeyStrings.TEAM);
+                        String newTeam = (String) userData.get(KeyStrings.TEAM);
                         if(previousTeam != null && newTeam != null && !previousTeam.equals(newTeam)){
-                            DatabaseReference teamsRef = FirebaseDatabase.getInstance().getReference(Constants.TEAMS_REFERENCE_STRING);
-                            teamsRef.child(previousTeam).child(Constants.MEMBERS_KEY_STRING).child(username).removeValue();
-                            teamsRef.child(newTeam).child(Constants.MEMBERS_KEY_STRING).child(username).setValue(true);
+                            DatabaseReference teamsRef = FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS);
+                            teamsRef.child(previousTeam).child(KeyStrings.MEMBERS).child(username).removeValue();
+                            teamsRef.child(newTeam).child(KeyStrings.MEMBERS).child(username).setValue(true);
                         }
                         Toast.makeText(getContext(), getString(R.string.changes_saved_label), Toast.LENGTH_SHORT).show();
-                        requireActivity().getSupportFragmentManager().setFragmentResult(Constants.EDIT_FRAGMENT_RESULT, new Bundle());
+                        requireActivity().getSupportFragmentManager().setFragmentResult(NavigationTags.EDIT_FRAGMENT_RESULT, new Bundle());
                         dismiss();
                     }
                 }
             });
         } else {
             String username = this.usernameET.getText().toString();
-            FirebaseDatabase.getInstance().getReference(Constants.USERS_REFERENCE_STRING).child(username).setValue(userData).addOnCompleteListener(new OnCompleteListener<Void>() {
+            FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).setValue(userData).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         /* The newly registered user will be automatically added to the team */
-                        FirebaseDatabase.getInstance().getReference(Constants.TEAMS_REFERENCE_STRING)
-                                .child(userData.get(Constants.TEAM_KEY_STRING).toString()).child(Constants.MEMBERS_KEY_STRING)
+                        FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS)
+                                .child(userData.get(KeyStrings.TEAM).toString()).child(KeyStrings.MEMBERS)
                                 .child(username).setValue(true);
                         Intent intent = new Intent(getContext(), MainActivity.class);
-                        intent.putExtra(Constants.LOGGED_USER_EXTRA_STRING, username);
+                        intent.putExtra(IntentExtrasTags.LOGGED_USER, username);
                         startActivity(intent);
                     }
                 }
@@ -427,7 +431,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
             @Override
             public void onSuccess(String requestId, Map resultData) {
                 String imageUrl = (String) resultData.get(Constants.CLOUDINARY_UPLOAD_RESULT_STRING);
-                userData.put(Constants.PROFILE_PIC_KEY_STRING, imageUrl);
+                userData.put(KeyStrings.PROFILE_PIC, imageUrl);
                 RegistrationWizardFragment.this.uploadUserOnDatabase(userData);
             }
 
@@ -452,10 +456,10 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
      */
     private void fieldPreCompilation(View view){
         this.submitBtn.setText(R.string.edit_profile_submit);
-        this.nameET.setText(this.editingData.get(Constants.NAME_KEY_STRING));
-        this.surnameET.setText(this.editingData.get(Constants.SURNAME_KEY_STRING));
-        this.birthDateET.setText(this.editingData.get(Constants.BIRTHDATE_KEY_STRING));
-        String profilePicUrl = this.editingData.get(Constants.PROFILE_PIC_KEY_STRING);
+        this.nameET.setText(this.editingData.get(KeyStrings.NAME));
+        this.surnameET.setText(this.editingData.get(KeyStrings.SURNAME));
+        this.birthDateET.setText(this.editingData.get(KeyStrings.BIRTHDATE));
+        String profilePicUrl = this.editingData.get(KeyStrings.PROFILE_PIC);
         if(profilePicUrl != null && !profilePicUrl.isEmpty()){
             Glide.with(this).load(profilePicUrl).circleCrop().into(this.profilePicIV);
         }

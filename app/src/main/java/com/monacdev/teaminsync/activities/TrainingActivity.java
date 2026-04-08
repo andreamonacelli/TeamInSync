@@ -25,8 +25,12 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.adapters.TrainingListTileAdapter;
+import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.ReferenceStrings;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
+import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.fragments.TrainingCreationWizardFragment;
-import com.monacdev.teaminsync.utils.Constants;
+import com.monacdev.teaminsync.constants.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,8 +58,8 @@ public class TrainingActivity extends AppCompatActivity {
             return insets;
         });
 
-        this.displayedUserID = getIntent().getStringExtra(Constants.DISPLAYED_USER_EXTRA_STRING);
-        this.displayedUserSurname = getIntent().getStringExtra(Constants.DISPLAYED_USER_SURNAME_EXTRA_STRING);
+        this.displayedUserID = getIntent().getStringExtra(IntentExtrasTags.DISPLAYED_USER);
+        this.displayedUserSurname = getIntent().getStringExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME);
         this.bindViewsToObjects();
         this.setListeners();
         this.isDisplayedUserLogged();
@@ -83,15 +87,15 @@ public class TrainingActivity extends AppCompatActivity {
         FirebaseUser loggedUser = authClient.getCurrentUser();
         if(loggedUser != null){
             String loggedUserEmail = loggedUser.getEmail();
-            DatabaseReference displayedUserRef = this.dbRef.child(Constants.USERS_REFERENCE_STRING).child(this.displayedUserID);
+            DatabaseReference displayedUserRef = this.dbRef.child(ReferenceStrings.USERS).child(this.displayedUserID);
             displayedUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     String displayedUserRole = null;
                     if(snapshot.exists()){
-                        viewedTeamID = snapshot.child(Constants.TEAM_KEY_STRING).getValue(String.class);
-                        String displayedUserEmail = snapshot.child(Constants.EMAIL_KEY_STRING).getValue(String.class);
-                        displayedUserRole = snapshot.child(Constants.ROLE_KEY_STRING).getValue(String.class);
+                        viewedTeamID = snapshot.child(KeyStrings.TEAM).getValue(String.class);
+                        String displayedUserEmail = snapshot.child(KeyStrings.EMAIL).getValue(String.class);
+                        displayedUserRole = snapshot.child(KeyStrings.ROLE).getValue(String.class);
                         if(loggedUserEmail != null && loggedUserEmail.equals(displayedUserEmail)){
                             isMyTrainingList = true;
                             setAddTrainingBtnVisibility(displayedUserRole);
@@ -140,7 +144,7 @@ public class TrainingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 TrainingCreationWizardFragment trainingCreationWizard = TrainingCreationWizardFragment.newInstance(TrainingActivity.this.viewedTeamID, TrainingActivity.this.displayedUserID);
-                trainingCreationWizard.show(getSupportFragmentManager(), Constants.TRAINING_CREATION_WIZARD_TAG);
+                trainingCreationWizard.show(getSupportFragmentManager(), NavigationTags.TRAINING_CREATION_WIZARD);
             }
         });
     }
@@ -155,7 +159,7 @@ public class TrainingActivity extends AppCompatActivity {
         Query q;
         if(role != null && role.equals(Constants.PLAYER_ROLE_STRING)){
             /* Fetching workflow in case the displayed user is a coach */
-            q = this.dbRef.child(Constants.TRAININGS_REFERENCE_STRING).child(displayedUserID);
+            q = this.dbRef.child(ReferenceStrings.TRAININGS).child(displayedUserID);
             q.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -179,7 +183,7 @@ public class TrainingActivity extends AppCompatActivity {
             });
         } else {
             /* Fetching workflow in case the displayed user is a coach */
-            q = this.dbRef.child(Constants.TRAININGS_REFERENCE_STRING);
+            q = this.dbRef.child(ReferenceStrings.TRAININGS);
             q.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -219,16 +223,16 @@ public class TrainingActivity extends AppCompatActivity {
      */
     private HashMap<String, String> parseTrainingDataFromSnapshot(DataSnapshot trainingSnapshot){
         HashMap<String, String> training = new HashMap<>();
-        training.put(Constants.TRAINING_TITLE_KEY_STRING, trainingSnapshot.child(Constants.TRAINING_TITLE_KEY_STRING).getValue(String.class));
-        training.put(Constants.TRAINING_TYPE_KEY_STRING, trainingSnapshot.child(Constants.TRAINING_TYPE_KEY_STRING).getValue(String.class));
-        training.put(Constants.TRAINING_DUE_TO_KEY_STRING, trainingSnapshot.child(Constants.TRAINING_DUE_TO_KEY_STRING).getValue(String.class));
-        training.put(Constants.TRAINING_TARGET_KEY_STRING, trainingSnapshot.child(Constants.TRAINING_TARGET_KEY_STRING).getValue(String.class));
+        training.put(KeyStrings.TRAINING_TITLE, trainingSnapshot.child(KeyStrings.TRAINING_TITLE).getValue(String.class));
+        training.put(KeyStrings.TRAINING_TYPE, trainingSnapshot.child(KeyStrings.TRAINING_TYPE).getValue(String.class));
+        training.put(KeyStrings.TRAINING_DUE_TO, trainingSnapshot.child(KeyStrings.TRAINING_DUE_TO).getValue(String.class));
+        training.put(KeyStrings.TRAINING_TARGET, trainingSnapshot.child(KeyStrings.TRAINING_TARGET).getValue(String.class));
         training.put(
-                Constants.TRAINING_COMPLETED_KEY_STRING,
-                String.valueOf(trainingSnapshot.child(Constants.TRAINING_COMPLETED_KEY_STRING).getValue(Boolean.class))
+                KeyStrings.TRAINING_COMPLETED,
+                String.valueOf(trainingSnapshot.child(KeyStrings.TRAINING_COMPLETED).getValue(Boolean.class))
         );
-        training.put(Constants.USERNAME_KEY_STRING, this.displayedUserID);
-        training.put(Constants.TRAINING_UUID_KEY_STRING, trainingSnapshot.getKey());
+        training.put(KeyStrings.USERNAME, this.displayedUserID);
+        training.put(KeyStrings.TRAINING_UUID, trainingSnapshot.getKey());
         return training;
     }
 }
