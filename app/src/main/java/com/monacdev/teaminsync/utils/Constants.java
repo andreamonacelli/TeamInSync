@@ -26,6 +26,7 @@ public final class Constants {
     public static final String TRAINING_DUE_TO_KEY_STRING = "due_to";
     public static final String TRAINING_COMPLETED_KEY_STRING = "completed";
     public static final String TRAINING_UUID_KEY_STRING = "training_uuid";
+    public static final String EDITING_MODE_KEY_STRING = "editing_mode";
     public static final String TRAININGS_REFERENCE_STRING = "trainings";
     public static final String NOTIFICATIONS_REFERENCE_STRING = "notifications";
 
@@ -34,9 +35,11 @@ public final class Constants {
     public static final String DISPLAYED_USER_EXTRA_STRING = "DISPLAYED_USER";
     public static final String DISPLAYED_USER_SURNAME_EXTRA_STRING = "DISPLAYED_USER_SURNAME";
     public static final String REG_WIZARD_TAG = "REGISTRATION_WIZARD";
+    public static final String EDIT_WIZARD_TAG = "EDIT_PROFILE_WIZARD";
     public static final String TEAM_ID_TAG = "TEAM_ID";
     public static final String TRAINING_CREATION_WIZARD_TAG = "TRAINING_CREATION_WIZARD";
     public static final String NOTIFICATIONS_FRAGMENT_TAG = "NOTIFICATION_FRAGMENT";
+    public static final String EDIT_FRAGMENT_RESULT = "PROFILE_EDIT_RESULT";
 
     /* Numeric constants */
     public static final int INVALID_SELECTION = -1;

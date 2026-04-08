@@ -96,4 +96,8 @@
     <string name="photo_source_gallery">Scegli dalla Galleria</string>
     <string name="photo_source_selection_title">Scegli la foto profilo</string>
     <string name="photo_upload_error">Errore nel caricamento della foto profilo</string>
+    <string name="edit_profile_submit">Salva Modifiche</string>
+    <string name="changes_saved_label">Modifiche salvate con successo!</string>
+    <string name="error_changes_save">Errore nel salvataggio delle modifiche</string>
+    <string name="edit_wizard_title">Modifica il tuo profilo</string>
 </resources>

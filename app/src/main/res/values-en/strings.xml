@@ -92,4 +92,8 @@
     <string name="photo_source_gallery">Choose from Gallery</string>
     <string name="photo_source_selection_title">Choose your profile picture</string>
     <string name="photo_upload_error">Error during the profile picture upload</string>
+    <string name="edit_profile_submit">Save Changes</string>
+    <string name="changes_saved_label">Changes saved successfully!</string>
+    <string name="error_changes_save">Error while saving changes</string>
+    <string name="edit_wizard_title">Edit your profile</string>
 </resources>

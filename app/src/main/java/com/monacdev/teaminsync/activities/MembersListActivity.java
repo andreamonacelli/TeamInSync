@@ -1,5 +1,6 @@
 package com.monacdev.teaminsync.activities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -44,6 +45,34 @@ public class MembersListActivity extends AppCompatActivity {
 
         this.teamID = getIntent().getStringExtra(Constants.TEAM_ID_TAG);
         this.bindViewsToObjects();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /* The following lines allow to reflect eventual changes in data */
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFERENCES_STRING, MODE_PRIVATE);
+        String loggedUsername = sharedPrefs.getString(Constants.LOGGED_USER_EXTRA_STRING, null);
+        if (loggedUsername != null) {
+            this.dbRef.child(Constants.USERS_REFERENCE_STRING).child(loggedUsername).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            String updatedTeamID = snapshot.child(Constants.TEAM_KEY_STRING).getValue(String.class);
+                            if (updatedTeamID != null) {
+                                MembersListActivity.this.teamID = updatedTeamID;
+                            }
+                            MembersListActivity.this.fetchUsersFromDB(MembersListActivity.this.coachesListRV, Constants.COACH_ROLE_STRING);
+                            MembersListActivity.this.fetchUsersFromDB(MembersListActivity.this.athletesListRV, Constants.PLAYER_ROLE_STRING);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(MembersListActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+        }
     }
 
     /**

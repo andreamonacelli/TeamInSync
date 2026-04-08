@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -39,6 +40,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -60,9 +62,12 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     private RadioGroup roleRadioGroup;
     private Spinner teamSelectorSpinner;
     private Button submitBtn;
+    private TextView regWizardTitle;
     private String loggedUserEmail;
     private Uri selectedImageUri = null; // In case the user selects an existing photo
     private byte[] cameraImageBytes = null; // In case the user takes a new photo from camera
+    private boolean isEditMode;
+    private HashMap<String, String> editingData = new HashMap<>();
     private final ArrayList<String> teamNames = new ArrayList<>();
     private final ArrayList<String> teamIDs = new ArrayList<>();
 
@@ -108,11 +113,32 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         return fragment;
     }
 
+    public static RegistrationWizardFragment newEditingInstance(HashMap<String, String> userData){
+        final RegistrationWizardFragment fragment = new RegistrationWizardFragment();
+        final Bundle args = new Bundle();
+        for(String key : userData.keySet()){
+            args.putString(key, userData.get(key));
+        }
+        args.putBoolean(Constants.EDITING_MODE_KEY_STRING, true);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getArguments() != null){
-            this.loggedUserEmail = getArguments().getString(Constants.EMAIL_KEY_STRING);
+            this.isEditMode = getArguments().getBoolean(Constants.EDITING_MODE_KEY_STRING, false);
+            if(this.isEditMode){
+                this.editingData.put(Constants.USERNAME_KEY_STRING, getArguments().getString(Constants.USERNAME_KEY_STRING));
+                this.editingData.put(Constants.NAME_KEY_STRING, getArguments().getString(Constants.NAME_KEY_STRING));
+                this.editingData.put(Constants.SURNAME_KEY_STRING, getArguments().getString(Constants.SURNAME_KEY_STRING));
+                this.editingData.put(Constants.BIRTHDATE_KEY_STRING, getArguments().getString(Constants.BIRTHDATE_KEY_STRING));
+                this.editingData.put(Constants.PROFILE_PIC_KEY_STRING, getArguments().getString(Constants.PROFILE_PIC_KEY_STRING));
+                this.editingData.put(Constants.TEAM_KEY_STRING, getArguments().getString(Constants.TEAM_KEY_STRING));
+            } else {
+                this.loggedUserEmail = getArguments().getString(Constants.EMAIL_KEY_STRING);
+            }
         }
     }
 
@@ -129,6 +155,8 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         this.bindViewsToObjects(view);
         /* Setting up the dropdown menu for the teams */
         this.setupTeamSelector();
+        /* In case we are in edit-mode, pre-compile the fields */
+        this.fieldPreCompilation(view);
         /* Setting the listener for the Submit button */
         this.submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,9 +177,17 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 }
                 /* if all the form validations checks passed, then we proceed to store the data */
                 selectedTeam = teamIDs.get(selectedTeamID);
-                HashMap<String, Object> newUserData = userDataMapping(selectedTeam);
-                //uploadUserOnDatabase(newUserData);
-                RegistrationWizardFragment.this.uploadUserWithProfilePicture(newUserData);
+                if(RegistrationWizardFragment.this.isEditMode){
+                    HashMap<String, Object> updateMap = new HashMap<>();
+                    updateMap.put(Constants.NAME_KEY_STRING, RegistrationWizardFragment.this.nameET.getText().toString().trim());
+                    updateMap.put(Constants.SURNAME_KEY_STRING, RegistrationWizardFragment.this.surnameET.getText().toString().trim());
+                    updateMap.put(Constants.BIRTHDATE_KEY_STRING, RegistrationWizardFragment.this.birthDateET.getText().toString().trim());
+                    updateMap.put(Constants.TEAM_KEY_STRING, selectedTeam);
+                    RegistrationWizardFragment.this.uploadUserOnDatabase(updateMap);
+                } else {
+                    HashMap<String, Object> newUserData = userDataMapping(selectedTeam);
+                    RegistrationWizardFragment.this.uploadUserWithProfilePicture(newUserData);
+                }
             }
         });
     }
@@ -180,6 +216,12 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         this.roleRadioGroup = view.findViewById(R.id.roleRadioGroup);
         this.teamSelectorSpinner = view.findViewById(R.id.teamSelectorSpinner);
         this.submitBtn = view.findViewById(R.id.submitBtn);
+        this.regWizardTitle = view.findViewById(R.id.regWizardTitle);
+        if(this.isEditMode){
+            this.regWizardTitle.setText(R.string.edit_wizard_title);
+        } else {
+            this.regWizardTitle.setText(R.string.registration_wizard_title);
+        }
     }
 
     /**
@@ -228,6 +270,15 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                     }
                 }
                 adapter.notifyDataSetChanged();
+                if(RegistrationWizardFragment.this.isEditMode){
+                    String currentTeamID = RegistrationWizardFragment.this.editingData.get(Constants.TEAM_KEY_STRING);
+                    if(currentTeamID != null){
+                        int selectedSpinnerPosition = RegistrationWizardFragment.this.teamIDs.indexOf(currentTeamID);
+                        if(selectedSpinnerPosition >= 0){
+                            RegistrationWizardFragment.this.teamSelectorSpinner.setSelection(selectedSpinnerPosition);
+                        }
+                    }
+                }
             }
 
             @Override
@@ -274,7 +325,10 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
      * @return <strong>true</strong> if all the fields have been compiled, <strong>false</strong> otherwise
      */
     private boolean validateFieldCompilation(){
-        if(this.nameET.getText().toString().isEmpty() || this.usernameET.getText().toString().isEmpty() || this.surnameET.getText().toString().isEmpty() || this.birthDateET.getText().toString().isEmpty()){
+        if(this.nameET.getText().toString().isEmpty() || this.surnameET.getText().toString().isEmpty() || this.birthDateET.getText().toString().isEmpty()){
+            return false;
+        }
+        if(!this.isEditMode && this.usernameET.getText().toString().isEmpty()){
             return false;
         }
         return true;
@@ -285,27 +339,53 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
      * @param userData the data to be uploaded
      */
     private void uploadUserOnDatabase(HashMap<String, Object> userData){
-        String username = this.usernameET.getText().toString();
-        FirebaseDatabase.getInstance().getReference(Constants.USERS_REFERENCE_STRING).child(username).setValue(userData).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
-                    /* The newly registered user will NOW be automatically added to the pending requests */
-                    String sectionString;
-                    if(roleRadioGroup.getCheckedRadioButtonId() == R.id.athleteRadioBtn){
-                        sectionString = Constants.PENDING_REQUESTS_KEY_STRING;
-                    } else {
-                        sectionString = Constants.MEMBERS_KEY_STRING;
-                    }
-                    FirebaseDatabase.getInstance().getReference(Constants.TEAMS_REFERENCE_STRING)
-                            .child(userData.get(Constants.TEAM_KEY_STRING).toString()).child(sectionString)
-                            .child(username).setValue(true);
-                    Intent intent = new Intent(getContext(), MainActivity.class);
-                    intent.putExtra(Constants.LOGGED_USER_EXTRA_STRING, username);
-                    startActivity(intent);
-                }
+        if(this.isEditMode){
+            String username = this.editingData.get(Constants.USERNAME_KEY_STRING);
+            if(username == null){
+                Toast.makeText(getContext(), getString(R.string.error_changes_save), Toast.LENGTH_SHORT).show();
+                return;
             }
-        });
+            FirebaseDatabase.getInstance().getReference(Constants.USERS_REFERENCE_STRING).child(username).updateChildren(userData).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        String previousTeam = RegistrationWizardFragment.this.editingData.get(Constants.TEAM_KEY_STRING);
+                        String newTeam = (String) userData.get(Constants.TEAM_KEY_STRING);
+                        if(previousTeam != null && newTeam != null && !previousTeam.equals(newTeam)){
+                            DatabaseReference teamsRef = FirebaseDatabase.getInstance().getReference(Constants.TEAMS_REFERENCE_STRING);
+                            teamsRef.child(previousTeam).child(Constants.MEMBERS_KEY_STRING).child(username).removeValue();
+                            teamsRef.child(previousTeam).child(Constants.PENDING_REQUESTS_KEY_STRING).child(username).removeValue();
+                            teamsRef.child(newTeam).child(Constants.PENDING_REQUESTS_KEY_STRING).child(username).setValue(true);
+                        }
+                        Toast.makeText(getContext(), getString(R.string.changes_saved_label), Toast.LENGTH_SHORT).show();
+                        requireActivity().getSupportFragmentManager().setFragmentResult(Constants.EDIT_FRAGMENT_RESULT, new Bundle());
+                        dismiss();
+                    }
+                }
+            });
+        } else {
+            String username = this.usernameET.getText().toString();
+            FirebaseDatabase.getInstance().getReference(Constants.USERS_REFERENCE_STRING).child(username).setValue(userData).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        /* The newly registered user will NOW be automatically added to the pending requests */
+                        String sectionString;
+                        if (roleRadioGroup.getCheckedRadioButtonId() == R.id.athleteRadioBtn) {
+                            sectionString = Constants.PENDING_REQUESTS_KEY_STRING;
+                        } else {
+                            sectionString = Constants.MEMBERS_KEY_STRING;
+                        }
+                        FirebaseDatabase.getInstance().getReference(Constants.TEAMS_REFERENCE_STRING)
+                                .child(userData.get(Constants.TEAM_KEY_STRING).toString()).child(sectionString)
+                                .child(username).setValue(true);
+                        Intent intent = new Intent(getContext(), MainActivity.class);
+                        intent.putExtra(Constants.LOGGED_USER_EXTRA_STRING, username);
+                        startActivity(intent);
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -369,5 +449,23 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         } else {
             cloudinaryManager.uploadFromURI(this.selectedImageUri, cloudinaryCallback);
         }
+    }
+
+    /**
+     * If we are in editing mode, we have to pre-compile some fields accordingly and hide some other fields
+     * @param view the view over which we are working
+     */
+    private void fieldPreCompilation(View view){
+        this.submitBtn.setText(R.string.edit_profile_submit);
+        this.nameET.setText(this.editingData.get(Constants.NAME_KEY_STRING));
+        this.surnameET.setText(this.editingData.get(Constants.SURNAME_KEY_STRING));
+        this.birthDateET.setText(this.editingData.get(Constants.BIRTHDATE_KEY_STRING));
+        String profilePicUrl = this.editingData.get(Constants.PROFILE_PIC_KEY_STRING);
+        if(profilePicUrl != null && !profilePicUrl.isEmpty()){
+            Glide.with(this).load(profilePicUrl).circleCrop().into(this.profilePicIV);
+        }
+        this.usernameET.setVisibility(View.GONE);
+        this.roleRadioGroup.setVisibility(View.GONE);
+        view.findViewById(R.id.selectRoleLabel).setVisibility(View.GONE);
     }
 }

@@ -69,6 +69,13 @@ public class MainActivity extends AppCompatActivity {
         this.setListeners();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /* This allows to reflect eventual changes in the user data */
+        this.populateDataFromDB();
+    }
+
     /**
      * Binds the Views defined within the XML layout file for the activity to their respective Java objects
      */
