@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="#FAFAFA">
+    android:background="?android:attr/windowBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <TextView
         android:id="@+id/trackingTrainingTitleTV"
@@ -27,7 +29,7 @@
         android:text="@string/tracking_frag_time_placeholder"
         android:textSize="72sp"
         android:textStyle="bold"
-        android:textColor="@color/black"
+        android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/trackingTrainingTitleTV" />
@@ -39,7 +41,7 @@
         android:layout_marginTop="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@android:drawable/ic_media_pause"
-        app:tint="@color/purple_500"
+        app:tint="?attr/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/workoutProgressTV" />

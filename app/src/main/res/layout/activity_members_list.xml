@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white"
     android:padding="16dp"
     tools:context=".activities.MembersListActivity">
 
@@ -15,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:text="@string/member_list_def_header"
-        android:textColor="@color/black"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -25,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="@string/coaching_staff_label"
-        android:textColor="#555555"
+        android:textColor="?android:attr/textColorSecondary"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -45,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="@string/athletes_label"
-        android:textColor="#555555"
+        android:textColor="?android:attr/textColorSecondary"
         android:textSize="20sp"
         android:textStyle="bold" />
 

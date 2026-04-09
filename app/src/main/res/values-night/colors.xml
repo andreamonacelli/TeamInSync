@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tile_active">#1E293B</color>
+    <color name="tile_completed">#15803D</color>
+    <color name="tile_missed">#B91C1C</color>
+    <color name="tile_completed_late">#C2410C</color>
+</resources>

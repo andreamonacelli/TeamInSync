@@ -7,7 +7,7 @@
     android:minWidth="140dp"
     android:minHeight="140dp"
     android:gravity="center"
-    android:background="@color/white">
+    android:background="?attr/colorSurface">
 
     <ProgressBar
     android:layout_width="50dp"
@@ -22,5 +22,5 @@
         android:textAlignment="center"
         android:text="@string/loader_default_string"
         android:textSize="16sp"
-        android:textColor="@android:color/black"/>
+        android:textColor="?android:attr/textColorPrimary"/>
 </LinearLayout>

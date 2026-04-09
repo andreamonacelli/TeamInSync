@@ -5,7 +5,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     tools:context=".activities.ProfileActivity">
 
     <TextView
@@ -16,7 +15,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:fontFamily="sans-serif"
-        android:textColor="@color/black"
+        android:textColor="?android:attr/textColorPrimary"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -34,7 +33,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@android:drawable/ic_menu_edit"
         android:visibility="visible"
-        app:tint="@color/colorPrimary"
+        app:tint="?attr/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -44,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="@string/profile_details_label"
-        android:textColor="#555555"
+        android:textColor="?android:attr/textColorSecondary"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +66,7 @@
         android:layout_marginTop="24dp"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@color/black"
+        android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profilePictureIV"
@@ -79,7 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:textSize="16sp"
-        android:textColor="#555555"
+        android:textColor="?android:attr/textColorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/roleLabelTV"
@@ -91,7 +90,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:textSize="16sp"
-        android:textColor="#888888"
+        android:textColor="?android:attr/textColorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/birthDateLabelTV"

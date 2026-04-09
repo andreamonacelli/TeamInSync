@@ -28,7 +28,7 @@
             android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
-            app:tint="@color/black" />
+            app:tint="?attr/colorPrimary" />
     </RelativeLayout>
 
     <TextView

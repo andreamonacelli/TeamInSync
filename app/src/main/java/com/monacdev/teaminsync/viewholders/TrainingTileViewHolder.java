@@ -2,7 +2,6 @@ package com.monacdev.teaminsync.viewholders;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.graphics.Color;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -11,8 +10,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.monacdev.teaminsync.R;
@@ -194,27 +195,32 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
      * Based on whether the currently displayed exercise is completed or expired, restyle the tile
      */
     private void restyleBasedOnCompletionExpiry(){
+        Context context = this.itemView.getContext();
+        MaterialCardView trainingCardView = (MaterialCardView) this.itemView;
+        if(this.actionsActive && !this.isCompleted){
+            this.startTrainingBtn.setVisibility(View.VISIBLE);
+        } else {
+            this.startTrainingBtn.setVisibility(View.GONE);
+        }
         if(this.isExpired){
             if(this.isCompleted){
                 /* Make the button non-clickable and color background in soft orange */
                 this.startTrainingBtn.setVisibility(View.GONE);
-                this.itemView.setBackgroundColor(Color.YELLOW);
+                trainingCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.tile_completed_late));
             } else {
                 /* Make the button clickable and color background in red */
                 this.startTrainingBtn.setEnabled(true);
-                this.startTrainingBtn.setVisibility(View.VISIBLE);
-                this.itemView.setBackgroundColor(Color.RED);
+                trainingCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.tile_missed));
             }
         } else {
             if(this.isCompleted){
                 /* Make the button non-clickable and color background in light gray */
                 this.startTrainingBtn.setVisibility(View.GONE);
-                this.itemView.setBackgroundColor(Color.LTGRAY);
+                trainingCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.tile_completed));
             } else {
                 /* Make the button clickable and color background in green */
                 this.startTrainingBtn.setEnabled(true);
-                this.startTrainingBtn.setVisibility(View.VISIBLE);
-                this.itemView.setBackgroundColor(Color.GREEN);
+                trainingCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.tile_active));
             }
         }
     }
