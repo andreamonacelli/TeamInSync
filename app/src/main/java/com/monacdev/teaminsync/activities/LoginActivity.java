@@ -29,6 +29,7 @@ import com.monacdev.teaminsync.constants.IntentExtrasTags;
 import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.fragments.RegistrationWizardFragment;
 import com.monacdev.teaminsync.constants.Constants;
+import com.monacdev.teaminsync.loaders.LoaderDialog;
 import com.onesignal.OneSignal;
 
 public class LoginActivity extends AppCompatActivity {
@@ -36,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText passwordET;
     private Button signInBtn;
     private Button registerBtn;
+    private LoaderDialog loaderDialog;
     private final FirebaseAuth authClient = FirebaseAuth.getInstance();
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
 
@@ -50,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
+        this.loaderDialog = new LoaderDialog(this);
         this.bindViewsToObjects();
         this.setListeners();
     }
@@ -91,7 +94,9 @@ public class LoginActivity extends AppCompatActivity {
     private void userSignIn(){
         String email = this.emailInputET.getText().toString();
         String password = this.passwordET.getText().toString();
+        this.loaderDialog.show(getString(R.string.sign_in_load_msg));
         this.authClient.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            this.loaderDialog.hide();
             if(task.isSuccessful()){
                 FirebaseUser loggedUser = authClient.getCurrentUser();
                 Toast.makeText(LoginActivity.this, R.string.auth_ok, Toast.LENGTH_SHORT).show();
@@ -112,7 +117,9 @@ public class LoginActivity extends AppCompatActivity {
     private void registerUser(){
         String email = this.emailInputET.getText().toString();
         String password = this.passwordET.getText().toString();
+        this.loaderDialog.show(getString(R.string.register_load_msg));
         this.authClient.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            this.loaderDialog.hide();
             if(task.isSuccessful()){
                 FirebaseUser loggedUser = authClient.getCurrentUser();
                 Toast.makeText(LoginActivity.this, R.string.register_ok, Toast.LENGTH_SHORT).show();
@@ -129,7 +136,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Manages user data retrieval from the Firebase DB and switches to either the HomePage or the WaitingForApprovalPage
+     * Manages user data retrieval from the Firebase DB and switches to the HomePage
      * @param loggedUser instance of the user that just logged in
      */
     private void navigateToNextActivity(FirebaseUser loggedUser){

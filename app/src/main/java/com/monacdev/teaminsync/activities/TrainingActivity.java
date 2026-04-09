@@ -31,6 +31,7 @@ import com.monacdev.teaminsync.constants.IntentExtrasTags;
 import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.fragments.TrainingCreationWizardFragment;
 import com.monacdev.teaminsync.constants.Constants;
+import com.monacdev.teaminsync.loaders.LoaderDialog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ public class TrainingActivity extends AppCompatActivity {
     private String displayedUserID;
     private String viewedTeamID;
     private boolean isMyTrainingList;
+    private LoaderDialog loaderDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,7 @@ public class TrainingActivity extends AppCompatActivity {
 
         this.displayedUserID = getIntent().getStringExtra(IntentExtrasTags.DISPLAYED_USER);
         String displayedUserSurname = getIntent().getStringExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME);
+        this.loaderDialog = new LoaderDialog(this);
         this.bindViewsToObjects();
         this.setListeners();
         this.isDisplayedUserLogged();
@@ -150,15 +153,17 @@ public class TrainingActivity extends AppCompatActivity {
      * @param role the role of the currently logged user
      */
     private void fetchTrainingsFromDB(String displayedUserID, String role){
+        this.loaderDialog.show(getString(R.string.trainings_load_msg));
         ArrayList<HashMap<String, String>> exercisesList = new ArrayList<>();
         Query q;
         if(role != null && role.equals(Constants.PLAYER_ROLE_STRING)){
-            /* Fetching workflow in case the displayed user is a coach */
+            /* Fetching workflow in case the displayed user is a player */
             q = this.dbRef.child(ReferenceStrings.TRAININGS).child(displayedUserID);
             q.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     exercisesList.clear();
+                    TrainingActivity.this.loaderDialog.hide();
                     if(snapshot.exists()){
                         for(DataSnapshot trainingSnapshot : snapshot.getChildren()){
                             HashMap<String, String> training = parseTrainingDataFromSnapshot(trainingSnapshot);
@@ -173,6 +178,7 @@ public class TrainingActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
+                    TrainingActivity.this.loaderDialog.hide();
                     Toast.makeText(TrainingActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                 }
             });
@@ -182,6 +188,7 @@ public class TrainingActivity extends AppCompatActivity {
             q.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    TrainingActivity.this.loaderDialog.hide();
                     exercisesList.clear();
                     ArrayList<String> trainingUIDs = new ArrayList<>();
                     if(snapshot.exists()){
@@ -205,6 +212,7 @@ public class TrainingActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
+                    TrainingActivity.this.loaderDialog.hide();
                     Toast.makeText(TrainingActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                 }
             });

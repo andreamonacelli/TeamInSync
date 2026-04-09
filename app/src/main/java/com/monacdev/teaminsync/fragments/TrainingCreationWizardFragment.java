@@ -25,6 +25,7 @@ import com.monacdev.teaminsync.constants.Constants;
 import com.monacdev.teaminsync.constants.KeyStrings;
 import com.monacdev.teaminsync.constants.ReferenceStrings;
 import com.monacdev.teaminsync.constants.NotificationsKeys;
+import com.monacdev.teaminsync.loaders.LoaderDialog;
 import com.monacdev.teaminsync.utils.PushNotificationsManager;
 
 import java.text.ParseException;
@@ -46,6 +47,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
     private String coachID;
     private ArrayList<String> targetAthletes;
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+    private LoaderDialog loaderDialog;
 
     public static TrainingCreationWizardFragment newInstance(String teamID, String coachID) {
         final TrainingCreationWizardFragment fragment = new TrainingCreationWizardFragment();
@@ -63,6 +65,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
             this.teamID = getArguments().getString(KeyStrings.TEAM);
             this.coachID = getArguments().getString(Constants.COACH_ROLE_STRING);
         }
+        this.loaderDialog = new LoaderDialog(requireActivity());
     }
 
     @NonNull
@@ -144,6 +147,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
             /* Do not update if data is empty */
             return;
         }
+        this.loaderDialog.show(getString(R.string.upload_training_loading_msg));
         Map<String, Object> multiUploadMap = new HashMap<>();
         for(String athleteID : this.targetAthletes){
             /* Upload training data */
@@ -158,6 +162,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
             }
         }
         this.dbRef.updateChildren(multiUploadMap).addOnCompleteListener(task -> {
+            this.loaderDialog.hide();
             if(task.isSuccessful()){
                 Toast.makeText(getContext(), R.string.exercise_added, Toast.LENGTH_SHORT).show();
                 if(completionEffect.equals(Constants.EFFECT_DISMISS)){

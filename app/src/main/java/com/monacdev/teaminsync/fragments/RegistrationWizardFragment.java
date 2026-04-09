@@ -2,7 +2,9 @@ package com.monacdev.teaminsync.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ import com.monacdev.teaminsync.constants.KeyStrings;
 import com.monacdev.teaminsync.constants.ReferenceStrings;
 import com.monacdev.teaminsync.constants.IntentExtrasTags;
 import com.monacdev.teaminsync.constants.NavigationTags;
+import com.monacdev.teaminsync.loaders.LoaderDialog;
 import com.monacdev.teaminsync.utils.CloudinaryManager;
 import com.monacdev.teaminsync.constants.Constants;
 
@@ -70,6 +73,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     private final HashMap<String, String> editingData = new HashMap<>();
     private final ArrayList<String> teamNames = new ArrayList<>();
     private final ArrayList<String> teamIDs = new ArrayList<>();
+    private LoaderDialog loaderDialog;
 
     private final ActivityResultLauncher<Intent> deviceGalleryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -136,6 +140,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 this.loggedUserEmail = getArguments().getString(KeyStrings.EMAIL);
             }
         }
+        this.loaderDialog = new LoaderDialog(requireActivity());
     }
 
     @Nullable
@@ -174,13 +179,15 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
             /* if all the form validations checks passed, then we proceed to store the data */
             selectedTeam = teamIDs.get(selectedTeamID);
             if(RegistrationWizardFragment.this.isEditMode){
+                this.loaderDialog.show(getString(R.string.upload_existing_user_msg));
                 HashMap<String, Object> updateMap = new HashMap<>();
                 updateMap.put(KeyStrings.NAME, RegistrationWizardFragment.this.nameET.getText().toString().trim());
                 updateMap.put(KeyStrings.SURNAME, RegistrationWizardFragment.this.surnameET.getText().toString().trim());
                 updateMap.put(KeyStrings.BIRTHDATE, RegistrationWizardFragment.this.birthDateET.getText().toString().trim());
                 updateMap.put(KeyStrings.TEAM, selectedTeam);
-                RegistrationWizardFragment.this.uploadUserOnDatabase(updateMap);
+                RegistrationWizardFragment.this.uploadUserWithProfilePicture(updateMap);
             } else {
+                this.loaderDialog.show(getString(R.string.upload_new_user_msg));
                 HashMap<String, Object> newUserData = userDataMapping(selectedTeam);
                 RegistrationWizardFragment.this.uploadUserWithProfilePicture(newUserData);
             }
@@ -330,7 +337,9 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 return;
             }
             FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).updateChildren(userData).addOnCompleteListener(task -> {
+                this.loaderDialog.hide();
                 if(task.isSuccessful()){
+                    this.uploadUserInSharedPreferences(username);
                     String previousTeam = RegistrationWizardFragment.this.editingData.get(KeyStrings.TEAM);
                     String newTeam = (String) userData.get(KeyStrings.TEAM);
                     if(previousTeam != null && newTeam != null && !previousTeam.equals(newTeam)){
@@ -346,7 +355,9 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         } else {
             String username = this.usernameET.getText().toString();
             FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).setValue(userData).addOnCompleteListener(task -> {
+                this.loaderDialog.hide();
                 if (task.isSuccessful()) {
+                    this.uploadUserInSharedPreferences(username);
                     /* The newly registered user will be automatically added to the team */
                     FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS)
                             .child(Objects.requireNonNull(userData.get(KeyStrings.TEAM)).toString()).child(KeyStrings.MEMBERS)
@@ -435,5 +446,16 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         this.usernameET.setVisibility(View.GONE);
         this.roleRadioGroup.setVisibility(View.GONE);
         view.findViewById(R.id.selectRoleLabel).setVisibility(View.GONE);
+    }
+
+    /**
+     * Saves the currently logged user into the SharedPreferences in order to manage persistence
+     */
+    private void uploadUserInSharedPreferences(String username){
+        requireContext();
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(Constants.SHARED_PREFERENCES_STRING, Context.MODE_PRIVATE);
+        SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
+        sharedPrefsEditor.putString(IntentExtrasTags.LOGGED_USER, username);
+        sharedPrefsEditor.apply();
     }
 }

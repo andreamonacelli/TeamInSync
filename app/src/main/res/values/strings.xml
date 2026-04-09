@@ -40,7 +40,7 @@
     <string name="athletes_label">Atleti</string>
     <string name="no_users_found">Nessun membro trovato!</string>
     <string name="profile_details_label">Profilo Utente</string>
-    <string name="born_on_label_def">Nato il: --/--/----</string>
+    <string name="born_on_label_def">Nato il: —/—/----</string>
     <string name="born_on_label">Nato il:</string>
     <string name="username_label_def" translatable="false">\@username</string>
     <string name="to_trainings_label">Allenamenti</string>
@@ -61,16 +61,16 @@
     <string name="upload_error_label">Errore nel caricamento sul database</string>
     <string name="exercise_added">Esercizio aggiunto all\'allenamento!</string>
     <string name="training_name_placeholder">Nome Esercizio</string>
-    <string name="training_info_placeholder">Obiettivo: -- | Scadenza: ----/--/--</string>
+    <string name="training_info_placeholder">Obiettivo: — | Scadenza: ----/--/--</string>
     <string name="start_training_btn_label">Inizia</string>
     <string name="complete_training_label">Completa</string>
     <string name="no_trainings_found">Nessun allenamento trovato</string>
     <string name="training_completion_error">Errore nel completamento</string>
     <string name="training_reps_completed_on_time">Allenamento completato, complimenti!</string>
     <string name="training_reps_completed_late">Allenamento completato in ritardo!</string>
-    <string name="splash_welcome_label">Benvenuto! Stiamo preparando tutto...</string>
+    <string name="splash_welcome_label">Benvenuto! Stiamo preparando tutto…</string>
     <string name="confirm_logout">Vuoi effettuare il logout?</string>
-    <string name="confirm" translatable="false">Ok</string>
+    <string name="confirm" translatable="false">Conferma</string>
     <string name="cancel">Annulla</string>
     <string name="push_new_training_title">Nuovo allenamento creato!</string>
     <string name="push_new_training_body">É stata creata una nuova sessione di allenamento!</string>
@@ -100,4 +100,16 @@
     <string name="changes_saved_label">Modifiche salvate con successo!</string>
     <string name="error_changes_save">Errore nel salvataggio delle modifiche</string>
     <string name="edit_wizard_title">Modifica il tuo profilo</string>
+    <string name="loader_default_string">Caricamento…</string>
+    <string name="sign_in_load_msg">Accesso in corso…</string>
+    <string name="register_load_msg">Registrazione in corso…</string>
+    <string name="members_load_msg">Caricamento membri squadra…</string>
+    <string name="loading_user_msg">Caricamento dati utente…</string>
+    <string name="trainings_load_msg">Caricando gli allenamenti…</string>
+    <string name="notifications_load_msg">Caricando le notifiche…</string>
+    <string name="upload_training_loading_msg">Pubblicando la sessione…</string>
+    <string name="upload_new_user_msg">Creando il nuovo utente…</string>
+    <string name="upload_existing_user_msg">Aggiornando le informazioni…</string>
+    <string name="exercise_load_msg">Caricando i dati dell\'allenamento…</string>
+    <string name="logout_load_msg">Effettuando il logout…</string>
 </resources>

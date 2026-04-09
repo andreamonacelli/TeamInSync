@@ -39,7 +39,7 @@
     <string name="athletes_label">Athletes</string>
     <string name="no_users_found">No member found!</string>
     <string name="profile_details_label">User Profile</string>
-    <string name="born_on_label_def">Born --/--/----</string>
+    <string name="born_on_label_def">Born —/—/----</string>
     <string name="to_trainings_label">Trainings</string>
     <string name="to_squad_list_label">To Squad List</string>
     <string name="athlete_label">Athlete</string>
@@ -59,14 +59,14 @@
     <string name="upload_error_label">Error while uploading on the database</string>
     <string name="exercise_added">Exercise added to training session!</string>
     <string name="training_name_placeholder">Exercise name</string>
-    <string name="training_info_placeholder">Goal: -- | Deadline: ----/--/--</string>
+    <string name="training_info_placeholder">Goal: — | Deadline: ----/--/--</string>
     <string name="start_training_btn_label">Start</string>
     <string name="complete_training_label">Complete</string>
     <string name="no_trainings_found">No trainings found</string>
     <string name="training_completion_error">Error during completion</string>
     <string name="training_reps_completed_on_time">Exercise completed, congratulations!</string>
     <string name="training_reps_completed_late">Exercise completed late!</string>
-    <string name="splash_welcome_label">Welcome! We are getting everything ready...</string>
+    <string name="splash_welcome_label">Welcome! We are getting everything ready…</string>
     <string name="confirm_logout">Do you want to log out?</string>
     <string name="cancel">Cancel</string>
     <string name="push_new_training_title">New training session created!</string>
@@ -96,4 +96,16 @@
     <string name="changes_saved_label">Changes saved successfully!</string>
     <string name="error_changes_save">Error while saving changes</string>
     <string name="edit_wizard_title">Edit your profile</string>
+    <string name="loader_default_string">Loading…</string>
+    <string name="sign_in_load_msg">Signing in…</string>
+    <string name="register_load_msg">Registering user…</string>
+    <string name="members_load_msg">Loading team members…</string>
+    <string name="loading_user_msg">Loading user data…</string>
+    <string name="trainings_load_msg">Loading trainings…</string>
+    <string name="notifications_load_msg">Loading notifications…</string>
+    <string name="upload_training_loading_msg">Uploading new training…</string>
+    <string name="upload_new_user_msg">Creating new user…</string>
+    <string name="upload_existing_user_msg">Updating user data…</string>
+    <string name="exercise_load_msg">Loading exercise data…</string>
+    <string name="logout_load_msg">Logging out…</string>
 </resources>

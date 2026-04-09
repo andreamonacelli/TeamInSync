@@ -25,6 +25,7 @@ import com.monacdev.teaminsync.adapters.NotificationListAdapter;
 import com.monacdev.teaminsync.constants.KeyStrings;
 import com.monacdev.teaminsync.constants.ReferenceStrings;
 import com.monacdev.teaminsync.constants.NotificationsKeys;
+import com.monacdev.teaminsync.loaders.LoaderDialog;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +37,7 @@ public class NotificationsFragment extends DialogFragment {
     private ImageButton closeNotificationsBtn;
     private String loggedUsername;
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+    private LoaderDialog loaderDialog;
 
     public static NotificationsFragment newInstance(String loggedUsername){
         NotificationsFragment fragment = new NotificationsFragment();
@@ -51,6 +53,7 @@ public class NotificationsFragment extends DialogFragment {
         if(getArguments() != null){
             this.loggedUsername = getArguments().getString(KeyStrings.USERNAME);
         }
+        this.loaderDialog = new LoaderDialog(requireActivity());
     }
 
     @NonNull
@@ -88,10 +91,12 @@ public class NotificationsFragment extends DialogFragment {
      * Given the logged user, fetches the list of notifications associated to it
      */
     private void fetchNotifications(){
+        this.loaderDialog.show(getString(R.string.notifications_load_msg));
         this.dbRef.child(ReferenceStrings.NOTIFICATIONS).child(this.loggedUsername).orderByChild(NotificationsKeys.NOTIFICATIONS_TIMESTAMP)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        NotificationsFragment.this.loaderDialog.hide();
                         ArrayList<HashMap<String, Object>> notificationsList = new ArrayList<>();
                         if(snapshot.exists()){
                             for(DataSnapshot notificationSnapshot : snapshot.getChildren()){
@@ -112,6 +117,7 @@ public class NotificationsFragment extends DialogFragment {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        NotificationsFragment.this.loaderDialog.hide();
                         Toast.makeText(getContext(), R.string.connection_err, Toast.LENGTH_SHORT).show();
                     }
                 });

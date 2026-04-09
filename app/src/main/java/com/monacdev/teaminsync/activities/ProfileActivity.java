@@ -32,12 +32,14 @@ import com.monacdev.teaminsync.constants.IntentExtrasTags;
 import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.fragments.RegistrationWizardFragment;
 import com.monacdev.teaminsync.constants.Constants;
+import com.monacdev.teaminsync.loaders.LoaderDialog;
 
 import java.util.HashMap;
 
 public class ProfileActivity extends AppCompatActivity {
     private String displayedUserID;
     private String displayedUserSurname;
+    private LoaderDialog loaderDialog;
     private final HashMap<String, String> editData = new HashMap<>();
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private TextView profileNameHeaderTV;
@@ -66,6 +68,7 @@ public class ProfileActivity extends AppCompatActivity {
             Log.i("user_profile_updated", "User profile has been updated and reloaded");
         }
         );
+        this.loaderDialog = new LoaderDialog(this);
         this.bindViewsToObjects();
         this.fillUserDataFromDB();
         this.setListeners();
@@ -111,9 +114,11 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private void fillUserDataFromDB(){
         DatabaseReference userRef = this.dbRef.child(ReferenceStrings.USERS).child(this.displayedUserID);
+        this.loaderDialog.show(getString(R.string.loading_user_msg));
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ProfileActivity.this.loaderDialog.hide();
                 if(snapshot.exists()){
                     String name = snapshot.child(KeyStrings.NAME).getValue(String.class);
                     String surname = snapshot.child(KeyStrings.SURNAME).getValue(String.class);

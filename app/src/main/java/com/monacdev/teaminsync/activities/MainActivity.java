@@ -34,6 +34,7 @@ import com.monacdev.teaminsync.constants.IntentExtrasTags;
 import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.fragments.NotificationsFragment;
 import com.monacdev.teaminsync.constants.Constants;
+import com.monacdev.teaminsync.loaders.LoaderDialog;
 import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton openNotificationsBtn;
     private ImageButton logoutBtn;
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+    private LoaderDialog loaderDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        this.loaderDialog = new LoaderDialog(this);
         this.bindViewsWithObjects();
         this.populateDataFromDB();
         this.setListeners();
@@ -183,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
      * Logs out the currently authenticated user and cleans the persistent SharedPreferences for the application
      */
     private void logoutUser(){
+        this.loaderDialog.show(getString(R.string.logout_load_msg));
         /* Cleaning the SharedPreferences used for persistence */
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES_STRING, MODE_PRIVATE);
         SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
@@ -195,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             /* Rerouting to the Login Activity */
             Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+            this.loaderDialog.hide();
             startActivity(loginIntent);
             finish();
         }, 500);

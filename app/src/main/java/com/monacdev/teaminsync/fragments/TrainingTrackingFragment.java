@@ -29,6 +29,7 @@ import com.monacdev.teaminsync.constants.KeyStrings;
 import com.monacdev.teaminsync.constants.ReferenceStrings;
 import com.monacdev.teaminsync.constants.IntentExtrasTags;
 import com.monacdev.teaminsync.constants.NavigationTags;
+import com.monacdev.teaminsync.loaders.LoaderDialog;
 import com.monacdev.teaminsync.utils.TrainingTrackerManager;
 
 import java.util.Locale;
@@ -42,6 +43,8 @@ public class TrainingTrackingFragment extends Fragment {
     private String trainingUID;
     private String athleteUsername;
     private TrainingTrackerManager trainingTrackerManager;
+    private LoaderDialog loaderDialog;
+
     private final Handler timerHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -75,6 +78,7 @@ public class TrainingTrackingFragment extends Fragment {
             this.trainingUID = getArguments().getString(KeyStrings.TRAINING_UUID);
             this.athleteUsername = getArguments().getString(IntentExtrasTags.LOGGED_USER);
         }
+        this.loaderDialog = new LoaderDialog(requireActivity());
     }
 
     @Nullable
@@ -164,10 +168,12 @@ public class TrainingTrackingFragment extends Fragment {
      * Fetches the details related to the displayed training directly from the Firebase DB
      */
     private void fetchTrainingData(){
+        this.loaderDialog.show(getString(R.string.exercise_load_msg));
         DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference().child(ReferenceStrings.TRAININGS).child(this.athleteUsername).child(this.trainingUID);
         trainingRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                TrainingTrackingFragment.this.loaderDialog.hide();
                 if(snapshot.exists()){
                     String exerciseName = snapshot.child(KeyStrings.TRAINING_TITLE).getValue(String.class);
                     if(exerciseName != null){
@@ -187,6 +193,7 @@ public class TrainingTrackingFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                TrainingTrackingFragment.this.loaderDialog.hide();
                 Toast.makeText(getContext(), R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
         });

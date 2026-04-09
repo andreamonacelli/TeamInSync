@@ -25,6 +25,7 @@ import com.monacdev.teaminsync.constants.Constants;
 import com.monacdev.teaminsync.constants.KeyStrings;
 import com.monacdev.teaminsync.constants.ReferenceStrings;
 import com.monacdev.teaminsync.constants.IntentExtrasTags;
+import com.monacdev.teaminsync.loaders.LoaderDialog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 public class MembersListActivity extends AppCompatActivity {
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private String teamID;
+    private LoaderDialog loaderDialog;
     private RecyclerView coachesListRV;
     private RecyclerView athletesListRV;
 
@@ -47,6 +49,7 @@ public class MembersListActivity extends AppCompatActivity {
         });
 
         this.teamID = getIntent().getStringExtra(IntentExtrasTags.TEAM_ID);
+        this.loaderDialog = new LoaderDialog(this);
         this.bindViewsToObjects();
     }
 
@@ -57,9 +60,11 @@ public class MembersListActivity extends AppCompatActivity {
         SharedPreferences sharedPrefs = getSharedPreferences(Constants.SHARED_PREFERENCES_STRING, MODE_PRIVATE);
         String loggedUsername = sharedPrefs.getString(IntentExtrasTags.LOGGED_USER, null);
         if (loggedUsername != null) {
+            this.loaderDialog.show(getString(R.string.members_load_msg));
             this.dbRef.child(ReferenceStrings.USERS).child(loggedUsername).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        MembersListActivity.this.loaderDialog.hide();
                         if (snapshot.exists()) {
                             String updatedTeamID = snapshot.child(KeyStrings.TEAM).getValue(String.class);
                             if (updatedTeamID != null) {
@@ -72,6 +77,7 @@ public class MembersListActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        MembersListActivity.this.loaderDialog.hide();
                         Toast.makeText(MembersListActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -85,10 +91,8 @@ public class MembersListActivity extends AppCompatActivity {
     private void bindViewsToObjects(){
         this.coachesListRV = findViewById(R.id.coachesListRV);
         this.coachesListRV.setLayoutManager(new LinearLayoutManager(this));
-        this.fetchUsersFromDB(this.coachesListRV, Constants.COACH_ROLE_STRING);
         this.athletesListRV = findViewById(R.id.athletesListRV);
         this.athletesListRV.setLayoutManager(new LinearLayoutManager(this));
-        this.fetchUsersFromDB(this.athletesListRV, Constants.PLAYER_ROLE_STRING);
     }
 
     /**
