@@ -2,6 +2,7 @@ package com.monacdev.teaminsync.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,6 +35,7 @@ import com.monacdev.teaminsync.utils.CloudinaryManager;
 import com.monacdev.teaminsync.constants.Constants;
 
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +52,7 @@ import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -154,6 +157,8 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
         /* Binding the views to their respective objects */
         this.bindViewsToObjects(view);
+        /* Binding a listener method to the date picker field */
+        this.birthDateET.setOnClickListener(v -> this.showDatePickerDialog());
         /* Setting up the dropdown menu for the teams */
         this.setupTeamSelector();
         if(this.isEditMode) {
@@ -457,5 +462,35 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
         sharedPrefsEditor.putString(IntentExtrasTags.LOGGED_USER, username);
         sharedPrefsEditor.apply();
+    }
+
+    /**
+     * Displays a DatePickerDialog to allow the user to select the birthdate properly, regardless of
+     * eventual differences in the keyboard format, date format or whatever
+     */
+    private void showDatePickerDialog(){
+        /* In case we are in editing mode, we should open the Calendar/Date Picker on the previously inserted date, otherwise we use today's date */
+        Calendar calendar = Calendar.getInstance();
+        int displayedYear = calendar.get(Calendar.YEAR);
+        int displayedMonth = calendar.get(Calendar.MONTH);
+        int displayedDay = calendar.get(Calendar.DAY_OF_MONTH);
+        if(this.isEditMode){
+            String previousBirthDate = this.birthDateET.getText().toString().trim();
+            try{
+                String[] dateParts = previousBirthDate.split("-");
+                displayedYear = Integer.parseInt(dateParts[Constants.DATE_PART_YEAR]);
+                displayedMonth = Integer.parseInt(dateParts[Constants.DATE_PART_MONTH]) - 1; // Months in Java go from 0 to 11
+                displayedDay = Integer.parseInt(dateParts[Constants.DATE_PART_DAY]);
+            } catch (Exception parsingException){
+                Log.e("date_parse_error", "Error while parsing birth date");
+            }
+        }
+        DatePickerDialog birthDatePickerDialog = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
+            String formattedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            RegistrationWizardFragment.this.birthDateET.setText(formattedDate);
+        }, displayedYear, displayedMonth, displayedDay);
+        /* We prevent the user from selecting a birthdate that is in the future */
+        birthDatePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        birthDatePickerDialog.show();
     }
 }

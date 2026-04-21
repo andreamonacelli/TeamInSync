@@ -1,8 +1,10 @@
 package com.monacdev.teaminsync.fragments;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -31,6 +33,7 @@ import com.monacdev.teaminsync.utils.PushNotificationsManager;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -98,8 +101,9 @@ public class TrainingCreationWizardFragment extends DialogFragment {
      * Defines the listeners for the View components within the current fragment
      */
     private void setListeners(){
-        this.appendBtn.setOnClickListener(view -> uploadTrainingToDatabase(Constants.EFFECT_NEXT));
-        this.completeBtn.setOnClickListener(view -> uploadTrainingToDatabase(Constants.EFFECT_DISMISS));
+        this.appendBtn.setOnClickListener(view -> this.uploadTrainingToDatabase(Constants.EFFECT_NEXT));
+        this.completeBtn.setOnClickListener(view -> this.uploadTrainingToDatabase(Constants.EFFECT_DISMISS));
+        this.trainingDueToET.setOnClickListener(view -> this.showExpirationDatePickerDialog());
     }
 
     /**
@@ -242,5 +246,35 @@ public class TrainingCreationWizardFragment extends DialogFragment {
         notificationData.put(NotificationsKeys.NOTIFICATIONS_READ, false);
         notificationData.put(NotificationsKeys.NOTIFICATIONS_TIMESTAMP, System.currentTimeMillis());
         return notificationData;
+    }
+
+    /**
+     * Displays a DatePickerDialog to allow the user to set the expiration date properly, regardless of
+     * eventual differences in the keyboard format, date format or whatever
+     */
+    private void showExpirationDatePickerDialog(){
+        /* In case we are in editing mode, we should open the Calendar/Date Picker on the previously inserted date, otherwise we use today's date */
+        Calendar calendar = Calendar.getInstance();
+        int displayedYear = calendar.get(Calendar.YEAR);
+        int displayedMonth = calendar.get(Calendar.MONTH);
+        int displayedDay = calendar.get(Calendar.DAY_OF_MONTH);
+        String previousExpirationDate = this.trainingDueToET.getText().toString().trim();
+        if(!previousExpirationDate.isEmpty()){
+            try{
+                String[] dateParts = previousExpirationDate.split("-");
+                displayedYear = Integer.parseInt(dateParts[Constants.DATE_PART_YEAR]);
+                displayedMonth = Integer.parseInt(dateParts[Constants.DATE_PART_MONTH]) - 1; // Months in Java go from 0 to 11
+                displayedDay = Integer.parseInt(dateParts[Constants.DATE_PART_DAY]);
+            } catch (Exception parsingException){
+                Log.e("date_parse_error", "Error while parsing expiration date");
+            }
+        }
+        DatePickerDialog expirationDatePicker = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
+            String formattedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            TrainingCreationWizardFragment.this.trainingDueToET.setText(formattedDate);
+        }, displayedYear, displayedMonth, displayedDay);
+        /* We prevent the user from selecting a birthdate that is in the future */
+        expirationDatePicker.getDatePicker().setMaxDate(System.currentTimeMillis());
+        expirationDatePicker.show();
     }
 }
