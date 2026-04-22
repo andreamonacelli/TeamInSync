@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -143,6 +144,16 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 this.loggedUserEmail = getArguments().getString(KeyStrings.EMAIL);
             }
         }
+        if(savedInstanceState != null){
+            this.selectedImageUri = savedInstanceState.getParcelable(IntentExtrasTags.IMAGE_URI_STATE_KEY);
+            if(this.selectedImageUri != null){
+                this.profilePicIV.setImageURI(this.selectedImageUri);
+            }
+            this.cameraImageBytes = savedInstanceState.getByteArray(IntentExtrasTags.IMAGE_BYTES_STATE_KEY);
+            if(this.cameraImageBytes != null){
+                this.profilePicIV.setImageBitmap(BitmapFactory.decodeByteArray(this.cameraImageBytes, 0, this.cameraImageBytes.length));
+            }
+        }
         this.loaderDialog = new LoaderDialog(requireActivity());
     }
 
@@ -202,6 +213,16 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(this.selectedImageUri != null){
+            outState.putParcelable(IntentExtrasTags.IMAGE_URI_STATE_KEY, this.selectedImageUri);
+        } else if(this.cameraImageBytes != null){
+            outState.putByteArray(IntentExtrasTags.IMAGE_BYTES_STATE_KEY, this.cameraImageBytes);
+        }
     }
 
     /**
