@@ -10,4 +10,5 @@ public final class IntentExtrasTags {
     public static final String TEAM_ID = "TEAM_ID";
     public static final String IMAGE_URI_STATE_KEY = "saved_image_uri";
     public static final String IMAGE_BYTES_STATE_KEY = "saved_image_bytes";
+    public static final String TEAM_SELECTION_STATE_KEY = "saved_team_spinner_index";
 }

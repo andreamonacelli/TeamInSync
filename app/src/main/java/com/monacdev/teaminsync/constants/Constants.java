@@ -13,6 +13,7 @@ public final class Constants {
     public static final int DATE_PART_YEAR = 0;
     public static final int DATE_PART_MONTH = 1;
     public static final int DATE_PART_DAY = 2;
+    public static final int NO_TEAM_SELECTED = -1;
 
     /* Textual constants */
     public static final String PLAYER_ROLE_STRING = "player";

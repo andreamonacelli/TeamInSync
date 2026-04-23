@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -73,6 +72,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     private String loggedUserEmail;
     private Uri selectedImageUri = null; // In case the user selects an existing photo
     private byte[] cameraImageBytes = null; // In case the user takes a new photo from camera
+    private int savedTeamSpinnerIndex = Constants.NO_TEAM_SELECTED; // To keep team selection
     private boolean isEditMode;
     private final HashMap<String, String> editingData = new HashMap<>();
     private final ArrayList<String> teamNames = new ArrayList<>();
@@ -86,7 +86,8 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 if(result.getResultCode() == Activity.RESULT_OK && result.getData() != null){
                     RegistrationWizardFragment.this.selectedImageUri = result.getData().getData();
                     RegistrationWizardFragment.this.cameraImageBytes = null;
-                    RegistrationWizardFragment.this.profilePicIV.setImageURI(RegistrationWizardFragment.this.selectedImageUri);
+                    // RegistrationWizardFragment.this.profilePicIV.setImageURI(RegistrationWizardFragment.this.selectedImageUri);
+                    Glide.with(this).load(this.selectedImageUri).circleCrop().into(this.profilePicIV);
                 }
             }
     );
@@ -97,7 +98,8 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 getActivity();
                 if(result.getResultCode() == Activity.RESULT_OK && result.getData() != null && result.getData().getExtras() != null){
                     Bitmap capturedPhoto = (Bitmap) result.getData().getExtras().get("data");
-                    RegistrationWizardFragment.this.profilePicIV.setImageBitmap(capturedPhoto);
+                    // RegistrationWizardFragment.this.profilePicIV.setImageBitmap(capturedPhoto);
+                    Glide.with(this).load(capturedPhoto).circleCrop().into(this.profilePicIV);
                     /* Conversion of the image for the upload on Cloudinary */
                     ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
                     if(capturedPhoto != null) {
@@ -144,15 +146,11 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 this.loggedUserEmail = getArguments().getString(KeyStrings.EMAIL);
             }
         }
+        /* Re-setting an eventually previously saved state */
         if(savedInstanceState != null){
             this.selectedImageUri = savedInstanceState.getParcelable(IntentExtrasTags.IMAGE_URI_STATE_KEY);
-            if(this.selectedImageUri != null){
-                this.profilePicIV.setImageURI(this.selectedImageUri);
-            }
             this.cameraImageBytes = savedInstanceState.getByteArray(IntentExtrasTags.IMAGE_BYTES_STATE_KEY);
-            if(this.cameraImageBytes != null){
-                this.profilePicIV.setImageBitmap(BitmapFactory.decodeByteArray(this.cameraImageBytes, 0, this.cameraImageBytes.length));
-            }
+            this.savedTeamSpinnerIndex = savedInstanceState.getInt(IntentExtrasTags.TEAM_SELECTION_STATE_KEY);
         }
         this.loaderDialog = new LoaderDialog(requireActivity());
     }
@@ -168,14 +166,72 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
         /* Binding the views to their respective objects */
         this.bindViewsToObjects(view);
-        /* Binding a listener method to the date picker field */
-        this.birthDateET.setOnClickListener(v -> this.showDatePickerDialog());
         /* Setting up the dropdown menu for the teams */
         this.setupTeamSelector();
+        /* Eventually re-setting the image preview */
+        if(this.selectedImageUri != null){
+            Glide.with(this).load(this.selectedImageUri).circleCrop().into(this.profilePicIV);
+        } else if(this.cameraImageBytes != null){
+            Glide.with(this).load(this.cameraImageBytes).circleCrop().into(this.profilePicIV);
+        }
+        this.setListeners();
         if(this.isEditMode) {
             /* In case we are in edit-mode, pre-compile the fields */
             this.fieldPreCompilation(view);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(this.selectedImageUri != null){
+            outState.putParcelable(IntentExtrasTags.IMAGE_URI_STATE_KEY, this.selectedImageUri);
+        } else if(this.cameraImageBytes != null){
+            outState.putByteArray(IntentExtrasTags.IMAGE_BYTES_STATE_KEY, this.cameraImageBytes);
+        }
+        if(this.teamSelectorSpinner != null){
+            int selectedTeamPosition = this.teamSelectorSpinner.getSelectedItemPosition();
+            if(selectedTeamPosition == Spinner.INVALID_POSITION){
+                outState.putInt(IntentExtrasTags.TEAM_SELECTION_STATE_KEY, Constants.NO_TEAM_SELECTED);
+            } else {
+                outState.putInt(IntentExtrasTags.TEAM_SELECTION_STATE_KEY, selectedTeamPosition);
+            }
+        }
+    }
+
+    /**
+     * Binds the Views defined within the XML layout file for the activity to their respective Java objects
+     * @param view The view to be taken as reference for the binding
+     */
+    private void bindViewsToObjects(@NonNull View view){
+        this.profilePicIV = view.findViewById(R.id.profilePicIV);
+        this.profilePicIV.setOnClickListener(view1 -> RegistrationWizardFragment.this.selectImageSourceDialog());
+        this.usernameET = view.findViewById(R.id.usernameET);
+        this.nameET = view.findViewById(R.id.nameET);
+        this.surnameET = view.findViewById(R.id.surnameET);
+        this.birthDateET = view.findViewById(R.id.birthDateET);
+        this.roleRadioGroup = view.findViewById(R.id.roleRadioGroup);
+        this.teamSelectorSpinner = view.findViewById(R.id.teamSelectorSpinner);
+        this.submitBtn = view.findViewById(R.id.submitBtn);
+        TextView regWizardTitle = view.findViewById(R.id.regWizardTitle);
+        if(this.isEditMode){
+            regWizardTitle.setText(R.string.edit_wizard_title);
+        } else {
+            regWizardTitle.setText(R.string.registration_wizard_title);
+        }
+    }
+
+    /**
+     * Defines the listeners for the View components within the current fragment
+     */
+    private void setListeners(){
+        /* Binding a listener method to the date picker field */
+        this.birthDateET.setOnClickListener(v -> this.showDatePickerDialog());
         /* Setting the listener for the Submit button */
         this.submitBtn.setOnClickListener(view1 -> {
             if(!validateFieldCompilation()){
@@ -208,43 +264,6 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 RegistrationWizardFragment.this.uploadUserWithProfilePicture(newUserData);
             }
         });
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if(this.selectedImageUri != null){
-            outState.putParcelable(IntentExtrasTags.IMAGE_URI_STATE_KEY, this.selectedImageUri);
-        } else if(this.cameraImageBytes != null){
-            outState.putByteArray(IntentExtrasTags.IMAGE_BYTES_STATE_KEY, this.cameraImageBytes);
-        }
-    }
-
-    /**
-     * Binds the Views defined within the XML layout file for the activity to their respective Java objects
-     * @param view The view to be taken as reference for the binding
-     */
-    private void bindViewsToObjects(@NonNull View view){
-        this.profilePicIV = view.findViewById(R.id.profilePicIV);
-        this.profilePicIV.setOnClickListener(view1 -> RegistrationWizardFragment.this.selectImageSourceDialog());
-        this.usernameET = view.findViewById(R.id.usernameET);
-        this.nameET = view.findViewById(R.id.nameET);
-        this.surnameET = view.findViewById(R.id.surnameET);
-        this.birthDateET = view.findViewById(R.id.birthDateET);
-        this.roleRadioGroup = view.findViewById(R.id.roleRadioGroup);
-        this.teamSelectorSpinner = view.findViewById(R.id.teamSelectorSpinner);
-        this.submitBtn = view.findViewById(R.id.submitBtn);
-        TextView regWizardTitle = view.findViewById(R.id.regWizardTitle);
-        if(this.isEditMode){
-            regWizardTitle.setText(R.string.edit_wizard_title);
-        } else {
-            regWizardTitle.setText(R.string.registration_wizard_title);
-        }
     }
 
     /**
@@ -293,7 +312,9 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                     }
                 }
                 adapter.notifyDataSetChanged();
-                if(RegistrationWizardFragment.this.isEditMode){
+                if(RegistrationWizardFragment.this.savedTeamSpinnerIndex != Constants.NO_TEAM_SELECTED){
+                    RegistrationWizardFragment.this.teamSelectorSpinner.setSelection(RegistrationWizardFragment.this.savedTeamSpinnerIndex);
+                } else if(RegistrationWizardFragment.this.isEditMode){
                     String currentTeamID = RegistrationWizardFragment.this.editingData.get(KeyStrings.TEAM);
                     if(currentTeamID != null){
                         int selectedSpinnerPosition = RegistrationWizardFragment.this.teamIDs.indexOf(currentTeamID);
@@ -466,7 +487,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         this.surnameET.setText(this.editingData.get(KeyStrings.SURNAME));
         this.birthDateET.setText(this.editingData.get(KeyStrings.BIRTHDATE));
         String profilePicUrl = this.editingData.get(KeyStrings.PROFILE_PIC);
-        if(profilePicUrl != null && !profilePicUrl.isEmpty()){
+        if(profilePicUrl != null && !profilePicUrl.isEmpty() && this.selectedImageUri == null && this.cameraImageBytes == null){
             Glide.with(this).load(profilePicUrl).circleCrop().into(this.profilePicIV);
         }
         this.usernameET.setVisibility(View.GONE);
