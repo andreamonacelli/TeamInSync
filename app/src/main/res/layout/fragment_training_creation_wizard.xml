@@ -1,94 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp">
-
-    <TextView
-        android:id="@+id/dialogFragTitleTV"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="?android:attr/windowBackground"
+    android:clickable="true"
+    android:focusable="true">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="@string/new_training_frag_header"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <EditText
-        android:id="@+id/trainingTitleET"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/exercise_title_hint"
-        android:inputType="text"
-        android:layout_marginBottom="16dp"/>
+        <TextView
+            android:id="@+id/dialogFragTitleTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/new_training_frag_header"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/trainingTypeLabelTV"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/training_type_label"
-        android:textColor="?android:attr/textColorSecondary" />
+        <EditText
+            android:id="@+id/trainingTitleET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/exercise_title_hint"
+            android:inputType="text"
+            android:layout_marginBottom="16dp"/>
 
-    <RadioGroup
-        android:id="@+id/trainingTypeRG"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
+        <TextView
+            android:id="@+id/trainingTypeLabelTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/training_type_label"
+            android:textColor="?android:attr/textColorSecondary" />
 
-        <RadioButton
-            android:id="@+id/chronoRB"
+        <RadioGroup
+            android:id="@+id/trainingTypeRG"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton
+                android:id="@+id/chronoRB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/duration_label"
+                android:checked="true"/>
+
+            <RadioButton
+            android:id="@+id/repetitionsRB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/duration_label"
-            android:checked="true"/>
+            android:layout_marginStart="16dp"
+            android:text="@string/repetitions_label"/>
+        </RadioGroup>
 
-        <RadioButton
-        android:id="@+id/repetitionsRB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="@string/repetitions_label"/>
-    </RadioGroup>
-
-    <EditText
-        android:id="@+id/trainingTargetET"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/training_target_label"
-        android:inputType="number"
-        android:layout_marginBottom="16dp"/>
-
-    <EditText
-        android:id="@+id/trainingDueToET"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/deadline_label"
-        android:focusable="false"
-        android:clickable="true"
-        android:cursorVisible="false"
-        android:layout_marginBottom="24dp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end">
-
-        <Button
-            android:id="@+id/completeBtn"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/trainingTargetET"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/complete_btn_label"
-            android:layout_marginEnd="8dp"/>
+            android:hint="@string/training_target_label"
+            android:inputType="number"
+            android:layout_marginBottom="16dp"/>
 
-        <Button
-            android:id="@+id/appendBtn"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/trainingDueToET"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/append_btn_label" />
+            android:hint="@string/deadline_label"
+            android:focusable="false"
+            android:clickable="true"
+            android:cursorVisible="false"
+            android:layout_marginBottom="24dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/completeBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/complete_btn_label"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/appendBtn"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/append_btn_label" />
+        </LinearLayout>
+
     </LinearLayout>
-
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

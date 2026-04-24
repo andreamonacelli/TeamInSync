@@ -38,13 +38,15 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
     private boolean isExpired;
     private boolean isCompleted;
     private final boolean actionsActive;
+    private final boolean isCoach;
     private String trainingUID;
     private String athleteUsername;
 
-    public TrainingTileViewHolder(@NonNull View itemView, boolean actionsActive) {
+    public TrainingTileViewHolder(@NonNull View itemView, boolean actionsActive, boolean isCoach) {
         super(itemView);
         this.bindViewsToObjects(itemView);
         this.actionsActive = actionsActive;
+        this.isCoach = isCoach;
     }
 
     /**
@@ -73,11 +75,6 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
         this.handleTrainingType(trainingData.get(KeyStrings.TRAINING_TYPE), trainingData.get(KeyStrings.USERNAME));
         this.isExpired = isTrainingExpired(trainingData.get(KeyStrings.TRAINING_DUE_TO));
         this.isCompleted = Boolean.parseBoolean(trainingData.get(KeyStrings.TRAINING_COMPLETED));
-        if(this.actionsActive && !this.isCompleted){
-            this.startTrainingBtn.setVisibility(View.VISIBLE);
-        } else {
-            this.startTrainingBtn.setVisibility(View.GONE);
-        }
         this.restyleBasedOnCompletionExpiry();
     }
 
@@ -197,10 +194,14 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
     private void restyleBasedOnCompletionExpiry(){
         Context context = this.itemView.getContext();
         MaterialCardView trainingCardView = (MaterialCardView) this.itemView;
-        if(this.actionsActive && !this.isCompleted){
+        if(this.actionsActive){
             this.startTrainingBtn.setVisibility(View.VISIBLE);
         } else {
+            trainingCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.tile_active));
             this.startTrainingBtn.setVisibility(View.GONE);
+            if(this.isCoach){
+                return;
+            }
         }
         if(this.isExpired){
             if(this.isCompleted){

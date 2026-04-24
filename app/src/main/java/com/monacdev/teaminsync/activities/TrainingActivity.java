@@ -169,7 +169,7 @@ public class TrainingActivity extends AppCompatActivity {
                             HashMap<String, String> training = parseTrainingDataFromSnapshot(trainingSnapshot);
                             exercisesList.add(training);
                         }
-                        TrainingListTileAdapter trainingsAdapter = new TrainingListTileAdapter(exercisesList, TrainingActivity.this.isMyTrainingList);
+                        TrainingListTileAdapter trainingsAdapter = new TrainingListTileAdapter(exercisesList, TrainingActivity.this.isMyTrainingList, false);
                         TrainingActivity.this.trainingListRV.setAdapter(trainingsAdapter);
                     } else {
                         Toast.makeText(TrainingActivity.this, R.string.no_trainings_found, Toast.LENGTH_SHORT).show();
@@ -203,7 +203,7 @@ public class TrainingActivity extends AppCompatActivity {
                                 }
                             }
                         }
-                        TrainingListTileAdapter trainingsAdapter = new TrainingListTileAdapter(exercisesList, TrainingActivity.this.isMyTrainingList);
+                        TrainingListTileAdapter trainingsAdapter = new TrainingListTileAdapter(exercisesList, false, true);
                         TrainingActivity.this.trainingListRV.setAdapter(trainingsAdapter);
                     } else {
                         Toast.makeText(TrainingActivity.this, R.string.no_trainings_found, Toast.LENGTH_SHORT).show();

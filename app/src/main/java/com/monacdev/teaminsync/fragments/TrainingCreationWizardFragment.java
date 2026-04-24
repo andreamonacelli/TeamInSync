@@ -273,8 +273,6 @@ public class TrainingCreationWizardFragment extends DialogFragment {
             String formattedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
             TrainingCreationWizardFragment.this.trainingDueToET.setText(formattedDate);
         }, displayedYear, displayedMonth, displayedDay);
-        /* We prevent the user from selecting a birthdate that is in the future */
-        expirationDatePicker.getDatePicker().setMaxDate(System.currentTimeMillis());
         expirationDatePicker.show();
     }
 }

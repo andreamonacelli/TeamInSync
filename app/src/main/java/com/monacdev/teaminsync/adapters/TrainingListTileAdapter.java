@@ -16,10 +16,12 @@ import java.util.HashMap;
 public class TrainingListTileAdapter extends RecyclerView.Adapter<TrainingTileViewHolder> {
     private final ArrayList<HashMap<String, String>> trainingsList;
     private final boolean activateActions;
+    private final boolean isCoach;
 
-    public TrainingListTileAdapter(ArrayList<HashMap<String, String>> trainingsList, boolean activateActions){
+    public TrainingListTileAdapter(ArrayList<HashMap<String, String>> trainingsList, boolean activateActions, boolean isCoach){
         this.trainingsList = trainingsList;
         this.activateActions = activateActions;
+        this.isCoach = isCoach;
     }
 
     /**
@@ -32,7 +34,7 @@ public class TrainingListTileAdapter extends RecyclerView.Adapter<TrainingTileVi
     @Override
     public TrainingTileViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.training_tile, parent, false);
-        return new TrainingTileViewHolder(view, this.activateActions);
+        return new TrainingTileViewHolder(view, this.activateActions, this.isCoach);
     }
 
     /**
