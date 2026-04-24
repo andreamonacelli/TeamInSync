@@ -110,10 +110,12 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Logout"
-            app:layout_constraintEnd_toStartOf="@+id/openNotificationsBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/homepageHeaderTV"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@android:drawable/ic_lock_power_off"
             app:tint="?attr/colorError" />
@@ -123,15 +125,13 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="4dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/homepageHeaderTV"
+            app:layout_constraintEnd_toStartOf="@+id/logoutBtn"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@android:drawable/stat_notify_chat"
+            app:srcCompat="@drawable/ic_os_notification_fallback_white_24dp"
             app:tint="?attr/colorPrimary"
-            tools:srcCompat="@android:drawable/stat_notify_chat" />
+            tools:srcCompat="@drawable/ic_os_notification_fallback_white_24dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
