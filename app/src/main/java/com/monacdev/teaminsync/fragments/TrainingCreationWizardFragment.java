@@ -207,6 +207,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
             trainingData.put(KeyStrings.TRAINING_DUE_TO, dueToDate);
             trainingData.put(Constants.COACH_ROLE_STRING, this.coachID);
             trainingData.put(KeyStrings.TRAINING_COMPLETED, false);
+            trainingData.put(KeyStrings.TRAINING_COMPLETED_LATE, false);
         }
         return trainingData;
     }
