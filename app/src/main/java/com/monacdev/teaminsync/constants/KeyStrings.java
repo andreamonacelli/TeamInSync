@@ -22,4 +22,5 @@ public final class KeyStrings {
     public static final String TRAINING_DUE_TO = "due_to";
     public static final String TRAINING_COMPLETED = "completed";
     public static final String TRAINING_UUID = "training_uuid";
+    public static final String TRAINING_COMPLETED_LATE = "completed_late";
 }

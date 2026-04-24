@@ -236,6 +236,10 @@ public class TrainingActivity extends AppCompatActivity {
         );
         training.put(KeyStrings.USERNAME, this.displayedUserID);
         training.put(KeyStrings.TRAINING_UUID, trainingSnapshot.getKey());
+        training.put(
+                KeyStrings.TRAINING_COMPLETED_LATE,
+                String.valueOf(trainingSnapshot.child(KeyStrings.TRAINING_COMPLETED_LATE).getValue(Boolean.class))
+        );
         return training;
     }
 }

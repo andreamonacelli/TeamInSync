@@ -37,6 +37,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
     private TextView trainingInfoTV;
     private boolean isExpired;
     private boolean isCompleted;
+    private boolean isCompletedLate;
     private final boolean actionsActive;
     private final boolean isCoach;
     private String trainingUID;
@@ -75,6 +76,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
         this.handleTrainingType(trainingData.get(KeyStrings.TRAINING_TYPE), trainingData.get(KeyStrings.USERNAME));
         this.isExpired = isTrainingExpired(trainingData.get(KeyStrings.TRAINING_DUE_TO));
         this.isCompleted = Boolean.parseBoolean(trainingData.get(KeyStrings.TRAINING_COMPLETED));
+        this.isCompletedLate = Boolean.parseBoolean(trainingData.get(KeyStrings.TRAINING_COMPLETED_LATE));
         this.restyleBasedOnCompletionExpiry();
     }
 
@@ -106,6 +108,9 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
                                 boolean completed = result.getBoolean(IntentExtrasTags.TRAINING_COMPLETED);
                                 if(completed){
                                     TrainingTileViewHolder.this.isCompleted = true;
+                                    if(TrainingTileViewHolder.this.isExpired){
+                                        TrainingTileViewHolder.this.isCompletedLate = true;
+                                    }
                                     TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
                                 }
                             }
@@ -136,10 +141,13 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
      * @param userID the ID of the user for whom the training should be completed
      */
     private void updateTrainingOnDB(View view, String userID){
-        DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference();
-        trainingRef.child(ReferenceStrings.TRAININGS).child(userID).child(TrainingTileViewHolder.this.trainingUID)
-                .child(KeyStrings.TRAINING_COMPLETED).setValue(true).addOnSuccessListener(unused -> {
+        DatabaseReference trainingRef = FirebaseDatabase.getInstance().getReference().child(ReferenceStrings.TRAININGS).child(userID).child(TrainingTileViewHolder.this.trainingUID);
+        HashMap<String, Object> trainingUpdateData = new HashMap<>();
+        trainingUpdateData.put(KeyStrings.TRAINING_COMPLETED, true);
+        trainingUpdateData.put(KeyStrings.TRAINING_COMPLETED_LATE, TrainingTileViewHolder.this.isExpired);
+        trainingRef.updateChildren(trainingUpdateData).addOnSuccessListener(unused -> {
                     TrainingTileViewHolder.this.isCompleted = true;
+                    TrainingTileViewHolder.this.isCompletedLate = TrainingTileViewHolder.this.isExpired;
                     TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
                     if(TrainingTileViewHolder.this.isExpired) {
                         Toast.makeText(view.getContext(), R.string.training_reps_completed_late, Toast.LENGTH_SHORT).show();
@@ -203,24 +211,21 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
                 return;
             }
         }
-        if(this.isExpired){
-            if(this.isCompleted){
-                /* Make the button non-clickable and color background in soft orange */
-                this.startTrainingBtn.setVisibility(View.GONE);
+        if(this.isCompleted){
+            this.startTrainingBtn.setVisibility(View.GONE);
+            if(this.isCompletedLate){
                 trainingCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.tile_completed_late));
             } else {
-                /* Make the button clickable and color background in red */
-                this.startTrainingBtn.setEnabled(true);
-                trainingCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.tile_missed));
+                trainingCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.tile_completed));
             }
         } else {
-            if(this.isCompleted){
-                /* Make the button non-clickable and color background in light gray */
-                this.startTrainingBtn.setVisibility(View.GONE);
-                trainingCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.tile_completed));
-            } else {
-                /* Make the button clickable and color background in green */
+            if(this.actionsActive){
+                this.startTrainingBtn.setVisibility(View.VISIBLE);
                 this.startTrainingBtn.setEnabled(true);
+            }
+            if(this.isExpired){
+                trainingCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.tile_missed));
+            } else {
                 trainingCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.tile_active));
             }
         }
