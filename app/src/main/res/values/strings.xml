@@ -112,4 +112,5 @@
     <string name="upload_existing_user_msg">Aggiornando le informazioni…</string>
     <string name="exercise_load_msg">Caricando i dati dell\'allenamento…</string>
     <string name="logout_load_msg">Effettuando il logout…</string>
+    <string name="close_notif_detail">Chiudi notifica</string>
 </resources>

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +36,10 @@ public class NotificationsFragment extends DialogFragment {
     private TextView emptyNotificationsTV;
     private RecyclerView notificationsListRV;
     private ImageButton closeNotificationsBtn;
+    private View notificationsDetailLayout;
+    private TextView notificationDetailTitleTV;
+    private TextView notificationDetailMessageTV;
+    private Button backToNotificationsListBtn;
     private String loggedUsername;
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private LoaderDialog loaderDialog;
@@ -78,6 +83,10 @@ public class NotificationsFragment extends DialogFragment {
         this.notificationsListRV = view.findViewById(R.id.notificationsListRV);
         this.notificationsListRV.setLayoutManager(new LinearLayoutManager(getContext()));
         this.closeNotificationsBtn = view.findViewById(R.id.closeNotificationsBtn);
+        this.notificationsDetailLayout = view.findViewById(R.id.notificationDetailLayout);
+        this.notificationDetailTitleTV = view.findViewById(R.id.notificationDetailTitleTV);
+        this.notificationDetailMessageTV = view.findViewById(R.id.notificationDetailMessageTV);
+        this.backToNotificationsListBtn = view.findViewById(R.id.backToNotificationsListBtn);
     }
 
     /**
@@ -85,6 +94,10 @@ public class NotificationsFragment extends DialogFragment {
      */
     private void setListeners(){
         this.closeNotificationsBtn.setOnClickListener(view -> dismiss());
+        this.backToNotificationsListBtn.setOnClickListener(view -> {
+            this.notificationsDetailLayout.setVisibility(View.GONE);
+            this.notificationsListRV.setVisibility(View.VISIBLE);
+        });
     }
 
     /**
@@ -104,7 +117,7 @@ public class NotificationsFragment extends DialogFragment {
                                 notificationsList.add(notificationData);
                             }
                             Collections.reverse(notificationsList);
-                            NotificationListAdapter notificationsAdapter = new NotificationListAdapter(notificationsList);
+                            NotificationListAdapter notificationsAdapter = new NotificationListAdapter(notificationsList, NotificationsFragment.this);
                             NotificationsFragment.this.notificationsListRV.setAdapter(notificationsAdapter);
                             NotificationsFragment.this.notificationsListRV.setVisibility(View.VISIBLE);
                             NotificationsFragment.this.emptyNotificationsTV.setVisibility(View.GONE);
@@ -140,5 +153,17 @@ public class NotificationsFragment extends DialogFragment {
         }
         notificationData.put(NotificationsKeys.NOTIFICATIONS_READ, isRead);
         return notificationData;
+    }
+
+    /**
+     * Displays the details of the clicked notification over the current fragment space
+     * @param title the title of the selected notification
+     * @param message the content of the selected notification
+     */
+    public void showNotificationsDetails(String title, String message){
+        this.notificationsListRV.setVisibility(View.GONE);
+        this.notificationDetailTitleTV.setText(title);
+        this.notificationDetailMessageTV.setText(message);
+        this.notificationsDetailLayout.setVisibility(View.VISIBLE);
     }
 }

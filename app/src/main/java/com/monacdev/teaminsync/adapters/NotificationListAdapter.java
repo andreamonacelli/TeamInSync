@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.monacdev.teaminsync.R;
+import com.monacdev.teaminsync.fragments.NotificationsFragment;
 import com.monacdev.teaminsync.viewholders.NotificationViewHolder;
 
 import java.util.ArrayList;
@@ -15,9 +16,11 @@ import java.util.HashMap;
 
 public class NotificationListAdapter extends RecyclerView.Adapter<NotificationViewHolder> {
     private final ArrayList<HashMap<String, Object>> notificationsList;
+    private final NotificationsFragment parentFragment;
 
-    public NotificationListAdapter(ArrayList<HashMap<String, Object>> notificationsList){
+    public NotificationListAdapter(ArrayList<HashMap<String, Object>> notificationsList, NotificationsFragment parentFragment){
         this.notificationsList = notificationsList;
+        this.parentFragment = parentFragment;
     }
 
     /**
@@ -30,7 +33,7 @@ public class NotificationListAdapter extends RecyclerView.Adapter<NotificationVi
     @Override
     public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification_tile, parent, false);
-        return new NotificationViewHolder(view);
+        return new NotificationViewHolder(view, this.parentFragment);
     }
 
     /**

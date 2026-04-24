@@ -108,4 +108,5 @@
     <string name="upload_existing_user_msg">Updating user data…</string>
     <string name="exercise_load_msg">Loading exercise data…</string>
     <string name="logout_load_msg">Logging out…</string>
+    <string name="close_notif_detail">Close notification</string>
 </resources>
