@@ -59,6 +59,11 @@ public class TrainingActivity extends AppCompatActivity {
         });
 
         this.displayedUserID = getIntent().getStringExtra(IntentExtrasTags.DISPLAYED_USER);
+        if(this.displayedUserID == null || this.displayedUserID.isEmpty()){
+            Toast.makeText(this, R.string.error_user_training_data, Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         String displayedUserSurname = getIntent().getStringExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME);
         this.loaderDialog = new LoaderDialog(this);
         this.bindViewsToObjects();
@@ -67,6 +72,14 @@ public class TrainingActivity extends AppCompatActivity {
         this.trainingPageHeaderTV.setText(String.format("%s %s", getString(R.string.training_list_header), displayedUserSurname));
         this.trainingTrackerFragmentContainer = findViewById(R.id.trainingTrackerFragmentContainer);
         this.trainingTrackerFragmentContainer.setVisibility(View.GONE);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(this.loaderDialog != null){
+            this.loaderDialog.hide();
+        }
     }
 
     /**
@@ -92,6 +105,9 @@ public class TrainingActivity extends AppCompatActivity {
             displayedUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(isFinishing() || isDestroyed()){
+                        return;
+                    }
                     String displayedUserRole = null;
                     if(snapshot.exists()){
                         viewedTeamID = snapshot.child(KeyStrings.TEAM).getValue(String.class);
@@ -112,6 +128,9 @@ public class TrainingActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
+                    if(isFinishing() || isDestroyed()){
+                        return;
+                    }
                     Toast.makeText(TrainingActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                     isMyTrainingList = false;
                 }
@@ -162,6 +181,9 @@ public class TrainingActivity extends AppCompatActivity {
             q.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(isFinishing() || isDestroyed()){
+                        return;
+                    }
                     exercisesList.clear();
                     TrainingActivity.this.loaderDialog.hide();
                     if(snapshot.exists()){
@@ -178,6 +200,9 @@ public class TrainingActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
+                    if(isFinishing() || isDestroyed()){
+                        return;
+                    }
                     TrainingActivity.this.loaderDialog.hide();
                     Toast.makeText(TrainingActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                 }
@@ -188,6 +213,9 @@ public class TrainingActivity extends AppCompatActivity {
             q.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(isFinishing() || isDestroyed()){
+                        return;
+                    }
                     TrainingActivity.this.loaderDialog.hide();
                     exercisesList.clear();
                     ArrayList<String> trainingUIDs = new ArrayList<>();
@@ -212,6 +240,9 @@ public class TrainingActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
+                    if(isFinishing() || isDestroyed()){
+                        return;
+                    }
                     TrainingActivity.this.loaderDialog.hide();
                     Toast.makeText(TrainingActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                 }

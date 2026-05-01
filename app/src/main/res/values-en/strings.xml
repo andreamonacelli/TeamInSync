@@ -114,4 +114,5 @@
     <string name="error_user_not_found">WARNING: User having e-mail %1$s not found in the system!</string>
     <string name="user_default_label">user</string>
     <string name="error_invalid_user">WARNING: Error while loading user, invalid user selected!</string>
+    <string name="error_user_training_data">WARNING: Error while loadin user information</string>
 </resources>
