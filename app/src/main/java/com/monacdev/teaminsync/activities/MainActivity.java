@@ -197,8 +197,9 @@ public class MainActivity extends AppCompatActivity {
         OneSignal.logout();
         /* Delay activity destruction to allow OneSignal to complete logout */
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            /* Rerouting to the Login Activity */
+            /* Rerouting to the Login Activity while contextually clearing the previous activity stack */
             Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             this.loaderDialog.hide();
             startActivity(loginIntent);
             finish();

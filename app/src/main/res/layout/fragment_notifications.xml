@@ -1,83 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="16dp">
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp">
-
-        <TextView
-            android:id="@+id/fragmentTitleTV"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="@string/notif_fragment_title"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <ImageButton
-            android:id="@+id/closeNotificationsBtn"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            app:tint="?attr/colorPrimary" />
-    </RelativeLayout>
-
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:fillViewport="true">
     <LinearLayout
-        android:id="@+id/notificationDetailLayout"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/notificationDetailTitleTV"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="?android:attr/textColorPrimary"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
             <TextView
-                android:id="@+id/notificationDetailMessageTV"
+                android:id="@+id/fragmentTitleTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/notif_fragment_title"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/closeNotificationsBtn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="?attr/colorPrimary" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/notificationDetailLayout"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/notificationDetailTitleTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="?android:attr/textColorSecondary" />
-        </ScrollView>
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary"
+                android:layout_marginBottom="16dp"/>
 
-        <Button
-            android:id="@+id/backToNotificationsListBtn"
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/notificationDetailMessageTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="?android:attr/textColorSecondary" />
+            </ScrollView>
+
+            <Button
+                android:id="@+id/backToNotificationsListBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/close_notif_detail"
+                android:layout_marginTop="16dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/emptyNotificationsTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/close_notif_detail"
-            android:layout_marginTop="16dp"/>
+            android:text="@string/no_notifications_found"
+            android:textAlignment="center"
+            android:visibility="gone"
+            android:layout_margin="24dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/notificationsListRV"
+            android:layout_width="match_parent"
+            android:layout_height="400dp" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/emptyNotificationsTV"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/no_notifications_found"
-        android:textAlignment="center"
-        android:visibility="gone"
-        android:layout_margin="24dp"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/notificationsListRV"
-        android:layout_width="match_parent"
-        android:layout_height="400dp" />
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

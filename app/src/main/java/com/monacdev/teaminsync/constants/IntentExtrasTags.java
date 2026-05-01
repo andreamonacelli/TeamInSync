@@ -11,4 +11,7 @@ public final class IntentExtrasTags {
     public static final String IMAGE_URI_STATE_KEY = "saved_image_uri";
     public static final String IMAGE_BYTES_STATE_KEY = "saved_image_bytes";
     public static final String TEAM_SELECTION_STATE_KEY = "saved_team_spinner_index";
+    public static final String NOTIFICATIONS_DETAILS_STATE_KEY = "showing_details";
+    public static final String NOTIFICATIONS_TITLE_STATE_KEY = "notification_title";
+    public static final String NOTIFICATIONS_MESSAGE_STATE_KEY = "notification_message";
 }

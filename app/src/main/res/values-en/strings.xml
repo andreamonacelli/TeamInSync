@@ -109,4 +109,6 @@
     <string name="exercise_load_msg">Loading exercise data…</string>
     <string name="logout_load_msg">Logging out…</string>
     <string name="close_notif_detail">Close notification</string>
+    <string name="reg_critical_error">WARNING: Critical error during registration, please contact user support!</string>
+    <string name="reg_data_upload_error">WARNING: Error while uploading data to the database</string>
 </resources>

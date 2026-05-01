@@ -19,6 +19,8 @@ import com.bumptech.glide.Glide;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -70,6 +72,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     private Spinner teamSelectorSpinner;
     private Button submitBtn;
     private String loggedUserEmail;
+    private String loggedUserPassword;
     private Uri selectedImageUri = null; // In case the user selects an existing photo
     private byte[] cameraImageBytes = null; // In case the user takes a new photo from camera
     private int savedTeamSpinnerIndex = Constants.NO_TEAM_SELECTED; // To keep team selection
@@ -111,10 +114,11 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
             }
     );
 
-    public static RegistrationWizardFragment newInstance(String userEmail) {
+    public static RegistrationWizardFragment newInstance(String userEmail, String userPassword) {
         final RegistrationWizardFragment fragment = new RegistrationWizardFragment();
         final Bundle args = new Bundle();
         args.putString(KeyStrings.EMAIL, userEmail);
+        args.putString(KeyStrings.PASSWORD, userPassword);
         fragment.setArguments(args);
         return fragment;
     }
@@ -144,6 +148,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                 this.editingData.put(KeyStrings.TEAM, getArguments().getString(KeyStrings.TEAM));
             } else {
                 this.loggedUserEmail = getArguments().getString(KeyStrings.EMAIL);
+                this.loggedUserPassword = getArguments().getString(KeyStrings.PASSWORD);
             }
         }
         /* Re-setting an eventually previously saved state */
@@ -378,42 +383,9 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
      */
     private void uploadUserOnDatabase(HashMap<String, Object> userData){
         if(this.isEditMode){
-            String username = this.editingData.get(KeyStrings.USERNAME);
-            if(username == null){
-                Toast.makeText(getContext(), getString(R.string.error_changes_save), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).updateChildren(userData).addOnCompleteListener(task -> {
-                this.loaderDialog.hide();
-                if(task.isSuccessful()){
-                    this.uploadUserInSharedPreferences(username);
-                    String previousTeam = RegistrationWizardFragment.this.editingData.get(KeyStrings.TEAM);
-                    String newTeam = (String) userData.get(KeyStrings.TEAM);
-                    if(previousTeam != null && newTeam != null && !previousTeam.equals(newTeam)){
-                        DatabaseReference teamsRef = FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS);
-                        teamsRef.child(previousTeam).child(KeyStrings.MEMBERS).child(username).removeValue();
-                        teamsRef.child(newTeam).child(KeyStrings.MEMBERS).child(username).setValue(true);
-                    }
-                    Toast.makeText(getContext(), getString(R.string.changes_saved_label), Toast.LENGTH_SHORT).show();
-                    requireActivity().getSupportFragmentManager().setFragmentResult(NavigationTags.EDIT_FRAGMENT_RESULT, new Bundle());
-                    dismiss();
-                }
-            });
+            this.saveChangesToDB(userData);
         } else {
-            String username = this.usernameET.getText().toString();
-            FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).setValue(userData).addOnCompleteListener(task -> {
-                this.loaderDialog.hide();
-                if (task.isSuccessful()) {
-                    this.uploadUserInSharedPreferences(username);
-                    /* The newly registered user will be automatically added to the team */
-                    FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS)
-                            .child(Objects.requireNonNull(userData.get(KeyStrings.TEAM)).toString()).child(KeyStrings.MEMBERS)
-                            .child(username).setValue(true);
-                    Intent intent = new Intent(getContext(), MainActivity.class);
-                    intent.putExtra(IntentExtrasTags.LOGGED_USER, username);
-                    startActivity(intent);
-                }
-            });
+            this.finalizeUserRegistration(userData);
         }
     }
 
@@ -534,5 +506,81 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         /* We prevent the user from selecting a birthdate that is in the future */
         birthDatePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
         birthDatePickerDialog.show();
+    }
+
+    /**
+     * Deals with the rollback of data on FirebaseAuth in case any error occurred while saving the
+     * user instance on the Firebase Real-Time DB
+     */
+    private void registrationRollback(){
+        FirebaseUser loggedUser = FirebaseAuth.getInstance().getCurrentUser();
+        if(loggedUser != null){
+            loggedUser.delete().addOnCompleteListener(deleteTask -> {
+                if(deleteTask.isSuccessful()){
+                    Toast.makeText(getContext(), R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), R.string.reg_critical_error, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    /**
+     * Effectively uploads the performed changes to the Real-Time DB
+     * @param userData the updated data for the user to be modified
+     */
+    private void saveChangesToDB(HashMap<String, Object> userData){
+        String username = this.editingData.get(KeyStrings.USERNAME);
+        if(username == null){
+            Toast.makeText(getContext(), getString(R.string.error_changes_save), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).updateChildren(userData).addOnCompleteListener(task -> {
+            this.loaderDialog.hide();
+            if(task.isSuccessful()){
+                this.uploadUserInSharedPreferences(username);
+                String previousTeam = RegistrationWizardFragment.this.editingData.get(KeyStrings.TEAM);
+                String newTeam = (String) userData.get(KeyStrings.TEAM);
+                if(previousTeam != null && newTeam != null && !previousTeam.equals(newTeam)){
+                    DatabaseReference teamsRef = FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS);
+                    teamsRef.child(previousTeam).child(KeyStrings.MEMBERS).child(username).removeValue();
+                    teamsRef.child(newTeam).child(KeyStrings.MEMBERS).child(username).setValue(true);
+                }
+                Toast.makeText(getContext(), getString(R.string.changes_saved_label), Toast.LENGTH_SHORT).show();
+                requireActivity().getSupportFragmentManager().setFragmentResult(NavigationTags.EDIT_FRAGMENT_RESULT, new Bundle());
+                dismiss();
+            }
+        });
+    }
+
+    /**
+     * Effectively loads the new user to the Real-Time DB and creates a new user instance in the
+     * Firebase authentication system
+     * @param userData the data for the new user
+     */
+    private void finalizeUserRegistration(HashMap<String, Object> userData){
+        String username = this.usernameET.getText().toString();
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(this.loggedUserEmail, this.loggedUserPassword).addOnCompleteListener(authTask -> {
+            if(authTask.isSuccessful()){
+                FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).setValue(userData).addOnCompleteListener(task -> {
+                    this.loaderDialog.hide();
+                    if (task.isSuccessful()) {
+                        this.uploadUserInSharedPreferences(username);
+                        FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS)
+                                .child(Objects.requireNonNull(userData.get(KeyStrings.TEAM)).toString()).child(KeyStrings.MEMBERS)
+                                .child(username).setValue(true);
+                        Intent intent = new Intent(getContext(), MainActivity.class);
+                        intent.putExtra(IntentExtrasTags.LOGGED_USER, username);
+                        startActivity(intent);
+                    } else {
+                        this.registrationRollback();
+                        Toast.makeText(getContext(), R.string.reg_data_upload_error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                this.loaderDialog.hide();
+                Toast.makeText(getContext(), R.string.register_err, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

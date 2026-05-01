@@ -113,4 +113,6 @@
     <string name="exercise_load_msg">Caricando i dati dell\'allenamento…</string>
     <string name="logout_load_msg">Effettuando il logout…</string>
     <string name="close_notif_detail">Chiudi notifica</string>
+    <string name="reg_critical_error">ATTENZIONE: Errore critico in fase di registrazione, contattare l\'assistenza!</string>
+    <string name="reg_data_upload_error">ATTENZIONE: Errore nel salvataggio dati sul database</string>
 </resources>

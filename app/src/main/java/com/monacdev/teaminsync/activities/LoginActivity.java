@@ -117,22 +117,24 @@ public class LoginActivity extends AppCompatActivity {
     private void registerUser(){
         String email = this.emailInputET.getText().toString();
         String password = this.passwordET.getText().toString();
-        this.loaderDialog.show(getString(R.string.register_load_msg));
-        this.authClient.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-            this.loaderDialog.hide();
-            if(task.isSuccessful()){
-                FirebaseUser loggedUser = authClient.getCurrentUser();
-                Toast.makeText(LoginActivity.this, R.string.register_ok, Toast.LENGTH_SHORT).show();
-                if(loggedUser != null){
-                    RegistrationWizardFragment wizard = RegistrationWizardFragment.newInstance(loggedUser.getEmail());
-                    wizard.show(getSupportFragmentManager(), NavigationTags.REG_WIZARD);
-                } else {
-                    Toast.makeText(LoginActivity.this, R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(LoginActivity.this, R.string.register_err, Toast.LENGTH_SHORT).show();
-            }
-        });
+        RegistrationWizardFragment wizard = RegistrationWizardFragment.newInstance(email, password);
+        wizard.show(getSupportFragmentManager(), NavigationTags.REG_WIZARD);
+//        this.loaderDialog.show(getString(R.string.register_load_msg));
+//        this.authClient.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+//            this.loaderDialog.hide();
+//            if(task.isSuccessful()){
+//                FirebaseUser loggedUser = authClient.getCurrentUser();
+//                Toast.makeText(LoginActivity.this, R.string.register_ok, Toast.LENGTH_SHORT).show();
+//                if(loggedUser != null){
+//                    RegistrationWizardFragment wizard = RegistrationWizardFragment.newInstance(loggedUser.getEmail());
+//                    wizard.show(getSupportFragmentManager(), NavigationTags.REG_WIZARD);
+//                } else {
+//                    Toast.makeText(LoginActivity.this, R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
+//                }
+//            } else {
+//                Toast.makeText(LoginActivity.this, R.string.register_err, Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
     /**

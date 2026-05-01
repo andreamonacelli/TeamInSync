@@ -23,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.adapters.NotificationListAdapter;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
 import com.monacdev.teaminsync.constants.KeyStrings;
 import com.monacdev.teaminsync.constants.ReferenceStrings;
 import com.monacdev.teaminsync.constants.NotificationsKeys;
@@ -41,6 +42,7 @@ public class NotificationsFragment extends DialogFragment {
     private TextView notificationDetailMessageTV;
     private Button backToNotificationsListBtn;
     private String loggedUsername;
+    private boolean showingNotificationDetails = false;
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private LoaderDialog loaderDialog;
 
@@ -69,9 +71,27 @@ public class NotificationsFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.fragment_notifications, null);
         this.bindViewsToObjects(view);
         this.setListeners();
+        if(savedInstanceState != null){
+            this.showingNotificationDetails = savedInstanceState.getBoolean(IntentExtrasTags.NOTIFICATIONS_DETAILS_STATE_KEY);
+            if(this.showingNotificationDetails){
+                String savedTitle = savedInstanceState.getString(IntentExtrasTags.NOTIFICATIONS_TITLE_STATE_KEY);
+                String savedMessage = savedInstanceState.getString(IntentExtrasTags.NOTIFICATIONS_MESSAGE_STATE_KEY);
+                this.showNotificationsDetails(savedTitle, savedMessage);
+            }
+        }
         this.fetchNotifications();
         dialogBuilder.setView(view);
         return dialogBuilder.create();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(IntentExtrasTags.NOTIFICATIONS_DETAILS_STATE_KEY, this.showingNotificationDetails);
+        if(this.showingNotificationDetails){
+            outState.putString(IntentExtrasTags.NOTIFICATIONS_TITLE_STATE_KEY, this.notificationDetailTitleTV.getText().toString());
+            outState.putString(IntentExtrasTags.NOTIFICATIONS_MESSAGE_STATE_KEY, this.notificationDetailMessageTV.getText().toString());
+        }
     }
 
     /**
@@ -95,6 +115,7 @@ public class NotificationsFragment extends DialogFragment {
     private void setListeners(){
         this.closeNotificationsBtn.setOnClickListener(view -> dismiss());
         this.backToNotificationsListBtn.setOnClickListener(view -> {
+            this.showingNotificationDetails = false;
             this.notificationsDetailLayout.setVisibility(View.GONE);
             this.notificationsListRV.setVisibility(View.VISIBLE);
         });
@@ -119,12 +140,16 @@ public class NotificationsFragment extends DialogFragment {
                             Collections.reverse(notificationsList);
                             NotificationListAdapter notificationsAdapter = new NotificationListAdapter(notificationsList, NotificationsFragment.this);
                             NotificationsFragment.this.notificationsListRV.setAdapter(notificationsAdapter);
-                            NotificationsFragment.this.notificationsListRV.setVisibility(View.VISIBLE);
-                            NotificationsFragment.this.emptyNotificationsTV.setVisibility(View.GONE);
+                            if(!NotificationsFragment.this.showingNotificationDetails) {
+                                NotificationsFragment.this.notificationsListRV.setVisibility(View.VISIBLE);
+                                NotificationsFragment.this.emptyNotificationsTV.setVisibility(View.GONE);
+                            }
                         } else {
-                            /* If there are no notifications for the current user display the respective TextView */
-                            NotificationsFragment.this.notificationsListRV.setVisibility(View.GONE);
-                            NotificationsFragment.this.emptyNotificationsTV.setVisibility(View.VISIBLE);
+                            if(!NotificationsFragment.this.showingNotificationDetails) {
+                                /* If there are no notifications for the current user display the respective TextView */
+                                NotificationsFragment.this.notificationsListRV.setVisibility(View.GONE);
+                                NotificationsFragment.this.emptyNotificationsTV.setVisibility(View.VISIBLE);
+                            }
                         }
                     }
 
@@ -161,6 +186,7 @@ public class NotificationsFragment extends DialogFragment {
      * @param message the content of the selected notification
      */
     public void showNotificationsDetails(String title, String message){
+        this.showingNotificationDetails = true;
         this.notificationsListRV.setVisibility(View.GONE);
         this.notificationDetailTitleTV.setText(title);
         this.notificationDetailMessageTV.setText(message);
