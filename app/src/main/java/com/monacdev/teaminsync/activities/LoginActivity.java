@@ -40,6 +40,8 @@ public class LoginActivity extends AppCompatActivity {
     private LoaderDialog loaderDialog;
     private final FirebaseAuth authClient = FirebaseAuth.getInstance();
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+    private Query firebasePendingQuery;
+    private ValueEventListener firebasePendingListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,24 @@ public class LoginActivity extends AppCompatActivity {
         this.loaderDialog = new LoaderDialog(this);
         this.bindViewsToObjects();
         this.setListeners();
+
+        /* Consistency check to deal with eventual partially completed authentication process interrupted by screen rotation */
+        FirebaseUser loggedUser = this.authClient.getCurrentUser();
+        if(loggedUser != null){
+            this.loaderDialog.show(getString(R.string.sign_in_load_msg));
+            this.navigateToNextActivity(loggedUser);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(this.firebasePendingQuery != null && this.firebasePendingListener != null){
+            this.firebasePendingQuery.removeEventListener(this.firebasePendingListener);
+        }
+        if(this.loaderDialog != null){
+            this.loaderDialog.hide();
+        }
+        super.onDestroy();
     }
 
     /**
@@ -71,19 +91,18 @@ public class LoginActivity extends AppCompatActivity {
      * Defines the listeners for the View components within the current activity
      */
     private void setListeners(){
-        /* Binding listeners to buttons */
         this.signInBtn.setOnClickListener(view -> {
             if(emailInputET.getText().toString().isEmpty() || passwordET.getText().toString().isEmpty()){
                 Toast.makeText(LoginActivity.this, R.string.form_not_compiled, Toast.LENGTH_SHORT).show();
             } else {
-                userSignIn();
+                this.userSignIn();
             }
         });
         this.registerBtn.setOnClickListener(view -> {
             if(emailInputET.getText().toString().isEmpty() || passwordET.getText().toString().isEmpty()){
                 Toast.makeText(LoginActivity.this, R.string.form_not_compiled, Toast.LENGTH_SHORT).show();
             } else {
-                registerUser();
+                this.registerUser();
             }
         });
     }
@@ -95,17 +114,18 @@ public class LoginActivity extends AppCompatActivity {
         String email = this.emailInputET.getText().toString();
         String password = this.passwordET.getText().toString();
         this.loaderDialog.show(getString(R.string.sign_in_load_msg));
-        this.authClient.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-            this.loaderDialog.hide();
+        this.authClient.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
             if(task.isSuccessful()){
                 FirebaseUser loggedUser = authClient.getCurrentUser();
                 Toast.makeText(LoginActivity.this, R.string.auth_ok, Toast.LENGTH_SHORT).show();
                 if(loggedUser != null){
                     navigateToNextActivity(loggedUser);
                 } else {
+                    this.loaderDialog.hide();
                     Toast.makeText(LoginActivity.this, R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
                 }
             } else {
+                this.loaderDialog.hide();
                 Toast.makeText(LoginActivity.this, R.string.auth_generic_err, Toast.LENGTH_SHORT).show();
             }
         });
@@ -115,26 +135,14 @@ public class LoginActivity extends AppCompatActivity {
      * Manages User Creation procedure leveraging Firebase API
      */
     private void registerUser(){
+        /* Check needed to avoid multiple instances of the fragment to be loaded */
+        if(getSupportFragmentManager().isStateSaved() || getSupportFragmentManager().findFragmentByTag(NavigationTags.REG_WIZARD) != null){
+            return;
+        }
         String email = this.emailInputET.getText().toString();
         String password = this.passwordET.getText().toString();
         RegistrationWizardFragment wizard = RegistrationWizardFragment.newInstance(email, password);
         wizard.show(getSupportFragmentManager(), NavigationTags.REG_WIZARD);
-//        this.loaderDialog.show(getString(R.string.register_load_msg));
-//        this.authClient.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-//            this.loaderDialog.hide();
-//            if(task.isSuccessful()){
-//                FirebaseUser loggedUser = authClient.getCurrentUser();
-//                Toast.makeText(LoginActivity.this, R.string.register_ok, Toast.LENGTH_SHORT).show();
-//                if(loggedUser != null){
-//                    RegistrationWizardFragment wizard = RegistrationWizardFragment.newInstance(loggedUser.getEmail());
-//                    wizard.show(getSupportFragmentManager(), NavigationTags.REG_WIZARD);
-//                } else {
-//                    Toast.makeText(LoginActivity.this, R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
-//                }
-//            } else {
-//                Toast.makeText(LoginActivity.this, R.string.register_err, Toast.LENGTH_SHORT).show();
-//            }
-//        });
     }
 
     /**
@@ -143,10 +151,18 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void navigateToNextActivity(FirebaseUser loggedUser){
         String userEmail = loggedUser.getEmail();
-        Query q = this.dbRef.getDatabase().getReference(ReferenceStrings.USERS).orderByChild(KeyStrings.EMAIL).equalTo(userEmail);
-        q.addListenerForSingleValueEvent(new ValueEventListener() {
+        if(userEmail == null){
+            this.loaderDialog.hide();
+            return;
+        }
+        this.firebasePendingQuery = this.dbRef.child(ReferenceStrings.USERS).orderByChild(KeyStrings.EMAIL).equalTo(userEmail);
+        this.firebasePendingListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(isFinishing() || isDestroyed()){
+                    return;
+                }
+                LoginActivity.this.loaderDialog.hide();
                 if(snapshot.exists()){
                     for(DataSnapshot userSnapshot : snapshot.getChildren()){
                         String loggedUserID = userSnapshot.getKey();
@@ -158,17 +174,23 @@ public class LoginActivity extends AppCompatActivity {
                         }
                         startActivity(intent);
                         finish();
+                        break;
                     }
                 } else {
-                    Toast.makeText(LoginActivity.this, "ATTENZIONE: Utente con mail " + userEmail + " non trovato nel sistema!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, getString(R.string.error_user_not_found, userEmail), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                if(isFinishing() || isDestroyed()){
+                    return;
+                }
+                LoginActivity.this.loaderDialog.hide();
                 Toast.makeText(LoginActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+        this.firebasePendingQuery.addListenerForSingleValueEvent(this.firebasePendingListener);
     }
 
     /**
