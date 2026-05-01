@@ -68,13 +68,13 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         if(this.firebasePendingQuery != null && this.firebasePendingListener != null){
             this.firebasePendingQuery.removeEventListener(this.firebasePendingListener);
         }
         if(this.loaderDialog != null){
             this.loaderDialog.hide();
         }
-        super.onDestroy();
     }
 
     /**
