@@ -54,13 +54,13 @@ dependencies {
     implementation libs.activity
     implementation libs.constraintlayout
     implementation libs.recyclerview
-    implementation platform('com.google.firebase:firebase-bom:34.9.0')
+    implementation platform(libs.firebase.bom)
     implementation libs.firebase.auth
-    implementation 'com.google.firebase:firebase-database:22.0.1'
-    implementation 'com.github.bumptech.glide:glide:5.0.5'
-    implementation 'androidx.core:core-splashscreen:1.2.0'
-    implementation 'com.onesignal:OneSignal:5.7.2'
-    implementation 'com.cloudinary:cloudinary-android:3.1.2'
+    implementation libs.firebase.database
+    implementation libs.glide
+    implementation libs.core.splashscreen
+    implementation libs.onesignal
+    implementation libs.cloudinary.android
     implementation libs.legacy.support.v4
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

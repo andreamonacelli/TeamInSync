@@ -1,6 +1,5 @@
 package com.monacdev.teaminsync.activities;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private String loggedUserUsername;
     private String loggedUserName;
     private String loggedUserSurname;
+    private Handler logoutHandler;
     private ImageView teamLogoIV;
     private TextView homepageHeaderTV;
     private Button toTrainingPageBtn;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton logoutBtn;
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private LoaderDialog loaderDialog;
+    private AlertDialog logoutConfirmationDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
         this.loaderDialog = new LoaderDialog(this);
         this.bindViewsWithObjects();
-        this.populateDataFromDB();
         this.setListeners();
     }
 
@@ -78,6 +79,20 @@ public class MainActivity extends AppCompatActivity {
         this.populateDataFromDB();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(this.logoutHandler != null) {
+            this.logoutHandler.removeCallbacksAndMessages(null);
+        }
+        if(this.loaderDialog != null){
+            this.loaderDialog.hide();
+        }
+        if(this.logoutConfirmationDialog != null && this.logoutConfirmationDialog.isShowing()){
+            this.logoutConfirmationDialog.dismiss();
+        }
+    }
+
     /**
      * Binds the Views defined within the XML layout file for the activity to their respective Java objects
      */
@@ -85,7 +100,9 @@ public class MainActivity extends AppCompatActivity {
         this.teamLogoIV = findViewById(R.id.teamLogoIV);
         this.homepageHeaderTV = findViewById(R.id.homepageHeaderTV);
         this.toTrainingPageBtn = findViewById(R.id.toTrainingPageBtn);
+        this.toTrainingPageBtn.setEnabled(false);
         this.squadListBtn = findViewById(R.id.squadListBtn);
+        this.squadListBtn.setEnabled(false);
         this.teamNameTV = findViewById(R.id.teamNameTV);
         this.leagueNameTV = findViewById(R.id.leagueNameTV);
         this.cityStadiumTV = findViewById(R.id.cityStadiumTV);
@@ -109,8 +126,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(trainingPageIntent);
         });
         this.openNotificationsBtn.setOnClickListener(view -> {
-            NotificationsFragment notificationsDialog = NotificationsFragment.newInstance(loggedUserUsername);
-            notificationsDialog.show(getSupportFragmentManager(), NavigationTags.NOTIFICATIONS_FRAGMENT);
+            if(!getSupportFragmentManager().isStateSaved() && this.loggedUserUsername != null){
+                NotificationsFragment notificationsDialog = NotificationsFragment.newInstance(loggedUserUsername);
+                notificationsDialog.show(getSupportFragmentManager(), NavigationTags.NOTIFICATIONS_FRAGMENT);
+            }
         });
         this.logoutBtn.setOnClickListener(view -> MainActivity.this.handleLogoutConfirmation());
     }
@@ -121,24 +140,34 @@ public class MainActivity extends AppCompatActivity {
     private void populateDataFromDB(){
         Intent callerIntent = this.getIntent();
         this.loggedUserUsername = callerIntent.getStringExtra(IntentExtrasTags.LOGGED_USER);
+        if(this.loggedUserUsername == null || this.loggedUserUsername.isEmpty()){
+            return;
+        }
         DatabaseReference userRef = this.dbRef.child(ReferenceStrings.USERS).child(this.loggedUserUsername);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
                 if(snapshot.exists()){
                     loggedUserName = snapshot.child(KeyStrings.NAME).getValue(String.class);
                     loggedUserSurname = snapshot.child(KeyStrings.SURNAME).getValue(String.class);
-                    homepageHeaderTV.setText(String.format("%s %s", getResources().getText(R.string.homepage_welcome), loggedUserName));
+                    homepageHeaderTV.setText(String.format("%s %s", getResources().getText(R.string.homepage_welcome), loggedUserName != null ? loggedUserName : getString(R.string.user_default_label)));
                     teamID = snapshot.child(KeyStrings.TEAM).getValue(String.class);
                     if(teamID != null && !teamID.isEmpty()){
-                        fetchTeamData(teamID);
+                        MainActivity.this.squadListBtn.setEnabled(true);
+                        MainActivity.this.toTrainingPageBtn.setEnabled(true);
+                        MainActivity.this.fetchTeamData(teamID);
                     }
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                if(!isFinishing() && !isDestroyed()) {
+                    Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -152,6 +181,9 @@ public class MainActivity extends AppCompatActivity {
         teamRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
                 if(snapshot.exists()){
                     String teamName = snapshot.child(KeyStrings.NAME).getValue(String.class);
                     String leagueName = snapshot.child(KeyStrings.LEAGUE).getValue(String.class);
@@ -168,16 +200,18 @@ public class MainActivity extends AppCompatActivity {
                         cityStadiumTV.setText(String.format("%s - %s", stadium, address));
                     }
                     if(logoPath != null && !logoPath.isEmpty()){
-                        Glide.with(MainActivity.this).load(logoPath).circleCrop().into(teamLogoIV);
+                        Glide.with(MainActivity.this).load(logoPath).circleCrop().into(MainActivity.this.teamLogoIV);
                     } else {
-                        teamLogoIV.setImageResource(R.mipmap.ic_launcher);
+                        Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).circleCrop().into(MainActivity.this.teamLogoIV);
                     }
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                if(!isFinishing() && !isDestroyed()){
+                    Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -196,7 +230,11 @@ public class MainActivity extends AppCompatActivity {
         FirebaseAuth.getInstance().signOut();
         OneSignal.logout();
         /* Delay activity destruction to allow OneSignal to complete logout */
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+        this.logoutHandler = new Handler(Looper.getMainLooper());
+        this.logoutHandler.postDelayed(() -> {
+            if (isFinishing() || isDestroyed()) {
+                return;
+            }
             /* Rerouting to the Login Activity while contextually clearing the previous activity stack */
             Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -214,7 +252,10 @@ public class MainActivity extends AppCompatActivity {
         dialogBuilder.setTitle(R.string.confirm_logout);
         dialogBuilder.setPositiveButton(R.string.confirm, (dialogInterface, i) -> MainActivity.this.logoutUser());
         dialogBuilder.setNegativeButton(R.string.cancel, (dialogInterface, i) -> Log.i(NavigationTags.LOGOUT_CANCELED, Constants.LOGOUT_CANCELED_MSG));
-        AlertDialog logoutDialog = dialogBuilder.create();
-        logoutDialog.show();
+        if(this.logoutConfirmationDialog != null && this.logoutConfirmationDialog.isShowing()){
+            this.logoutConfirmationDialog.dismiss();
+        }
+        this.logoutConfirmationDialog = dialogBuilder.create();
+        this.logoutConfirmationDialog.show();
     }
 }
