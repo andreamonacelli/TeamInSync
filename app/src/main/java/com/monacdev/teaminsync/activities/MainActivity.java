@@ -35,6 +35,7 @@ import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.fragments.NotificationsFragment;
 import com.monacdev.teaminsync.constants.Constants;
 import com.monacdev.teaminsync.loaders.LoaderDialog;
+import com.onesignal.Continue;
 import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         this.loaderDialog = new LoaderDialog(this);
         this.bindViewsWithObjects();
         this.setListeners();
+        OneSignal.getNotifications().requestPermission(true, Continue.with(r -> Log.i("no_action_needed", "No action is needed, OneSignal initialization completed!")));
     }
 
     @Override

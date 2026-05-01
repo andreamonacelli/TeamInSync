@@ -113,4 +113,5 @@
     <string name="reg_data_upload_error">WARNING: Error while uploading data to the database</string>
     <string name="error_user_not_found">WARNING: User having e-mail %1$s not found in the system!</string>
     <string name="user_default_label">user</string>
+    <string name="error_invalid_user">WARNING: Error while loading user, invalid user selected!</string>
 </resources>

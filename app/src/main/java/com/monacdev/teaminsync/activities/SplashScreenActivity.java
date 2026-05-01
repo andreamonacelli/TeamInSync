@@ -4,7 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,12 +17,12 @@ import com.monacdev.teaminsync.constants.IntentExtrasTags;
 import com.monacdev.teaminsync.utils.CloudinaryManager;
 import com.monacdev.teaminsync.constants.Constants;
 import com.monacdev.teaminsync.utils.PushNotificationsManager;
-import com.onesignal.Continue;
 import com.onesignal.OneSignal;
 import com.onesignal.debug.LogLevel;
 
 @SuppressLint("CustomSplashScreen")
 public class SplashScreenActivity extends AppCompatActivity {
+    private Handler routingHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +30,17 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         this.initializeNotificationsSystem();
-        CloudinaryManager.init(this);
-        this.defineNextRoute();
+        CloudinaryManager.init(getApplicationContext());
+        this.routingHandler = new Handler(Looper.getMainLooper());
+        this.routingHandler.postDelayed(this::defineNextRoute, 1500);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(this.routingHandler != null){
+            this.routingHandler.removeCallbacksAndMessages(null);
+        }
     }
 
     /**
@@ -50,7 +60,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 return;
             }
         }
-        /* If we get to this part of the code it means that for some reason no user was logged beforehand */
+        /* If we get to this part of the code it means that no user was logged beforehand */
         Intent loginIntent = new Intent(SplashScreenActivity.this, LoginActivity.class);
         startActivity(loginIntent);
         finish();
@@ -61,7 +71,6 @@ public class SplashScreenActivity extends AppCompatActivity {
      */
     private void initializeNotificationsSystem(){
         OneSignal.getDebug().setAlertLevel(LogLevel.FATAL);
-        OneSignal.initWithContext(SplashScreenActivity.this, PushNotificationsManager.ONESIGNAL_APP_ID);
-        OneSignal.getNotifications().requestPermission(true, Continue.with(r -> Log.i("no_action_needed", "No action is needed, OneSignal initialization completed!")));
+        OneSignal.initWithContext(getApplicationContext(), PushNotificationsManager.ONESIGNAL_APP_ID);
     }
 }

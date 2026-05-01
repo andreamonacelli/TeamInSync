@@ -74,6 +74,14 @@ public class ProfileActivity extends AppCompatActivity {
         this.setListeners();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(this.loaderDialog != null){
+            this.loaderDialog.hide();
+        }
+    }
+
     /**
      * Binds the Views defined within the XML layout file for the activity to their respective Java objects
      */
@@ -92,12 +100,8 @@ public class ProfileActivity extends AppCompatActivity {
      * Defines the listeners for the View components within the current activity
      */
     private void setListeners(){
-        this.toSquadListBtn.setOnClickListener(view -> {
-            /* We can safely assume that we got here from either the squad list page */
-            finish();
-        });
+        this.toSquadListBtn.setOnClickListener(view -> finish());
         this.toMyTrainingsPageBtn.setOnClickListener(view -> {
-            /* Here we are navigating to the page containing the training of the displayed user which might not be the logged one! */
             Intent trainingsIntent = new Intent(ProfileActivity.this, TrainingActivity.class);
             trainingsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER, displayedUserID);
             trainingsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER_SURNAME, displayedUserSurname);
@@ -113,11 +117,19 @@ public class ProfileActivity extends AppCompatActivity {
      * Given the user that is displayed in the page, fetch its data from the Firebase DB
      */
     private void fillUserDataFromDB(){
+        if(this.displayedUserID == null || this.displayedUserID.isEmpty()){
+            Toast.makeText(this, R.string.error_invalid_user, Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         DatabaseReference userRef = this.dbRef.child(ReferenceStrings.USERS).child(this.displayedUserID);
         this.loaderDialog.show(getString(R.string.loading_user_msg));
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
                 ProfileActivity.this.loaderDialog.hide();
                 if(snapshot.exists()){
                     String name = snapshot.child(KeyStrings.NAME).getValue(String.class);

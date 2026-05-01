@@ -117,4 +117,5 @@
     <string name="reg_data_upload_error">ATTENZIONE: Errore nel salvataggio dati sul database</string>
     <string name="error_user_not_found">ATTENZIONE: Utente con mail %1$s non trovato nel sistema!</string>
     <string name="user_default_label">utente</string>
+    <string name="error_invalid_user">ATTENZIONE: Errore nel caricamento dell\'utente, utente non valido!</string>
 </resources>
