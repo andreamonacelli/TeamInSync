@@ -31,7 +31,7 @@ public class MemberViewHolder extends RecyclerView.ViewHolder {
      * Handles the binding of given user data to the actual view that will be drawn on screen
      * @param userData the data to be shown in the view
      */
-    public void bindData(HashMap<String, String> userData){
+    public void bindData(@NonNull HashMap<String, String> userData){
         this.setUpTextViews(
                 userData.get(KeyStrings.NAME),
                 userData.get(KeyStrings.SURNAME),
@@ -43,7 +43,6 @@ public class MemberViewHolder extends RecyclerView.ViewHolder {
             Intent memberDetailsIntent = new Intent(itemView.getContext(), ProfileActivity.class);
             memberDetailsIntent.putExtra(IntentExtrasTags.DISPLAYED_USER, userData.get(KeyStrings.USERNAME));
             itemView.getContext().startActivity(memberDetailsIntent);
-            /* Here we do not have to terminate the activity because we can get back here later on */
         });
     }
 
@@ -81,7 +80,6 @@ public class MemberViewHolder extends RecyclerView.ViewHolder {
         } else {
             fallbackImageId = R.drawable.ic_athlete;
         }
-        /* Loading the image using Glide and its methods */
         Glide.with(itemView.getContext()).load(imagePath)
                 .placeholder(fallbackImageId)
                 .error(fallbackImageId)

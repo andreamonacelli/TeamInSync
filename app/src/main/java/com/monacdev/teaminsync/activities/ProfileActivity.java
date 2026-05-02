@@ -127,9 +127,6 @@ public class ProfileActivity extends AppCompatActivity {
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (isFinishing() || isDestroyed()) {
-                    return;
-                }
                 ProfileActivity.this.loaderDialog.hide();
                 if(snapshot.exists()){
                     String name = snapshot.child(KeyStrings.NAME).getValue(String.class);
@@ -158,6 +155,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                ProfileActivity.this.loaderDialog.hide();
                 Toast.makeText(ProfileActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
         });
@@ -204,7 +202,7 @@ public class ProfileActivity extends AppCompatActivity {
      * Given the DataSnapshot for the user, populates the map that should eventually be given to the edit page
      * @param snapshot the DataSnapshot for the displayed user
      */
-    private void populateEditData(DataSnapshot snapshot){
+    private void populateEditData(@NonNull DataSnapshot snapshot){
         String name = snapshot.child(KeyStrings.NAME).getValue(String.class);
         String surname = snapshot.child(KeyStrings.SURNAME).getValue(String.class);
         String birthDate = snapshot.child(KeyStrings.BIRTHDATE).getValue(String.class);

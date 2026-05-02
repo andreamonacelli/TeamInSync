@@ -119,7 +119,7 @@ public class LoginActivity extends AppCompatActivity {
                 FirebaseUser loggedUser = authClient.getCurrentUser();
                 Toast.makeText(LoginActivity.this, R.string.auth_ok, Toast.LENGTH_SHORT).show();
                 if(loggedUser != null){
-                    navigateToNextActivity(loggedUser);
+                    this.navigateToNextActivity(loggedUser);
                 } else {
                     this.loaderDialog.hide();
                     Toast.makeText(LoginActivity.this, R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
@@ -136,7 +136,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void registerUser(){
         /* Check needed to avoid multiple instances of the fragment to be loaded */
-        if(getSupportFragmentManager().isStateSaved() || getSupportFragmentManager().findFragmentByTag(NavigationTags.REG_WIZARD) != null){
+        if(getSupportFragmentManager().findFragmentByTag(NavigationTags.REG_WIZARD) != null){
             return;
         }
         String email = this.emailInputET.getText().toString();
@@ -149,7 +149,7 @@ public class LoginActivity extends AppCompatActivity {
      * Manages user data retrieval from the Firebase DB and switches to the HomePage
      * @param loggedUser instance of the user that just logged in
      */
-    private void navigateToNextActivity(FirebaseUser loggedUser){
+    private void navigateToNextActivity(@NonNull FirebaseUser loggedUser){
         String userEmail = loggedUser.getEmail();
         if(userEmail == null){
             this.loaderDialog.hide();
@@ -159,9 +159,6 @@ public class LoginActivity extends AppCompatActivity {
         this.firebasePendingListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(isFinishing() || isDestroyed()){
-                    return;
-                }
                 LoginActivity.this.loaderDialog.hide();
                 if(snapshot.exists()){
                     for(DataSnapshot userSnapshot : snapshot.getChildren()){
@@ -183,9 +180,6 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                if(isFinishing() || isDestroyed()){
-                    return;
-                }
                 LoginActivity.this.loaderDialog.hide();
                 Toast.makeText(LoginActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
             }

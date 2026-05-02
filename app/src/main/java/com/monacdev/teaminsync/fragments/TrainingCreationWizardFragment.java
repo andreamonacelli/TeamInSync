@@ -52,6 +52,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private LoaderDialog loaderDialog;
 
+    @NonNull
     public static TrainingCreationWizardFragment newInstance(String teamID, String coachID) {
         final TrainingCreationWizardFragment fragment = new TrainingCreationWizardFragment();
         final Bundle args = new Bundle();
@@ -74,7 +75,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(requireActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.fragment_training_creation_wizard, null);
         this.bindViewsToObjects(view);
@@ -87,7 +88,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
      * Binds the Views defined within the XML layout file for the activity to their respective Java objects
      * @param view The view to be taken as reference for the binding
      */
-    private void bindViewsToObjects(View view){
+    private void bindViewsToObjects(@NonNull View view){
         this.trainingTitleET = view.findViewById(R.id.trainingTitleET);
         this.trainingTypeRG = view.findViewById(R.id.trainingTypeRG);
         this.trainingTargetET = view.findViewById(R.id.trainingTargetET);
@@ -136,7 +137,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), R.string.connection_err, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -168,7 +169,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
         this.dbRef.updateChildren(multiUploadMap).addOnCompleteListener(task -> {
             this.loaderDialog.hide();
             if(task.isSuccessful()){
-                Toast.makeText(getContext(), R.string.exercise_added, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.exercise_added, Toast.LENGTH_SHORT).show();
                 if(completionEffect.equals(Constants.EFFECT_DISMISS)){
                     dismiss();
                     PushNotificationsManager.sendPushNotification(
@@ -177,10 +178,10 @@ public class TrainingCreationWizardFragment extends DialogFragment {
                             getString(R.string.push_new_training_body)
                     );
                 } else {
-                    clearInputFields();
+                    TrainingCreationWizardFragment.this.clearInputFields();
                 }
             } else {
-                Toast.makeText(getContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.upload_error_label, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -189,6 +190,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
      * Creates a HashMap containing all the data related to the training, ready to be uploaded to the Firebase DB
      * @return the HashMap containing all the training data
      */
+    @NonNull
     private HashMap<String, Object> prepareDataForUpload(){
         HashMap<String, Object> trainingData = new HashMap<>();
         String title = this.trainingTitleET.getText().toString().trim();
@@ -218,14 +220,13 @@ public class TrainingCreationWizardFragment extends DialogFragment {
      * @param dueToDate should be a valid date in the format YYYY-MM-DD
      * @return <strong>true</strong> if all data is format-compliant, <strong>false</strong> otherwise
      */
-    private boolean validateInputData(String target, String dueToDate){
+    private boolean validateInputData(@NonNull String target, String dueToDate){
         if(target.isEmpty()){
             return false;
         }
         if(!target.matches("[0-9]*?[0-9]:[0-9][0-9]") && !target.matches("[0-9]+")){
             return false;
         }
-        /* Here we can assume that the checks on the target string have passed */
         try{
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             simpleDateFormat.setLenient(false);
@@ -240,6 +241,7 @@ public class TrainingCreationWizardFragment extends DialogFragment {
      * Prepares a HashMap containing all the notification info to be uploaded on the Firebase DB
      * @return the filled HashMap object
      */
+    @NonNull
     private HashMap<String, Object> prepareNotification(){
         HashMap<String, Object> notificationData = new HashMap<>();
         notificationData.put(NotificationsKeys.NOTIFICATIONS_TITLE, getString(R.string.push_new_training_title));

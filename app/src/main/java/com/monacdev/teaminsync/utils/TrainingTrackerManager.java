@@ -85,4 +85,16 @@ public class TrainingTrackerManager {
     public boolean isTimerRunning() {
         return this.timerRunning;
     }
+
+    public int getElapsedSeconds() {
+        return elapsedSeconds;
+    }
+
+    public void setElapsedSeconds(int elapsedSeconds) {
+        this.elapsedSeconds = elapsedSeconds;
+    }
+
+    public void setTargetReachedMsgSent(boolean targetReachedMsgSent) {
+        this.targetReachedMsgSent = targetReachedMsgSent;
+    }
 }

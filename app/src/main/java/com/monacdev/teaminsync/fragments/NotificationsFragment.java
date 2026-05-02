@@ -46,7 +46,8 @@ public class NotificationsFragment extends DialogFragment {
     private final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
     private LoaderDialog loaderDialog;
 
-    public static NotificationsFragment newInstance(String loggedUsername){
+    @NonNull
+    public static NotificationsFragment newInstance(@NonNull String loggedUsername){
         NotificationsFragment fragment = new NotificationsFragment();
         Bundle args = new Bundle();
         args.putString(KeyStrings.USERNAME, loggedUsername);
@@ -66,7 +67,7 @@ public class NotificationsFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(requireActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.fragment_notifications, null);
         this.bindViewsToObjects(view);
@@ -94,14 +95,22 @@ public class NotificationsFragment extends DialogFragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(this.loaderDialog != null){
+            this.loaderDialog.hide();
+        }
+    }
+
     /**
      * Binds the Views defined within the XML layout file for the activity to their respective Java objects
      * @param view The view to be taken as reference for the binding
      */
-    private void bindViewsToObjects(View view){
+    private void bindViewsToObjects(@NonNull View view){
         this.emptyNotificationsTV = view.findViewById(R.id.emptyNotificationsTV);
         this.notificationsListRV = view.findViewById(R.id.notificationsListRV);
-        this.notificationsListRV.setLayoutManager(new LinearLayoutManager(getContext()));
+        this.notificationsListRV.setLayoutManager(new LinearLayoutManager(requireContext()));
         this.closeNotificationsBtn = view.findViewById(R.id.closeNotificationsBtn);
         this.notificationsDetailLayout = view.findViewById(R.id.notificationDetailLayout);
         this.notificationDetailTitleTV = view.findViewById(R.id.notificationDetailTitleTV);
@@ -146,7 +155,6 @@ public class NotificationsFragment extends DialogFragment {
                             }
                         } else {
                             if(!NotificationsFragment.this.showingNotificationDetails) {
-                                /* If there are no notifications for the current user display the respective TextView */
                                 NotificationsFragment.this.notificationsListRV.setVisibility(View.GONE);
                                 NotificationsFragment.this.emptyNotificationsTV.setVisibility(View.VISIBLE);
                             }
@@ -156,7 +164,7 @@ public class NotificationsFragment extends DialogFragment {
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         NotificationsFragment.this.loaderDialog.hide();
-                        Toast.makeText(getContext(), R.string.connection_err, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), R.string.connection_err, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -166,7 +174,8 @@ public class NotificationsFragment extends DialogFragment {
      * @param notificationSnapshot the DataSnapshot received from Firebase
      * @return a HashMap containing all the parsed data
      */
-    private HashMap<String, Object> parseNotification(DataSnapshot notificationSnapshot){
+    @NonNull
+    private HashMap<String, Object> parseNotification(@NonNull DataSnapshot notificationSnapshot){
         HashMap<String, Object> notificationData = new HashMap<>();
         notificationData.put(NotificationsKeys.NOTIFICATIONS_UID, notificationSnapshot.getKey());
         notificationData.put(KeyStrings.USERNAME, this.loggedUsername);

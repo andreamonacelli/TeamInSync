@@ -65,7 +65,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
      * Handles the binding of given training exercise data to the actual view that will be drawn on screen
      * @param trainingData the data to be shown in the view
      */
-    public void bindData(HashMap<String, String> trainingData){
+    public void bindData(@NonNull HashMap<String, String> trainingData){
         this.fillTextFields(
                 trainingData.get(KeyStrings.TRAINING_TITLE),
                 trainingData.get(KeyStrings.TRAINING_TARGET),

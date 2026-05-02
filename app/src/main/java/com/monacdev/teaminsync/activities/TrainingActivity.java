@@ -71,7 +71,12 @@ public class TrainingActivity extends AppCompatActivity {
         this.isDisplayedUserLogged();
         this.trainingPageHeaderTV.setText(String.format("%s %s", getString(R.string.training_list_header), displayedUserSurname));
         this.trainingTrackerFragmentContainer = findViewById(R.id.trainingTrackerFragmentContainer);
-        this.trainingTrackerFragmentContainer.setVisibility(View.GONE);
+        if(savedInstanceState != null){
+            boolean isTrackerVisible = savedInstanceState.getBoolean(IntentExtrasTags.TRAINING_TRACKER_STATE_KEY);
+            this.trainingTrackerFragmentContainer.setVisibility(isTrackerVisible ? View.VISIBLE : View.GONE);
+        } else {
+            this.trainingTrackerFragmentContainer.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -79,6 +84,15 @@ public class TrainingActivity extends AppCompatActivity {
         super.onDestroy();
         if(this.loaderDialog != null){
             this.loaderDialog.hide();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(this.trainingTrackerFragmentContainer != null){
+            boolean isVisible = (this.trainingTrackerFragmentContainer.getVisibility() == View.VISIBLE);
+            outState.putBoolean(IntentExtrasTags.TRAINING_TRACKER_STATE_KEY, isVisible);
         }
     }
 
@@ -105,9 +119,6 @@ public class TrainingActivity extends AppCompatActivity {
             displayedUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(isFinishing() || isDestroyed()){
-                        return;
-                    }
                     String displayedUserRole = null;
                     if(snapshot.exists()){
                         viewedTeamID = snapshot.child(KeyStrings.TEAM).getValue(String.class);
@@ -123,20 +134,17 @@ public class TrainingActivity extends AppCompatActivity {
                         isMyTrainingList = false;
                     }
                     String roleForFetch = displayedUserRole != null ? displayedUserRole : Constants.PLAYER_ROLE_STRING;
-                    TrainingActivity.this.fetchTrainingsFromDB(TrainingActivity.this.displayedUserID, roleForFetch);
+                    TrainingActivity.this.fetchTrainingsFromDB(roleForFetch);
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    if(isFinishing() || isDestroyed()){
-                        return;
-                    }
                     Toast.makeText(TrainingActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
-                    isMyTrainingList = false;
+                    TrainingActivity.this.isMyTrainingList = false;
                 }
             });
         } else {
-            isMyTrainingList = false;
+            this.isMyTrainingList = false;
         }
     }
 
@@ -145,7 +153,6 @@ public class TrainingActivity extends AppCompatActivity {
      */
     private void setAddTrainingBtnVisibility(String role){
         if(this.isMyTrainingList){
-            /* Actually useful only for buttons visibility's sake */
             if(role != null && role.equals(Constants.COACH_ROLE_STRING)){
                 this.createTrainingBtn.setVisibility(View.VISIBLE);
             } else {
@@ -168,86 +175,88 @@ public class TrainingActivity extends AppCompatActivity {
 
     /**
      * Fetches the list of trainings for the displayed user from the Firebase DB
-     * @param displayedUserID the user whose trainings are going to be displayed
      * @param role the role of the currently logged user
      */
-    private void fetchTrainingsFromDB(String displayedUserID, String role){
+    private void fetchTrainingsFromDB(String role){
         this.loaderDialog.show(getString(R.string.trainings_load_msg));
         ArrayList<HashMap<String, String>> exercisesList = new ArrayList<>();
-        Query q;
         if(role != null && role.equals(Constants.PLAYER_ROLE_STRING)){
-            /* Fetching workflow in case the displayed user is a player */
-            q = this.dbRef.child(ReferenceStrings.TRAININGS).child(displayedUserID);
-            q.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(isFinishing() || isDestroyed()){
-                        return;
-                    }
-                    exercisesList.clear();
-                    TrainingActivity.this.loaderDialog.hide();
-                    if(snapshot.exists()){
-                        for(DataSnapshot trainingSnapshot : snapshot.getChildren()){
-                            HashMap<String, String> training = parseTrainingDataFromSnapshot(trainingSnapshot);
-                            exercisesList.add(training);
-                        }
-                        TrainingListTileAdapter trainingsAdapter = new TrainingListTileAdapter(exercisesList, TrainingActivity.this.isMyTrainingList, false);
-                        TrainingActivity.this.trainingListRV.setAdapter(trainingsAdapter);
-                    } else {
-                        Toast.makeText(TrainingActivity.this, R.string.no_trainings_found, Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    if(isFinishing() || isDestroyed()){
-                        return;
-                    }
-                    TrainingActivity.this.loaderDialog.hide();
-                    Toast.makeText(TrainingActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
-                }
-            });
+            this.fetchTrainingsForAthlete(exercisesList);
         } else {
-            /* Fetching workflow in case the displayed user is a coach */
-            q = this.dbRef.child(ReferenceStrings.TRAININGS);
-            q.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(isFinishing() || isDestroyed()){
-                        return;
-                    }
-                    TrainingActivity.this.loaderDialog.hide();
-                    exercisesList.clear();
-                    ArrayList<String> trainingUIDs = new ArrayList<>();
-                    if(snapshot.exists()){
-                        for(DataSnapshot athleteTrainingSnapshot : snapshot.getChildren()){
-                            for(DataSnapshot trainingSnapshot : athleteTrainingSnapshot.getChildren()){
-                                String coachID = trainingSnapshot.child(Constants.COACH_ROLE_STRING).getValue(String.class);
-                                String exerciseUID = trainingSnapshot.getKey();
-                                if(coachID != null && coachID.equals(displayedUserID) && !trainingUIDs.contains(exerciseUID)){
-                                    trainingUIDs.add(exerciseUID);
-                                    HashMap<String, String> training = parseTrainingDataFromSnapshot(trainingSnapshot);
-                                    exercisesList.add(training);
-                                }
+            this.fetchTrainingsForCoach(exercisesList);
+        }
+    }
+
+    /**
+     * Performs the query to parse training data from the Firebase Real-Time DB in case the displayed
+     * user is a <strong>coach</strong>
+     * @param exercisesList the list that will contain the fetched trainings data
+     */
+    private void fetchTrainingsForCoach(ArrayList<HashMap<String, String>> exercisesList){
+        Query q = this.dbRef.child(ReferenceStrings.TRAININGS);
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                TrainingActivity.this.loaderDialog.hide();
+                exercisesList.clear();
+                ArrayList<String> trainingUIDs = new ArrayList<>();
+                if(snapshot.exists()){
+                    for(DataSnapshot athleteTrainingSnapshot : snapshot.getChildren()){
+                        for(DataSnapshot trainingSnapshot : athleteTrainingSnapshot.getChildren()){
+                            String coachID = trainingSnapshot.child(Constants.COACH_ROLE_STRING).getValue(String.class);
+                            String exerciseUID = trainingSnapshot.getKey();
+                            if(coachID != null && coachID.equals(TrainingActivity.this.displayedUserID) && !trainingUIDs.contains(exerciseUID)){
+                                trainingUIDs.add(exerciseUID);
+                                HashMap<String, String> training = parseTrainingDataFromSnapshot(trainingSnapshot);
+                                exercisesList.add(training);
                             }
                         }
-                        TrainingListTileAdapter trainingsAdapter = new TrainingListTileAdapter(exercisesList, false, true);
-                        TrainingActivity.this.trainingListRV.setAdapter(trainingsAdapter);
-                    } else {
-                        Toast.makeText(TrainingActivity.this, R.string.no_trainings_found, Toast.LENGTH_SHORT).show();
                     }
+                    TrainingListTileAdapter trainingsAdapter = new TrainingListTileAdapter(exercisesList, false, true);
+                    TrainingActivity.this.trainingListRV.setAdapter(trainingsAdapter);
+                } else {
+                    Toast.makeText(TrainingActivity.this, R.string.no_trainings_found, Toast.LENGTH_SHORT).show();
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    if(isFinishing() || isDestroyed()){
-                        return;
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                TrainingActivity.this.loaderDialog.hide();
+                Toast.makeText(TrainingActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Performs the query to parse training data from the Firebase Real-Time DB in case the displayed
+     * user is an <strong>athlete</strong>
+     * @param exercisesList the list that will contain the fetched trainings data
+     */
+    private void fetchTrainingsForAthlete(ArrayList<HashMap<String, String>> exercisesList){
+        Query q = this.dbRef.child(ReferenceStrings.TRAININGS).child(this.displayedUserID);
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                exercisesList.clear();
+                TrainingActivity.this.loaderDialog.hide();
+                if(snapshot.exists()){
+                    for(DataSnapshot trainingSnapshot : snapshot.getChildren()){
+                        HashMap<String, String> training = parseTrainingDataFromSnapshot(trainingSnapshot);
+                        exercisesList.add(training);
                     }
-                    TrainingActivity.this.loaderDialog.hide();
-                    Toast.makeText(TrainingActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    TrainingListTileAdapter trainingsAdapter = new TrainingListTileAdapter(exercisesList, TrainingActivity.this.isMyTrainingList, false);
+                    TrainingActivity.this.trainingListRV.setAdapter(trainingsAdapter);
+                } else {
+                    Toast.makeText(TrainingActivity.this, R.string.no_trainings_found, Toast.LENGTH_SHORT).show();
                 }
-            });
-        }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                TrainingActivity.this.loaderDialog.hide();
+                Toast.makeText(TrainingActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
@@ -255,7 +264,8 @@ public class TrainingActivity extends AppCompatActivity {
      * @param trainingSnapshot the DataSnapshot from which the data needs to be parsed
      * @return a HashMap containing the parsed data
      */
-    private HashMap<String, String> parseTrainingDataFromSnapshot(DataSnapshot trainingSnapshot){
+    @NonNull
+    private HashMap<String, String> parseTrainingDataFromSnapshot(@NonNull DataSnapshot trainingSnapshot){
         HashMap<String, String> training = new HashMap<>();
         training.put(KeyStrings.TRAINING_TITLE, trainingSnapshot.child(KeyStrings.TRAINING_TITLE).getValue(String.class));
         training.put(KeyStrings.TRAINING_TYPE, trainingSnapshot.child(KeyStrings.TRAINING_TYPE).getValue(String.class));

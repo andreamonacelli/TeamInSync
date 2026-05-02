@@ -49,7 +49,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder {
      * Handles the binding of given notification data to the actual view that will be drawn on screen
      * @param notificationData the data to be shown in the view
      */
-    public void bindData(HashMap<String, Object> notificationData){
+    public void bindData(@NonNull HashMap<String, Object> notificationData){
         String title = Objects.requireNonNull(notificationData.get(NotificationsKeys.NOTIFICATIONS_TITLE)).toString();
         String message = Objects.requireNonNull(notificationData.get(NotificationsKeys.NOTIFICATIONS_MSG)).toString();
         this.notificationTitleTV.setText(title);

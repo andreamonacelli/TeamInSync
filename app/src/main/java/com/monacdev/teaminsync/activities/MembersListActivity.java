@@ -71,9 +71,6 @@ public class MembersListActivity extends AppCompatActivity {
             this.teamFetchListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(isFinishing() || isDestroyed()){
-                        return;
-                    }
                     if (snapshot.exists()) {
                         String updatedTeamID = snapshot.child(KeyStrings.TEAM).getValue(String.class);
                         if (updatedTeamID != null) {
@@ -88,10 +85,8 @@ public class MembersListActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    if(!isFinishing() && !isDestroyed()){
-                        MembersListActivity.this.loaderDialog.hide();
-                        Toast.makeText(MembersListActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
-                    }
+                    MembersListActivity.this.loaderDialog.hide();
+                    Toast.makeText(MembersListActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                 }
             };
             this.dbRef.child(ReferenceStrings.USERS).child(this.loggedUsername).addListenerForSingleValueEvent(this.teamFetchListener);
@@ -101,7 +96,7 @@ public class MembersListActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        /* Cleanup event listeners to avoid memory leaks */
+        /* Cleanup event listeners over the Firebase queries to avoid memory leaks */
         if(this.teamFetchListener != null){
             this.dbRef.child(ReferenceStrings.USERS).child(this.loggedUsername).removeEventListener(this.teamFetchListener);
             this.teamFetchListener = null;
@@ -154,9 +149,6 @@ public class MembersListActivity extends AppCompatActivity {
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (isFinishing() || isDestroyed()) {
-                    return;
-                }
                 userList.clear();
                 MembersListActivity.this.completedRecyclerViews++;
                 if (snapshot.exists()) {
@@ -181,11 +173,9 @@ public class MembersListActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                if (!isFinishing() && !isDestroyed()) {
-                    MembersListActivity.this.completedRecyclerViews++;
-                    MembersListActivity.this.checkLoaderDismissal();
-                    Toast.makeText(MembersListActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
-                }
+                MembersListActivity.this.completedRecyclerViews++;
+                MembersListActivity.this.checkLoaderDismissal();
+                Toast.makeText(MembersListActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
         };
         if(role.equals(Constants.COACH_ROLE_STRING)){

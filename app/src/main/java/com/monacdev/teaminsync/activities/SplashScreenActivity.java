@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import com.monacdev.teaminsync.constants.IntentExtrasTags;
 import com.monacdev.teaminsync.utils.CloudinaryManager;
 import com.monacdev.teaminsync.constants.Constants;
 import com.monacdev.teaminsync.utils.PushNotificationsManager;
+import com.onesignal.Continue;
 import com.onesignal.OneSignal;
 import com.onesignal.debug.LogLevel;
 
@@ -72,5 +74,6 @@ public class SplashScreenActivity extends AppCompatActivity {
     private void initializeNotificationsSystem(){
         OneSignal.getDebug().setAlertLevel(LogLevel.FATAL);
         OneSignal.initWithContext(getApplicationContext(), PushNotificationsManager.ONESIGNAL_APP_ID);
+        OneSignal.getNotifications().requestPermission(true, Continue.with(r -> Log.i("no_action_needed", "No action is needed, OneSignal initialization completed!")));
     }
 }

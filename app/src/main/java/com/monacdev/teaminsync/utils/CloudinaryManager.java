@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.UploadCallback;
 import com.monacdev.teaminsync.constants.Constants;
@@ -17,7 +19,7 @@ public class CloudinaryManager {
      * Initializes the Cloudinary service for the application
      * @param context the application context
      */
-    public static void init(Context context){
+    public static void init(@NonNull Context context){
         try{
             Map<String, String> config = new HashMap<>();
             config.put(Constants.CLOUDINARY_CLOUD_NAME_KEY, Constants.CLOUDINARY_CLOUD_NAME_STRING);

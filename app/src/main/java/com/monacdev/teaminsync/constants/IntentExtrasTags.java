@@ -14,4 +14,10 @@ public final class IntentExtrasTags {
     public static final String NOTIFICATIONS_DETAILS_STATE_KEY = "showing_details";
     public static final String NOTIFICATIONS_TITLE_STATE_KEY = "notification_title";
     public static final String NOTIFICATIONS_MESSAGE_STATE_KEY = "notification_message";
+    public static final String TRAINING_TRACKER_STATE_KEY = "training_tracker_visible";
+    public static final String TRAINING_TIMER_RUNNING = "training_timer_runninng";
+    public static final String TRAINING_EXERCISE_NAME = "training_exercise_name";
+    public static final String TRAINING_EXERCISE_TARGET = "training_exercise_target";
+    public static final String TRAINING_ELAPSED_SECONDS = "elapsed_seconds";
+    public static final String TARGET_REACHED_MESSAGE_SENT = "target_message_sent";
 }

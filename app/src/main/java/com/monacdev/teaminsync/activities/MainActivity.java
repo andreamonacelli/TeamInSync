@@ -35,7 +35,6 @@ import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.fragments.NotificationsFragment;
 import com.monacdev.teaminsync.constants.Constants;
 import com.monacdev.teaminsync.loaders.LoaderDialog;
-import com.onesignal.Continue;
 import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
@@ -71,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         this.loaderDialog = new LoaderDialog(this);
         this.bindViewsWithObjects();
         this.setListeners();
-        OneSignal.getNotifications().requestPermission(true, Continue.with(r -> Log.i("no_action_needed", "No action is needed, OneSignal initialization completed!")));
     }
 
     @Override
@@ -128,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(trainingPageIntent);
         });
         this.openNotificationsBtn.setOnClickListener(view -> {
-            if(!getSupportFragmentManager().isStateSaved() && this.loggedUserUsername != null){
+            if(this.loggedUserUsername != null){
                 NotificationsFragment notificationsDialog = NotificationsFragment.newInstance(loggedUserUsername);
                 notificationsDialog.show(getSupportFragmentManager(), NavigationTags.NOTIFICATIONS_FRAGMENT);
             }
@@ -149,9 +147,6 @@ public class MainActivity extends AppCompatActivity {
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (isFinishing() || isDestroyed()) {
-                    return;
-                }
                 if(snapshot.exists()){
                     loggedUserName = snapshot.child(KeyStrings.NAME).getValue(String.class);
                     loggedUserSurname = snapshot.child(KeyStrings.SURNAME).getValue(String.class);
@@ -167,9 +162,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                if(!isFinishing() && !isDestroyed()) {
-                    Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -183,9 +176,6 @@ public class MainActivity extends AppCompatActivity {
         teamRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (isFinishing() || isDestroyed()) {
-                    return;
-                }
                 if(snapshot.exists()){
                     String teamName = snapshot.child(KeyStrings.NAME).getValue(String.class);
                     String leagueName = snapshot.child(KeyStrings.LEAGUE).getValue(String.class);
@@ -211,9 +201,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                if(!isFinishing() && !isDestroyed()){
-                    Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -234,9 +222,6 @@ public class MainActivity extends AppCompatActivity {
         /* Delay activity destruction to allow OneSignal to complete logout */
         this.logoutHandler = new Handler(Looper.getMainLooper());
         this.logoutHandler.postDelayed(() -> {
-            if (isFinishing() || isDestroyed()) {
-                return;
-            }
             /* Rerouting to the Login Activity while contextually clearing the previous activity stack */
             Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

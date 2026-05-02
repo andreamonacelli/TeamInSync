@@ -85,11 +85,10 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     private final ActivityResultLauncher<Intent> deviceGalleryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                getActivity();
+                requireActivity();
                 if(result.getResultCode() == Activity.RESULT_OK && result.getData() != null){
                     RegistrationWizardFragment.this.selectedImageUri = result.getData().getData();
                     RegistrationWizardFragment.this.cameraImageBytes = null;
-                    // RegistrationWizardFragment.this.profilePicIV.setImageURI(RegistrationWizardFragment.this.selectedImageUri);
                     Glide.with(this).load(this.selectedImageUri).circleCrop().into(this.profilePicIV);
                 }
             }
@@ -98,10 +97,9 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     private final ActivityResultLauncher<Intent> cameraLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                getActivity();
+                requireActivity();
                 if(result.getResultCode() == Activity.RESULT_OK && result.getData() != null && result.getData().getExtras() != null){
                     Bitmap capturedPhoto = (Bitmap) result.getData().getExtras().get("data");
-                    // RegistrationWizardFragment.this.profilePicIV.setImageBitmap(capturedPhoto);
                     Glide.with(this).load(capturedPhoto).circleCrop().into(this.profilePicIV);
                     /* Conversion of the image for the upload on Cloudinary */
                     ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
@@ -114,6 +112,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
             }
     );
 
+    @NonNull
     public static RegistrationWizardFragment newInstance(String userEmail, String userPassword) {
         final RegistrationWizardFragment fragment = new RegistrationWizardFragment();
         final Bundle args = new Bundle();
@@ -123,7 +122,8 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         return fragment;
     }
 
-    public static RegistrationWizardFragment newEditingInstance(HashMap<String, String> userData){
+    @NonNull
+    public static RegistrationWizardFragment newEditingInstance(@NonNull HashMap<String, String> userData){
         final RegistrationWizardFragment fragment = new RegistrationWizardFragment();
         final Bundle args = new Bundle();
         for(String key : userData.keySet()){
@@ -240,17 +240,17 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         /* Setting the listener for the Submit button */
         this.submitBtn.setOnClickListener(view1 -> {
             if(!validateFieldCompilation()){
-                Toast.makeText(getContext(), R.string.empty_form_fields,Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.empty_form_fields,Toast.LENGTH_SHORT).show();
                 return;
             }
             if(!validateBirthDateInput(birthDateET.getText().toString().trim())){
-                Toast.makeText(getContext(), R.string.invalid_date,Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.invalid_date,Toast.LENGTH_SHORT).show();
                 return;
             }
             String selectedTeam;
             int selectedTeamID = validateTeamSelection();
             if(selectedTeamID == Constants.INVALID_SELECTION){
-                Toast.makeText(getContext(), R.string.no_team_selected, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.no_team_selected, Toast.LENGTH_SHORT).show();
                 return;
             }
             /* if all the form validations checks passed, then we proceed to store the data */
@@ -276,6 +276,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
      * <br>This method assumes that data such as the birthdate has already been adequately validated
      * @return The HashMap containing the mapped data
      */
+    @NonNull
     private HashMap<String, Object> userDataMapping(String selectedTeam){
         String role;
         if(this.roleRadioGroup.getCheckedRadioButtonId() == R.id.athleteRadioBtn){
@@ -332,7 +333,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), R.string.teams_load_err, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.teams_load_err, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -428,7 +429,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
             @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
 
             @Override
-            public void onSuccess(String requestId, Map resultData) {
+            public void onSuccess(String requestId, @NonNull Map resultData) {
                 String imageUrl = (String) resultData.get(Constants.CLOUDINARY_UPLOAD_RESULT_STRING);
                 userData.put(KeyStrings.PROFILE_PIC, imageUrl);
                 RegistrationWizardFragment.this.uploadUserOnDatabase(userData);
@@ -437,7 +438,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
 
             @Override
             public void onError(String requestId, ErrorInfo error) {
-                Toast.makeText(getContext(), getString(R.string.photo_upload_error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.photo_upload_error), Toast.LENGTH_SHORT).show();
             }
 
             @Override public void onReschedule(String requestId, ErrorInfo error) {}
@@ -517,9 +518,9 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
         if(loggedUser != null){
             loggedUser.delete().addOnCompleteListener(deleteTask -> {
                 if(deleteTask.isSuccessful()){
-                    Toast.makeText(getContext(), R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.auth_session_creation_err, Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getContext(), R.string.reg_critical_error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.reg_critical_error, Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -532,7 +533,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
     private void saveChangesToDB(HashMap<String, Object> userData){
         String username = this.editingData.get(KeyStrings.USERNAME);
         if(username == null){
-            Toast.makeText(getContext(), getString(R.string.error_changes_save), Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.error_changes_save), Toast.LENGTH_SHORT).show();
             return;
         }
         FirebaseDatabase.getInstance().getReference(ReferenceStrings.USERS).child(username).updateChildren(userData).addOnCompleteListener(task -> {
@@ -546,7 +547,7 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                     teamsRef.child(previousTeam).child(KeyStrings.MEMBERS).child(username).removeValue();
                     teamsRef.child(newTeam).child(KeyStrings.MEMBERS).child(username).setValue(true);
                 }
-                Toast.makeText(getContext(), getString(R.string.changes_saved_label), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.changes_saved_label), Toast.LENGTH_SHORT).show();
                 requireActivity().getSupportFragmentManager().setFragmentResult(NavigationTags.EDIT_FRAGMENT_RESULT, new Bundle());
                 dismiss();
             }
@@ -569,17 +570,17 @@ public class RegistrationWizardFragment extends BottomSheetDialogFragment {
                         FirebaseDatabase.getInstance().getReference(ReferenceStrings.TEAMS)
                                 .child(Objects.requireNonNull(userData.get(KeyStrings.TEAM)).toString()).child(KeyStrings.MEMBERS)
                                 .child(username).setValue(true);
-                        Intent intent = new Intent(getContext(), MainActivity.class);
+                        Intent intent = new Intent(requireContext(), MainActivity.class);
                         intent.putExtra(IntentExtrasTags.LOGGED_USER, username);
                         startActivity(intent);
                     } else {
                         this.registrationRollback();
-                        Toast.makeText(getContext(), R.string.reg_data_upload_error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), R.string.reg_data_upload_error, Toast.LENGTH_SHORT).show();
                     }
                 });
             } else {
                 this.loaderDialog.hide();
-                Toast.makeText(getContext(), R.string.register_err, Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.register_err, Toast.LENGTH_SHORT).show();
             }
         });
     }
