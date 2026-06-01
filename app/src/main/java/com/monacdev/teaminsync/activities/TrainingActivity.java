@@ -77,6 +77,13 @@ public class TrainingActivity extends AppCompatActivity {
         } else {
             this.trainingTrackerFragmentContainer.setVisibility(View.GONE);
         }
+        /* Making sure to reload the training lists each time a new training gets added (only for coach view) */
+        this.getSupportFragmentManager().setFragmentResultListener(NavigationTags.TRAINING_CREATION_WIZARD, this, (requestKey, result) -> {
+            boolean creationSuccess = result.getBoolean(IntentExtrasTags.TRAINING_CREATION_SUCCESS);
+            if(creationSuccess){
+                TrainingActivity.this.fetchTrainingsFromDB(Constants.COACH_ROLE_STRING);
+            }
+        });
     }
 
     @Override

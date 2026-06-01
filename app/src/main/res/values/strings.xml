@@ -119,4 +119,5 @@
     <string name="user_default_label">utente</string>
     <string name="error_invalid_user">ATTENZIONE: Errore nel caricamento dell\'utente, utente non valido!</string>
     <string name="error_user_training_data">ATTENZIONE: Errore nel caricamento delle informazioni utente</string>
+    <string name="error_team_loading">ATTENZIONE: Errore nel caricamento delle info squadra</string>
 </resources>

@@ -34,7 +34,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         this.initializeNotificationsSystem();
         CloudinaryManager.init(getApplicationContext());
         this.routingHandler = new Handler(Looper.getMainLooper());
-        this.routingHandler.postDelayed(this::defineNextRoute, 1500);
+        this.routingHandler.postDelayed(this::defineNextRoute, 100);
     }
 
     @Override

@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         /* This allows to reflect eventual changes in the user data */
+        this.loaderDialog.show(getString(R.string.loading_user_msg));
         this.populateDataFromDB();
     }
 
@@ -157,11 +158,15 @@ public class MainActivity extends AppCompatActivity {
                         MainActivity.this.toTrainingPageBtn.setEnabled(true);
                         MainActivity.this.fetchTeamData(teamID);
                     }
+                } else {
+                    MainActivity.this.loaderDialog.hide();
+                    Toast.makeText(MainActivity.this, R.string.error_invalid_user, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                MainActivity.this.loaderDialog.hide();
                 Toast.makeText(MainActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
             }
         });
@@ -176,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
         teamRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                MainActivity.this.loaderDialog.hide();
                 if(snapshot.exists()){
                     String teamName = snapshot.child(KeyStrings.NAME).getValue(String.class);
                     String leagueName = snapshot.child(KeyStrings.LEAGUE).getValue(String.class);
@@ -196,6 +202,8 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Glide.with(MainActivity.this).load(R.mipmap.ic_launcher).circleCrop().into(MainActivity.this.teamLogoIV);
                     }
+                } else {
+                    Toast.makeText(MainActivity.this, R.string.error_team_loading, Toast.LENGTH_SHORT).show();
                 }
             }
 

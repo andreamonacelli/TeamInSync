@@ -24,7 +24,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.monacdev.teaminsync.R;
 import com.monacdev.teaminsync.constants.Constants;
+import com.monacdev.teaminsync.constants.IntentExtrasTags;
 import com.monacdev.teaminsync.constants.KeyStrings;
+import com.monacdev.teaminsync.constants.NavigationTags;
 import com.monacdev.teaminsync.constants.ReferenceStrings;
 import com.monacdev.teaminsync.constants.NotificationsKeys;
 import com.monacdev.teaminsync.loaders.LoaderDialog;
@@ -171,6 +173,9 @@ public class TrainingCreationWizardFragment extends DialogFragment {
             if(task.isSuccessful()){
                 Toast.makeText(requireContext(), R.string.exercise_added, Toast.LENGTH_SHORT).show();
                 if(completionEffect.equals(Constants.EFFECT_DISMISS)){
+                    Bundle result = new Bundle();
+                    result.putBoolean(IntentExtrasTags.TRAINING_CREATION_SUCCESS, true);
+                    getParentFragmentManager().setFragmentResult(NavigationTags.TRAINING_CREATION_WIZARD, result);
                     dismiss();
                     PushNotificationsManager.sendPushNotification(
                             TrainingCreationWizardFragment.this.targetAthletes,

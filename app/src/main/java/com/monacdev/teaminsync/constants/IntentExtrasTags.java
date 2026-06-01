@@ -20,4 +20,5 @@ public final class IntentExtrasTags {
     public static final String TRAINING_EXERCISE_TARGET = "training_exercise_target";
     public static final String TRAINING_ELAPSED_SECONDS = "elapsed_seconds";
     public static final String TARGET_REACHED_MESSAGE_SENT = "target_message_sent";
+    public static final String TRAINING_CREATION_SUCCESS = "training_created";
 }
