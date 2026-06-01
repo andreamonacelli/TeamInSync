@@ -25,16 +25,21 @@ import com.onesignal.debug.LogLevel;
 @SuppressLint("CustomSplashScreen")
 public class SplashScreenActivity extends AppCompatActivity {
     private Handler routingHandler;
+    private boolean isReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SplashScreen.installSplashScreen(this);
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        splashScreen.setKeepOnScreenCondition(() -> !this.isReady);
         this.initializeNotificationsSystem();
         CloudinaryManager.init(getApplicationContext());
         this.routingHandler = new Handler(Looper.getMainLooper());
-        this.routingHandler.postDelayed(this::defineNextRoute, 100);
+        this.routingHandler.postDelayed(() -> {
+            this.isReady = true;
+            this.defineNextRoute();
+        }, 1500);
     }
 
     @Override
