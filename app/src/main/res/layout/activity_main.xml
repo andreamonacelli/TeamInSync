@@ -34,8 +34,9 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:ellipsize="end"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/logoutBtn"
+            app:layout_constraintEnd_toStartOf="@id/openNotificationsBtn"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button

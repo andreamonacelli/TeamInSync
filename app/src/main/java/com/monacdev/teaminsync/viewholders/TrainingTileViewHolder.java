@@ -42,6 +42,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
     private final boolean isCoach;
     private String trainingUID;
     private String athleteUsername;
+    private HashMap<String, String> currentTrainingData;
 
     public TrainingTileViewHolder(@NonNull View itemView, boolean actionsActive, boolean isCoach) {
         super(itemView);
@@ -66,6 +67,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
      * @param trainingData the data to be shown in the view
      */
     public void bindData(@NonNull HashMap<String, String> trainingData){
+        this.currentTrainingData = trainingData;
         this.fillTextFields(
                 trainingData.get(KeyStrings.TRAINING_TITLE),
                 trainingData.get(KeyStrings.TRAINING_TARGET),
@@ -111,6 +113,8 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
                                     if(TrainingTileViewHolder.this.isExpired){
                                         TrainingTileViewHolder.this.isCompletedLate = true;
                                     }
+                                    TrainingTileViewHolder.this.currentTrainingData.put(KeyStrings.TRAINING_COMPLETED, "true");
+                                    TrainingTileViewHolder.this.currentTrainingData.put(KeyStrings.TRAINING_COMPLETED_LATE, String.valueOf(TrainingTileViewHolder.this.isCompletedLate));
                                     TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
                                 }
                             }
@@ -148,6 +152,8 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
         trainingRef.updateChildren(trainingUpdateData).addOnSuccessListener(unused -> {
                     TrainingTileViewHolder.this.isCompleted = true;
                     TrainingTileViewHolder.this.isCompletedLate = TrainingTileViewHolder.this.isExpired;
+                    TrainingTileViewHolder.this.currentTrainingData.put(KeyStrings.TRAINING_COMPLETED, "true");
+                    TrainingTileViewHolder.this.currentTrainingData.put(KeyStrings.TRAINING_COMPLETED_LATE, String.valueOf(TrainingTileViewHolder.this.isExpired));
                     TrainingTileViewHolder.this.restyleBasedOnCompletionExpiry();
                     if(TrainingTileViewHolder.this.isExpired) {
                         Toast.makeText(view.getContext(), R.string.training_reps_completed_late, Toast.LENGTH_SHORT).show();

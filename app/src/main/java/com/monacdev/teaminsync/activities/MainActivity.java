@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 if(snapshot.exists()){
                     loggedUserName = snapshot.child(KeyStrings.NAME).getValue(String.class);
                     loggedUserSurname = snapshot.child(KeyStrings.SURNAME).getValue(String.class);
-                    homepageHeaderTV.setText(String.format("%s %s", getResources().getText(R.string.homepage_welcome), loggedUserName != null ? loggedUserName : getString(R.string.user_default_label)));
+                    homepageHeaderTV.setText(String.format("%s %s!", getResources().getText(R.string.homepage_welcome), loggedUserName != null ? loggedUserName : getString(R.string.user_default_label)));
                     teamID = snapshot.child(KeyStrings.TEAM).getValue(String.class);
                     if(teamID != null && !teamID.isEmpty()){
                         MainActivity.this.squadListBtn.setEnabled(true);

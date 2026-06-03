@@ -27,6 +27,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder {
     private boolean isRead;
     private String notificationAthleteID;
     private String notificationUID;
+    private HashMap<String, Object> currentNotificationData;
     private final NotificationsFragment parentFragment;
 
     public NotificationViewHolder(@NonNull View itemView, NotificationsFragment parentFragment) {
@@ -50,6 +51,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder {
      * @param notificationData the data to be shown in the view
      */
     public void bindData(@NonNull HashMap<String, Object> notificationData){
+        this.currentNotificationData = notificationData;
         String title = Objects.requireNonNull(notificationData.get(NotificationsKeys.NOTIFICATIONS_TITLE)).toString();
         String message = Objects.requireNonNull(notificationData.get(NotificationsKeys.NOTIFICATIONS_MSG)).toString();
         this.notificationTitleTV.setText(title);
@@ -61,6 +63,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder {
             this.parentFragment.showNotificationsDetails(title, message);
             if(!this.isRead){
                 this.isRead = true;
+                this.currentNotificationData.put(NotificationsKeys.NOTIFICATIONS_READ, true);
                 this.updateNotificationDataOnDB(view, true, false);
                 this.configureImageButton();
             }
@@ -76,6 +79,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder {
             this.markAsReadBtn.setColorFilter(Color.BLACK);
             this.markAsReadBtn.setOnClickListener(view -> {
                 NotificationViewHolder.this.isRead = false;
+                NotificationViewHolder.this.currentNotificationData.put(NotificationsKeys.NOTIFICATIONS_READ, false);
                 NotificationViewHolder.this.markAsReadBtn.setColorFilter(Color.RED);
                 NotificationViewHolder.this.updateNotificationDataOnDB(view, false, true);
                 NotificationViewHolder.this.configureImageButton();
@@ -84,6 +88,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder {
             this.markAsReadBtn.setColorFilter(Color.RED);
             this.markAsReadBtn.setOnClickListener(view -> {
                 NotificationViewHolder.this.isRead = true;
+                NotificationViewHolder.this.currentNotificationData.put(NotificationsKeys.NOTIFICATIONS_READ, true);
                 NotificationViewHolder.this.markAsReadBtn.setColorFilter(Color.BLACK);
                 NotificationViewHolder.this.updateNotificationDataOnDB(view, true, true);
                 NotificationViewHolder.this.configureImageButton();
