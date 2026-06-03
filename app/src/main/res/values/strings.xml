@@ -32,7 +32,7 @@
     <string name="no_team_selected">ATTENZIONE: Per favore selezionare una squadra!</string>
     <string name="invalid_date">ATTENZIONE: Data di nascita inserita non valida o in formato sbagliato!</string>
     <string name="empty_form_fields">ATTENZIONE: Compilare tutti i campi!</string>
-    <string name="homepage_welcome">Benvenuto, </string>
+    <string name="homepage_welcome">Benvenuto,</string>
     <string name="member_list_def_header">Membri della squadra</string>
     <string name="member_tile_default">Nome Cognome</string>
     <string name="member_tile_info_def">Username e data di nascita</string>
@@ -70,7 +70,7 @@
     <string name="training_reps_completed_late">Allenamento completato in ritardo!</string>
     <string name="splash_welcome_label">Benvenuto! Stiamo preparando tutto…</string>
     <string name="confirm_logout">Vuoi effettuare il logout?</string>
-    <string name="confirm" translatable="false">Conferma</string>
+    <string name="confirm">Conferma</string>
     <string name="cancel">Annulla</string>
     <string name="push_new_training_title">Nuovo allenamento creato!</string>
     <string name="push_new_training_body">É stata creata una nuova sessione di allenamento!</string>
@@ -120,4 +120,6 @@
     <string name="error_invalid_user">ATTENZIONE: Errore nel caricamento dell\'utente, utente non valido!</string>
     <string name="error_user_training_data">ATTENZIONE: Errore nel caricamento delle informazioni utente</string>
     <string name="error_team_loading">ATTENZIONE: Errore nel caricamento delle info squadra</string>
+    <string name="training_goal_label">Obiettivo:</string>
+    <string name="training_expiry_label">Scadenza:</string>
 </resources>

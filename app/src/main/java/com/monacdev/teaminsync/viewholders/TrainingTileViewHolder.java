@@ -179,7 +179,7 @@ public class TrainingTileViewHolder extends RecyclerView.ViewHolder {
             this.trainingNameTV.setText(R.string.training_name_placeholder);
         }
         if(target != null && deadline != null){
-            this.trainingInfoTV.setText(String.format("Obiettivo: %s | Scadenza: %s", target, deadline));
+            this.trainingInfoTV.setText(String.format("%s %s | %s %s", this.itemView.getContext().getString(R.string.training_goal_label), target, this.itemView.getContext().getString(R.string.training_expiry_label), deadline));
         } else {
             this.trainingInfoTV.setText(R.string.training_info_placeholder);
         }
